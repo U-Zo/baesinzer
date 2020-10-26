@@ -1,6 +1,9 @@
 package pkw.projectw.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +15,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -40,5 +43,18 @@ public class UserService {
 
     public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
+    }
+    public Optional<User> findOne(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserDetails userDetails = new Us;
+        return null;
     }
 }

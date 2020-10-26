@@ -2,11 +2,13 @@ package pkw.projectw.domain;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+@Table(name = "users")
+@SequenceGenerator(
+        name="USER_SEQ_GEN",
+        sequenceName = "USER_SEQ"
+)
 @Entity
 @Getter
 @Setter
@@ -15,7 +17,9 @@ import javax.persistence.Id;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "USER_SEQ_GEN"
+    )
     private Long id;
 
     @NonNull
@@ -25,4 +29,9 @@ public class User {
     private String password;
 
     private char verified = '0';
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.ROLE_NOT_PERMITTED;
+
+    private String refresh_token;
 }
