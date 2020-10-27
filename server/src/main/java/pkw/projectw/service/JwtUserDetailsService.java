@@ -20,30 +20,22 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username).orElse(null);
+        User user = userRepository.findByEmail(username).orElseThrow(() ->
+                new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         return getUserDetails(user);
     }
 
-    public UserDetails loadUserByRefreshToken(String token) {
-        User user = userRepository.findByRefreshToken(token).orElse(null);
+    public UserDetails loadUserByRefreshToken(String token) throws UsernameNotFoundException {
+        User user = userRepository.findByRefreshToken(token).orElseThrow(() ->
+                new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         return getUserDetails(user);
     }
 
     private UserDetails getUserDetails(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-
-        if (user == null) {
-            throw new UsernameNotFoundException("유저가 없습니다.");
-        }
-
-
+        authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
-    }
-
-    public void userUpdate(User user) {
-        userRepository.save(user);
     }
 }

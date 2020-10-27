@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Table(name = "users")
+@Table(name = "USERS")
 @SequenceGenerator(
         name="USER_SEQ_GEN",
         sequenceName = "USER_SEQ"
@@ -27,8 +27,6 @@ public class User {
 
     @NonNull
     private String password;
-
-    private char verified = '0';
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.ROLE_NOT_PERMITTED;

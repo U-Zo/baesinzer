@@ -2,14 +2,12 @@ package pkw.projectw.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import pkw.projectw.domain.User;
+import pkw.projectw.domain.UserRole;
 import pkw.projectw.repository.UserRepository;
 
 import java.util.Optional;
@@ -33,7 +31,7 @@ public class UserService {
     public Long register(User user) {
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(u -> {
-                    throw new IllegalStateException("이미 존재하는 회원입니다.");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다.");
                 });
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -45,21 +43,28 @@ public class UserService {
 
     public User login(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.CONFLICT, "없습니다."));
+                new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자 정보가 일치하지 않습니다."));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            System.out.println("암호화 안 맞음");
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자 정보가 일치하지 않습니다.");
+        }
+
+        if (isVerifiedUser(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "인증되지 않은 사용자입니다.");
         }
 
         return user;
+    }
+
+    private boolean isVerifiedUser(User user) {
+        return user.getRole().equals(UserRole.ROLE_NOT_PERMITTED);
     }
 
     public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
     }
 
-    public User update(User user) {
-        return userRepository.save(user);
+    public void update(User user) {
+        userRepository.save(user);
     }
 }

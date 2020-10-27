@@ -1,17 +1,15 @@
 package pkw.projectw.controller;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-import pkw.projectw.domain.RequestLoginUser;
 import pkw.projectw.domain.User;
 import pkw.projectw.service.CookieUtil;
 import pkw.projectw.service.JwtTokenUtil;
 import pkw.projectw.service.UserService;
+import pkw.projectw.service.VerificationTokenService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -26,20 +24,17 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
     private final CookieUtil cookieUtil;
+    private final VerificationTokenService verificationTokenService;
 
     @PostMapping("/api/register")
-    public Map<String, String> register(@RequestBody RegisterForm form) {
+    public void register(@RequestBody UserAuthForm form) {
         User user = new User(form.getEmail(), form.getPassword());
         userService.register(user);
-
-        Map<String, String> userInfo = new HashMap<>();
-        userInfo.put("email", user.getEmail());
-
-        return userInfo;
+        verificationTokenService.createVerification(user.getEmail());
     }
 
     @PostMapping("/api/login")
-    public Map<String, String> login(@RequestBody RequestLoginUser form,
+    public Map<String, String> login(@RequestBody UserAuthForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
         Map<String, String> auth = new HashMap<>();
@@ -58,4 +53,16 @@ public class UserController {
         return auth;
     }
 
+    @GetMapping("/api/logout")
+    public void logout(HttpServletResponse response) {
+        Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, null);
+        Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, null);
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+    }
+
+    @GetMapping("/api/verify")
+    public String verifyEmail(String code) {
+        return verificationTokenService.verifyEmail(code);
+    }
 }

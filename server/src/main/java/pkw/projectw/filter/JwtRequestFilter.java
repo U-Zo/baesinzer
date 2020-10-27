@@ -38,11 +38,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         try {
             if (jwtToken != null) {
-                System.out.println("jwtToken is not null");
                 accessToken = jwtToken.getValue();
-                System.out.println(accessToken);
-                email = jwtTokenUtil.getEmail(accessToken);
-                System.out.println(email);
+
+                if (!accessToken.equals("")) {
+                    email = jwtTokenUtil.getEmail(accessToken);
+                }
             }
 
             if (email != null) {
@@ -61,8 +61,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (refreshTokenCookie != null) {
                 refreshToken = refreshTokenCookie.getValue();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         try {
