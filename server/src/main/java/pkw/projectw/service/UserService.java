@@ -1,12 +1,14 @@
 package pkw.projectw.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import pkw.projectw.domain.User;
 import pkw.projectw.repository.UserRepository;
 
@@ -15,7 +17,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,20 +43,23 @@ public class UserService implements UserDetailsService {
         return user.getId();
     }
 
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.CONFLICT, "없습니다."));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            System.out.println("암호화 안 맞음");
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+
+        return user;
+    }
+
     public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
-    }
-    public Optional<User> findOne(String email) {
-        return userRepository.findByEmail(email);
     }
 
     public User update(User user) {
         return userRepository.save(user);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDetails userDetails = new Us;
-        return null;
     }
 }

@@ -9,14 +9,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pkw.projectw.domain.User;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 
 @Service
 public class JwtTokenUtil {
 
     // 토큰 만료 시간
-    public final static long TOKEN_EXPIRATION_DATE = 1000L * 10;
-    public final static long REFRESH_TOKEN_EXPIRATION_DATE = 1000L * 60 * 24;
+    public final static long TOKEN_EXPIRATION_DATE = 1000L * 5;
+    public final static long REFRESH_TOKEN_EXPIRATION_DATE = 1000L * 5;
 
     // 토큰 이름
     public final static String ACCESS_TOKEN_NAME = "access_token";
@@ -28,7 +30,7 @@ public class JwtTokenUtil {
 
     public Claims extractAllClaims(String token) throws ExpiredJwtException {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(SECRET_KEY.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -58,7 +60,7 @@ public class JwtTokenUtil {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
                 .compact();
     }
 

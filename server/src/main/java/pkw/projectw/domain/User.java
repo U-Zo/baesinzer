@@ -33,5 +33,5 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.ROLE_NOT_PERMITTED;
 
-    private String refresh_token;
+    private String refreshToken;
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import pkw.projectw.domain.RequestLoginUser;
 import pkw.projectw.domain.User;
 import pkw.projectw.service.CookieUtil;
 import pkw.projectw.service.JwtTokenUtil;
@@ -28,7 +29,6 @@ public class UserController {
 
     @PostMapping("/api/register")
     public Map<String, String> register(@RequestBody RegisterForm form) {
-        System.out.println(form.getEmail());
         User user = new User(form.getEmail(), form.getPassword());
         userService.register(user);
 
@@ -39,25 +39,23 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public Map<String, String> login(@RequestBody Map<String, Long> map,
+    public Map<String, String> login(@RequestBody RequestLoginUser form,
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
-            Map<String, String> auth = new HashMap<>();
-            userService.findOne(map.get("id")).ifPresentOrElse(user -> {
-                final String accessToken = jwtTokenUtil.generateToken(user);
-                final String refreshToken = jwtTokenUtil.generateRefreshToken(user);
-                Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, accessToken);
-                Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, refreshToken);
-                response.addCookie(accessTokenCookie);
-                response.addCookie(refreshTokenCookie);
-                user.setRefresh_token(refreshToken);
-                userService.update(user);
-                auth.put("email", user.getEmail());
-            }, () -> {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "유저가 존재하지 않습니다.");
-            });
+        Map<String, String> auth = new HashMap<>();
+        User user = userService.login(form.getEmail(), form.getPassword());
 
-            return auth;
+        final String accessToken = jwtTokenUtil.generateToken(user);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(user);
+        Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, accessToken);
+        Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, refreshToken);
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
+        user.setRefreshToken(refreshToken);
+        userService.update(user);
+        auth.put("email", user.getEmail());
+
+        return auth;
     }
 
 }
