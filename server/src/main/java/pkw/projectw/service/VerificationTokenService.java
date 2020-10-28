@@ -3,6 +3,7 @@ package pkw.projectw.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pkw.projectw.domain.User;
 import pkw.projectw.domain.UserRole;
 import pkw.projectw.domain.VerificationToken;
@@ -10,8 +11,10 @@ import pkw.projectw.repository.UserRepository;
 import pkw.projectw.repository.VerificationTokenRepository;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class VerificationTokenService {
 
@@ -27,6 +30,9 @@ public class VerificationTokenService {
 
         VerificationToken verificationTokens = verificationTokenRepository
                 .findByUserEmail(email).orElseGet(VerificationToken::new);
+
+        verificationTokens.setToken(UUID.randomUUID().toString());
+        verificationTokens.setExpireDateTime(LocalDateTime.now().plusSeconds(20));
 
         if (verificationTokens.getUser() == null) {
             verificationTokens.setUser(user);
