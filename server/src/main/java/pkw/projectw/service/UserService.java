@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import pkw.projectw.domain.User;
-import pkw.projectw.domain.UserRole;
 import pkw.projectw.repository.UserRepository;
 
 import java.util.Optional;
@@ -49,15 +48,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자 정보가 일치하지 않습니다.");
         }
 
-        if (isVerifiedUser(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "인증되지 않은 사용자입니다.");
-        }
-
         return user;
-    }
-
-    private boolean isVerifiedUser(User user) {
-        return user.getRole().equals(UserRole.ROLE_NOT_PERMITTED);
     }
 
     public Optional<User> findOne(Long userId) {

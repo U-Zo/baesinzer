@@ -1,11 +1,14 @@
 package pkw.projectw.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import pkw.projectw.domain.User;
+import pkw.projectw.domain.UserRole;
 import pkw.projectw.service.CookieUtil;
 import pkw.projectw.service.JwtTokenUtil;
 import pkw.projectw.service.UserService;
@@ -39,6 +42,13 @@ public class UserController {
                                      HttpServletResponse response) {
         Map<String, String> auth = new HashMap<>();
         User user = userService.login(form.getEmail(), form.getPassword());
+
+        if (user.getRole().equals(UserRole.ROLE_NOT_PERMITTED)) {
+            response.setStatus(403);
+            verificationTokenService.createVerification(user.getEmail());
+            auth.put("authError", "이메일 인증이 필요합니다.");
+            return auth;
+        }
 
         final String accessToken = jwtTokenUtil.generateToken(user);
         final String refreshToken = jwtTokenUtil.generateRefreshToken(user);

@@ -23,9 +23,9 @@ public class VerificationToken {
             generator = "VERIFICATION_SEQ_GEN"
     )
     private Long id;
-    private String token = UUID.randomUUID().toString();
+    private String token;
     private String status = STATUS_PENDING;
-    private LocalDateTime expireDateTime = LocalDateTime.now().plusDays(1);
+    private LocalDateTime expireDateTime;
 
     @OneToOne
     @JoinColumn(name = "USER_ID")
