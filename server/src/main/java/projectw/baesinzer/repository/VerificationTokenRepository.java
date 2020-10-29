@@ -1,7 +1,7 @@
-package pkw.projectw.repository;
+package projectw.baesinzer.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pkw.projectw.domain.VerificationToken;
+import projectw.baesinzer.domain.VerificationToken;
 
 import java.util.Optional;
 

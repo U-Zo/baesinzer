@@ -1,14 +1,14 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pkw.projectw.domain.User;
-import pkw.projectw.domain.UserRole;
-import pkw.projectw.domain.VerificationToken;
-import pkw.projectw.repository.UserRepository;
-import pkw.projectw.repository.VerificationTokenRepository;
+import projectw.baesinzer.domain.User;
+import projectw.baesinzer.domain.UserRole;
+import projectw.baesinzer.domain.VerificationToken;
+import projectw.baesinzer.repository.UserRepository;
+import projectw.baesinzer.repository.VerificationTokenRepository;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

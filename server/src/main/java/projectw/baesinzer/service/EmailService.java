@@ -1,4 +1,4 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;

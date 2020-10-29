@@ -1,13 +1,13 @@
-package pkw.projectw;
+package projectw.baesinzer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProjectwApplication {
+public class BaesinzerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ProjectwApplication.class, args);
+        SpringApplication.run(BaesinzerApplication.class, args);
     }
 
 }

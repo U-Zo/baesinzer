@@ -1,18 +1,16 @@
-package pkw.projectw.controller;
+package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-import pkw.projectw.domain.User;
-import pkw.projectw.domain.UserRole;
-import pkw.projectw.service.CookieUtil;
-import pkw.projectw.service.JwtTokenUtil;
-import pkw.projectw.service.UserService;
-import pkw.projectw.service.VerificationTokenService;
+import projectw.baesinzer.domain.User;
+import projectw.baesinzer.domain.UserRole;
+import projectw.baesinzer.service.CookieUtil;
+import projectw.baesinzer.service.JwtTokenUtil;
+import projectw.baesinzer.service.UserService;
+import projectw.baesinzer.service.VerificationTokenService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

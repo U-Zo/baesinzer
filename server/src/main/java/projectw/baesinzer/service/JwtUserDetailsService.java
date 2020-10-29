@@ -1,4 +1,4 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pkw.projectw.domain.User;
-import pkw.projectw.repository.UserRepository;
+import projectw.baesinzer.domain.User;
+import projectw.baesinzer.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;

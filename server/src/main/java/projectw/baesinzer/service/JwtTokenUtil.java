@@ -1,4 +1,4 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,7 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import pkw.projectw.domain.User;
+import projectw.baesinzer.domain.User;
 
 import java.util.Date;
 

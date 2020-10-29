@@ -1,4 +1,4 @@
-package pkw.projectw.controller;
+package projectw.baesinzer.controller;
 
 import lombok.Getter;
 

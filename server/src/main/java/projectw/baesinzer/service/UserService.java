@@ -1,4 +1,4 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -6,8 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import pkw.projectw.domain.User;
-import pkw.projectw.repository.UserRepository;
+import projectw.baesinzer.domain.User;
+import projectw.baesinzer.repository.UserRepository;
 
 import java.util.Optional;
 

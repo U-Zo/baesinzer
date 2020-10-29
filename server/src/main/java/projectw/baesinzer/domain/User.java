@@ -1,4 +1,4 @@
-package pkw.projectw.domain;
+package projectw.baesinzer.domain;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Table(name = "USERS")
 @SequenceGenerator(
-        name="USER_SEQ_GEN",
+        name = "USER_SEQ_GEN",
         sequenceName = "USER_SEQ"
 )
 @Entity

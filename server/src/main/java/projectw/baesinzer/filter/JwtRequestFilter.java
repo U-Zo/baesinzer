@@ -1,4 +1,4 @@
-package pkw.projectw.filter;
+package projectw.baesinzer.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pkw.projectw.domain.User;
-import pkw.projectw.service.CookieUtil;
-import pkw.projectw.service.JwtTokenUtil;
-import pkw.projectw.service.JwtUserDetailsService;
+import projectw.baesinzer.domain.User;
+import projectw.baesinzer.service.CookieUtil;
+import projectw.baesinzer.service.JwtTokenUtil;
+import projectw.baesinzer.service.JwtUserDetailsService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

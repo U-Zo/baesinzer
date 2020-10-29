@@ -1,10 +1,10 @@
-package pkw.projectw.service;
+package projectw.baesinzer.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import pkw.projectw.domain.User;
+import projectw.baesinzer.domain.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
