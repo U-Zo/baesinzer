@@ -15,8 +15,9 @@ import java.util.Date;
 public class JwtTokenUtil {
 
     // 토큰 만료 시간
-    public final static long TOKEN_EXPIRATION_DATE = 1000L * 5;
-    public final static long REFRESH_TOKEN_EXPIRATION_DATE = 1000L * 60 * 60;
+    public final static long TOKEN_EXPIRATION_DATE = 1000L * 60 * 60 * 24;
+    public final static long REFRESH_TOKEN_EXPIRATION_DATE = 1000L * 60 * 60 * 24 * 7;
+    private final static long HAVE_TO_REFRESH_TOKEN_DATE = 1000L * 60 * 60 * 24 * 3;
 
     // 토큰 이름
     public final static String ACCESS_TOKEN_NAME = "access_token";
@@ -40,6 +41,13 @@ public class JwtTokenUtil {
     public Boolean isTokenExpired(String token) {
         final Date expiration = extractAllClaims(token).getExpiration();
         return expiration.before(new Date());
+    }
+
+    public Boolean needTokenRefresh(String token) {
+        final Date expiration = extractAllClaims(token).getExpiration();
+        long leftTime = new Date().getTime() - expiration.getTime();
+
+        return leftTime < HAVE_TO_REFRESH_TOKEN_DATE;
     }
 
     public String generateToken(User user) {
