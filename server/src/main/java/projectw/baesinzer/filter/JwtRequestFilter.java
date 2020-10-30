@@ -2,12 +2,15 @@ package projectw.baesinzer.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.User;
 import projectw.baesinzer.service.CookieUtil;
 import projectw.baesinzer.service.JwtTokenUtil;
@@ -73,12 +76,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-                    User user = new User();
-                    user.setEmail(userDetails.getUsername());
+                    User user = userDetailsService.getUserRepository().findByEmail(userDetails.getUsername()).orElseThrow(() ->
+                            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자 정보가 일치하지 않습니다."));
+
                     String newAccessToken = jwtTokenUtil.generateToken(user);
 
                     Cookie newAccessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, newAccessToken);
                     response.addCookie(newAccessTokenCookie);
+
+                    if (jwtTokenUtil.needTokenRefresh(refreshToken)) {
+                        String newRefreshToken = jwtTokenUtil.generateRefreshToken(user);
+
+                        Cookie newRefreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, newRefreshToken);
+                        response.addCookie(newRefreshTokenCookie);
+                        user.setRefreshToken(newRefreshToken);
+                        userDetailsService.getUserRepository().save(user);
+                    }
                 }
             }
         } catch (ExpiredJwtException e) {

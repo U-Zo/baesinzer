@@ -1,5 +1,6 @@
 package projectw.baesinzer.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Getter
 public class JwtUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
