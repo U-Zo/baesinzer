@@ -3,29 +3,20 @@ package projectw.baesinzer.repository;
 import org.springframework.stereotype.Repository;
 import projectw.baesinzer.domain.Room;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class RoomRepository {
 
     private final Map<String, Room> roomMap = new LinkedHashMap<>();
 
-    public List<Room> findAllRoom() {
-
-        List<Room> rooms = new ArrayList<>(roomMap.values());
-        Collections.reverse(rooms);
-
-        return rooms;
+    public Map<String, Room> findAll() {
+        return roomMap;
     }
 
-    public Room findByRoomId(String id) {
-        return roomMap.get(id);
-    }
-
-    public Room createRoom(String name) {
-        Room room = Room.create(name);
-        roomMap.put(room.getRoomId(), room);
-        room.setUsers(new ArrayList<>());
-        return room;
+    public Optional<Room> findByRoomId(String id) {
+        return Optional.ofNullable(roomMap.get(id));
     }
 }

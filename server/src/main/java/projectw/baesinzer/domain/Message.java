@@ -6,10 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class Message {
 
-    private String userNickname;
+    private String username;
     private String message;
     private String roomId;
 }
