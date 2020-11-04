@@ -58,7 +58,6 @@ public class VerificationTokenService {
 
         verificationToken.setStatus(VerificationToken.STATUS_VERIFIED);
         verificationToken.getUser().setRole(UserRole.ROLE_USER);
-        verificationTokenRepository.save(verificationToken);
 
         return "인증이 완료되었습니다.";
     }

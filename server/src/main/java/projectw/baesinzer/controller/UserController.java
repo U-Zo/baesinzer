@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import projectw.baesinzer.domain.User;
 import projectw.baesinzer.domain.UserRole;
-import projectw.baesinzer.service.CookieUtil;
-import projectw.baesinzer.service.JwtTokenUtil;
+import projectw.baesinzer.util.CookieUtil;
+import projectw.baesinzer.util.JwtTokenUtil;
 import projectw.baesinzer.service.UserService;
 import projectw.baesinzer.service.VerificationTokenService;
 
@@ -54,8 +54,7 @@ public class UserController {
         Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, refreshToken);
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-        user.setRefreshToken(refreshToken);
-        userService.update(user);
+        userService.updateRefreshToken(user, refreshToken);
         auth.put("email", user.getEmail());
 
         return auth;

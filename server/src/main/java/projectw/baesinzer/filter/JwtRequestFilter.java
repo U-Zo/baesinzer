@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.User;
-import projectw.baesinzer.service.CookieUtil;
-import projectw.baesinzer.service.JwtTokenUtil;
+import projectw.baesinzer.util.CookieUtil;
+import projectw.baesinzer.util.JwtTokenUtil;
 import projectw.baesinzer.service.JwtUserDetailsService;
 
 import javax.servlet.FilterChain;
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Transactional
 @AllArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -90,7 +91,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         Cookie newRefreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, newRefreshToken);
                         response.addCookie(newRefreshTokenCookie);
                         user.setRefreshToken(newRefreshToken);
-                        userDetailsService.getUserRepository().save(user);
                     }
                 }
             }
