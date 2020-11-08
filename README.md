@@ -1,4 +1,4 @@
-# Project-W
+# Baesinzer
 
 React + Spring Boot 텍스트 기반 웹 게임
 
