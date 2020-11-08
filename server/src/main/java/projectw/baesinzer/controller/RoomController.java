@@ -20,9 +20,9 @@ public class RoomController {
         return roomService.findRooms();
     }
 
-    @GetMapping("/room/{roomId}")
-    public Room joinRoom(@PathVariable String roomId) {
-        return roomService.findOne(roomId);
+    @GetMapping("/room/{roomCode}")
+    public Room joinRoom(@PathVariable String roomCode) {
+        return roomService.findOne(roomCode);
     }
 
     @PostMapping("/room")

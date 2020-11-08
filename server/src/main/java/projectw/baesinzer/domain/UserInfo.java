@@ -8,5 +8,5 @@ import lombok.Setter;
 public class UserInfo {
 
     private int userNo;
-    private String nickname;
+    private String username;
 }

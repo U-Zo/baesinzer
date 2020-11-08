@@ -16,7 +16,15 @@ public class RoomRepository {
         return roomMap;
     }
 
-    public Optional<Room> findByRoomId(String id) {
-        return Optional.ofNullable(roomMap.get(id));
+    public Optional<Room> findByRoomCode(String roomCode) {
+        return Optional.ofNullable(roomMap.get(roomCode));
+    }
+
+    public void sava(Room room) {
+        roomMap.put(room.getRoomCode(), room);
+    }
+
+    public void deleteByRoomCode(String roomCode) {
+        roomMap.remove(roomCode);
     }
 }

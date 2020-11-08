@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.User;
+import projectw.baesinzer.service.auth.JwtUserDetailsService;
 import projectw.baesinzer.util.CookieUtil;
 import projectw.baesinzer.util.JwtTokenUtil;
-import projectw.baesinzer.service.JwtUserDetailsService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

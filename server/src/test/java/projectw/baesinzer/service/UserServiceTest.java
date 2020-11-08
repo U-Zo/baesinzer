@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import projectw.baesinzer.domain.User;
+import projectw.baesinzer.service.auth.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

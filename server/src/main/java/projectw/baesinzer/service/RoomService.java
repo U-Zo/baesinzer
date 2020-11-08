@@ -7,10 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.repository.RoomRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +23,22 @@ public class RoomService {
     }
 
     // 방 코드로 조회
-    public Room findOne(String roomId) {
-        return roomRepository.findByRoomId(roomId).orElseThrow(() ->
+    public Room findOne(String roomCode) {
+        return roomRepository.findByRoomCode(roomCode).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 방입니다."));
     }
 
     // 방 만들기
     public Room addRoom(String roomName) {
         Room room = new Room(roomName);
-        room.setRoomId(UUID.randomUUID().toString());
-        room.setUsers(new ArrayList<>());
+        room.setRoomCode(UUID.randomUUID().toString());
+        room.setUsers(new HashMap<>());
+        roomRepository.sava(room);
         return room;
+    }
+
+    // 방 제거
+    public void removeRoom(Room room) {
+        roomRepository.deleteByRoomCode(room.getRoomCode());
     }
 }

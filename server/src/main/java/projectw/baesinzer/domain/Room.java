@@ -5,18 +5,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 public class Room {
 
-    private String roomId;
+    private String roomCode;
 
     @NonNull
     private String roomName;
-
-    private long userCount;
-    private List<UserInfo> users;
+    private Map<Integer, UserInfo> users;
 }
