@@ -1,4 +1,4 @@
-package projectw.baesinzer.controller;
+package projectw.baesinzer.controller.auth;
 
 import lombok.Getter;
 

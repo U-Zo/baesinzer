@@ -1,16 +1,13 @@
-package projectw.baesinzer.controller;
+package projectw.baesinzer.controller.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import projectw.baesinzer.domain.User;
 import projectw.baesinzer.domain.UserRole;
 import projectw.baesinzer.util.CookieUtil;
 import projectw.baesinzer.util.JwtTokenUtil;
-import projectw.baesinzer.service.UserService;
-import projectw.baesinzer.service.VerificationTokenService;
+import projectw.baesinzer.service.auth.UserService;
+import projectw.baesinzer.service.auth.VerificationTokenService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -27,14 +25,14 @@ public class UserController {
     private final CookieUtil cookieUtil;
     private final VerificationTokenService verificationTokenService;
 
-    @PostMapping("/api/register")
+    @PostMapping("/register")
     public void register(@RequestBody UserAuthForm form) {
         User user = new User(form.getEmail(), form.getPassword());
         userService.register(user);
         verificationTokenService.createVerification(user.getEmail());
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public Map<String, String> login(@RequestBody UserAuthForm form,
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
@@ -60,7 +58,7 @@ public class UserController {
         return auth;
     }
 
-    @GetMapping("/api/logout")
+    @GetMapping("/logout")
     public void logout(HttpServletResponse response) {
         Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, null);
         Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, null);
@@ -68,7 +66,7 @@ public class UserController {
         response.addCookie(refreshTokenCookie);
     }
 
-    @GetMapping("/api/verify")
+    @GetMapping("/verify")
     public String verifyEmail(String code) {
         return verificationTokenService.verifyEmail(code);
     }
