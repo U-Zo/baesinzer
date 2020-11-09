@@ -1,9 +1,13 @@
 package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.domain.UserInfo;
@@ -17,7 +21,7 @@ public class MessageController {
     private final SimpMessageSendingOperations operations;
 
     @MessageMapping("socket/message")
-    public void sendMessage(Message message) {
+    public void sendMessage(Message message, SimpMessageHeaderAccessor headerAccessor) {
         UserInfo userInfo = message.getUserInfo();
         Room room = roomService.findOne(message.getRoomCode());
 
@@ -26,16 +30,21 @@ public class MessageController {
                 message.setMessage(userInfo.getUsername() + "님이 입장하셨습니다.");
 
                 // 최대 6명 까지 할당 번호 검사하여 없으면 할당
-                for (int i = 0; i < 6; i++) {
+                for (int i = 1; i <= 6; i++) {
                     if (room.getUsers().get(i) == null) {
                         room.getUsers().put(i, userInfo);
                         userInfo.setUserNo(i);
+                        room.setCount(room.getUsers().size());
+
+                        headerAccessor.getSessionAttributes().put("user", userInfo);
+                        headerAccessor.getSessionAttributes().put("roomCode", message.getRoomCode());
                         break;
                     }
                 }
                 break;
             case EXIT:
                 room.getUsers().remove(userInfo.getUserNo());
+                room.setCount(room.getUsers().size());
 
                 // 방의 인원이 0이 되면 방 목록에서 삭제
                 if (room.getUsers().size() == 0) {
@@ -48,5 +57,30 @@ public class MessageController {
         }
 
         operations.convertAndSend("/sub/socket/room/" + message.getRoomCode(), message);
+    }
+
+    @EventListener
+    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+
+        UserInfo userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
+        String roomCode = (String) headerAccessor.getSessionAttributes().get("roomCode");
+
+        Room room = roomService.findOne(roomCode);
+        if (userInfo != null) {
+            room.getUsers().remove(userInfo.getUserNo());
+            room.setCount(room.getUsers().size());
+
+            // 방의 인원이 0이 되면 방 목록에서 삭제
+            if (room.getUsers().size() == 0) {
+                roomService.removeRoom(room);
+            }
+
+            Message message = new Message();
+            message.setUserInfo(userInfo);
+            message.setType(Message.MessageType.EXIT);
+            message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
+            operations.convertAndSend("/sub/socket/room/" + roomCode, message);
+        }
     }
 }

@@ -16,5 +16,6 @@ public class Room {
 
     @NonNull
     private String roomName;
+    private int count;
     private Map<Integer, UserInfo> users;
 }
