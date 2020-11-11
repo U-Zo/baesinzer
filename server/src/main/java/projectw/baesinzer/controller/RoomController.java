@@ -1,7 +1,9 @@
 package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.service.RoomService;
 
@@ -22,7 +24,12 @@ public class RoomController {
 
     @GetMapping("/room/{roomCode}")
     public Room joinRoom(@PathVariable String roomCode) {
-        return roomService.findOne(roomCode);
+        Room room = roomService.findOne(roomCode);
+        if (room.getUsers().size() == 6) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가득 찬 방입니다.");
+        }
+
+        return room;
     }
 
     @PostMapping("/room")

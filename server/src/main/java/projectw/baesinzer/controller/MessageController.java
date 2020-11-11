@@ -2,11 +2,13 @@ package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
 import projectw.baesinzer.domain.Room;
@@ -56,7 +58,7 @@ public class MessageController {
                 break;
         }
 
-        operations.convertAndSend("/sub/socket/room/" + message.getRoomCode(), message);
+        operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
     }
 
     @EventListener
