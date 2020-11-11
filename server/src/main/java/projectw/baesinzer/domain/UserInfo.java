@@ -12,9 +12,9 @@ public class UserInfo {
     private int userNo;
     private String username;
     private int locationId;
-    private boolean isDead;
-    private boolean isBaesinzer;
-    private boolean hasVoted;
+    private boolean dead;
+    private boolean baesinzer;
+    private int hasVoted;
     private int votedNum;
     private List<Mission> missionList;
 }

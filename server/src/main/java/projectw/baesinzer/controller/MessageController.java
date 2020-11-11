@@ -2,13 +2,11 @@ package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
 import projectw.baesinzer.domain.Room;
@@ -44,6 +42,11 @@ public class MessageController {
                     }
                 }
                 break;
+            case VOTE:
+                int userNo = userInfo.getHasVoted();
+                UserInfo votedUserInfo = room.getUsers().get(userNo);
+                votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
+                break;
             case EXIT:
                 room.getUsers().remove(userInfo.getUserNo());
                 room.setCount(room.getUsers().size());
@@ -53,6 +56,9 @@ public class MessageController {
                     roomService.removeRoom(room);
                     break;
                 }
+
+                headerAccessor.getSessionAttributes().remove("user");
+                headerAccessor.getSessionAttributes().remove("room");
 
                 message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
                 break;
@@ -82,6 +88,8 @@ public class MessageController {
             message.setUserInfo(userInfo);
             message.setType(Message.MessageType.EXIT);
             message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
+            headerAccessor.getSessionAttributes().remove("user");
+            headerAccessor.getSessionAttributes().remove("room");
             operations.convertAndSend("/sub/socket/room/" + roomCode, message);
         }
     }
