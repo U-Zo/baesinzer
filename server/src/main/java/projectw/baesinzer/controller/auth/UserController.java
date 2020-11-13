@@ -3,11 +3,12 @@ package projectw.baesinzer.controller.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import projectw.baesinzer.domain.User;
+import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.domain.UserRole;
-import projectw.baesinzer.util.CookieUtil;
-import projectw.baesinzer.util.JwtTokenUtil;
 import projectw.baesinzer.service.auth.UserService;
 import projectw.baesinzer.service.auth.VerificationTokenService;
+import projectw.baesinzer.util.CookieUtil;
+import projectw.baesinzer.util.JwtTokenUtil;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +57,17 @@ public class UserController {
         auth.put("email", user.getEmail());
 
         return auth;
+    }
+
+    @PostMapping("/check")
+    public UserInfo check(@RequestBody Map<String, String> map, HttpServletRequest request) {
+        Cookie jwtToken = cookieUtil.getCookie(request, JwtTokenUtil.ACCESS_TOKEN_NAME);
+        System.out.println(map);
+        String email = map.get("email");
+        if (jwtTokenUtil.getEmail(jwtToken.getValue()).equals(email)) {
+            return new UserInfo();
+        }
+        return null;
     }
 
     @GetMapping("/logout")

@@ -32,7 +32,7 @@ public class VerificationTokenService {
                 .findByUserEmail(email).orElseGet(VerificationToken::new);
 
         verificationTokens.setToken(UUID.randomUUID().toString());
-        verificationTokens.setExpireDateTime(LocalDateTime.now().plusSeconds(20));
+        verificationTokens.setExpireDateTime(LocalDateTime.now().plusDays(1));
 
         if (verificationTokens.getUser() == null) {
             verificationTokens.setUser(user);
