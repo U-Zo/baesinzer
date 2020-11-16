@@ -30,7 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/**").permitAll()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/ws-stomp/**").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

@@ -47,6 +47,7 @@ public class MessageController {
                     room.getUsers().get(i).setHasVoted(0);
                     room.getUsers().get(i).setVotedNum(0);
                 }
+                break;
             case VOTE:
                 int userNo = userInfo.getHasVoted();
                 UserInfo votedUserInfo = room.getUsers().get(userNo);

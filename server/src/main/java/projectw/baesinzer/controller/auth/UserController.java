@@ -1,7 +1,9 @@
 package projectw.baesinzer.controller.auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import projectw.baesinzer.domain.User;
 import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.domain.UserRole;
@@ -66,8 +68,9 @@ public class UserController {
         String email = map.get("email");
         if (jwtTokenUtil.getEmail(jwtToken.getValue()).equals(email)) {
             return new UserInfo();
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        return null;
     }
 
     @GetMapping("/logout")
