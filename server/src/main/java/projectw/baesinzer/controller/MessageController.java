@@ -42,13 +42,19 @@ public class MessageController {
                     }
                 }
                 break;
+            case VOTE_START:
+                for (int i = 1; i <= room.getCount(); i++) {
+                    room.getUsers().get(i).setHasVoted(0);
+                    room.getUsers().get(i).setVotedNum(0);
+                }
             case VOTE:
                 int userNo = userInfo.getHasVoted();
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
                 votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
                 break;
             case EXIT:
-                room.getUsers().remove(userInfo.getUserNo());
+                UserInfo _userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
+                room.getUsers().remove(_userInfo.getUserNo());
                 room.setCount(room.getUsers().size());
 
                 // 방의 인원이 0이 되면 방 목록에서 삭제
