@@ -1,4 +1,4 @@
-package projectw.baesinzer.service;
+package projectw.baesinzer.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,11 +51,12 @@ public class UserService {
         return user;
     }
 
-    public Optional<User> findOne(Long userId) {
-        return userRepository.findById(userId);
+    public void updateRefreshToken(User user, String token) {
+        user.setRefreshToken(token);
     }
 
-    public void update(User user) {
-        userRepository.save(user);
+
+    public Optional<User> findOne(Long userId) {
+        return userRepository.findById(userId);
     }
 }

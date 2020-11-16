@@ -1,4 +1,4 @@
-package projectw.baesinzer.service;
+package projectw.baesinzer.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -6,12 +6,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import projectw.baesinzer.domain.User;
 
 import java.util.Date;
 
-@Service
+@Component
 public class JwtTokenUtil {
 
     // 토큰 만료 시간

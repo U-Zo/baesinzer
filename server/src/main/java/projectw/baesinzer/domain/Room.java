@@ -1,24 +1,21 @@
 package projectw.baesinzer.domain;
 
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class Room {
 
-    private String roomId = UUID.randomUUID().toString();
+    private String roomCode;
+
+    @NonNull
     private String roomName;
-    private long userCount;
-    private List<String> users;
-
-    public static Room create(String name) {
-        Room room = new Room();
-        room.setRoomName(name);
-
-        return room;
-    }
+    private int count;
+    private Map<Integer, UserInfo> users;
 }
