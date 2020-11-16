@@ -62,11 +62,9 @@ public class UserController {
     }
 
     @PostMapping("/check")
-    public UserInfo check(@RequestBody Map<String, String> map, HttpServletRequest request) {
+    public UserInfo check(HttpServletRequest request) {
         Cookie jwtToken = cookieUtil.getCookie(request, JwtTokenUtil.ACCESS_TOKEN_NAME);
-        System.out.println(map);
-        String email = map.get("email");
-        if (jwtTokenUtil.getEmail(jwtToken.getValue()).equals(email)) {
+        if (jwtTokenUtil.getEmail(jwtToken.getValue()) != null) {
             return new UserInfo();
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
