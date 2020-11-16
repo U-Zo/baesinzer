@@ -61,7 +61,7 @@ public class UserController {
         return auth;
     }
 
-    @PostMapping("/check")
+    @GetMapping("/check")
     public UserInfo check(HttpServletRequest request) {
         Cookie jwtToken = cookieUtil.getCookie(request, JwtTokenUtil.ACCESS_TOKEN_NAME);
         if (jwtTokenUtil.getEmail(jwtToken.getValue()) != null) {
