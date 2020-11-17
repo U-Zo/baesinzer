@@ -53,7 +53,6 @@ const RoomContainer = ({ match, history }) => {
 
     //서버에 정보 전달
     //dispatch로유저 정보를 저장한다.
-    console.log(userInfo2);
     dispatch(logMessage(userInfo2.username, message));
     stompClient.send(
       '/pub/socket/message',
@@ -61,7 +60,9 @@ const RoomContainer = ({ match, history }) => {
       JSON.stringify({
         type: 'ROOM',
         roomCode: roomId,
-        userInfo: {},
+        userInfo: {
+          userInfo,
+        },
         message: message,
       })
     );
@@ -70,6 +71,7 @@ const RoomContainer = ({ match, history }) => {
   const exit = () => {
     dispatch(exitRoom());
   };
+
   // 서버로부터 메세지를 받아옴
   // 접속했을 때 구독
 
@@ -130,7 +132,7 @@ const RoomContainer = ({ match, history }) => {
     if (room === null) {
       history.push(`/lobby`); //room의 정보가 null이면(exit), lobby로 이동
     }
-  }, [room]);
+  }, [room, history]);
   return (
     <Room
       onSubmit={sendMessage}

@@ -49,7 +49,6 @@ const RoomListContainer = ({ history }) => {
 
   useEffect(() => {
     if (room) {
-      console.log(room.roomCode);
       history.push(`/room/${room.roomCode}`);
     }
   }, [room, history]); //방만들기 하면, 그 방으로 이동!
