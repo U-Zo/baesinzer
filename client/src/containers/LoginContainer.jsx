@@ -58,7 +58,7 @@ const LoginContainer = ({ history }) => {
 
   useEffect(() => {
     if (userInfo) {
-      history.push('/');
+      history.push('/lobby');
       try {
         localStorage.setItem('user', JSON.stringify(userInfo));
       } catch (e) {
