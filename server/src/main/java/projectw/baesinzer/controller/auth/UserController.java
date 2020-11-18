@@ -29,10 +29,14 @@ public class UserController {
     private final VerificationTokenService verificationTokenService;
 
     @PostMapping("/register")
-    public void register(@RequestBody UserAuthForm form) {
+    public Map<String, String> register(@RequestBody UserAuthForm form) {
         User user = new User(form.getEmail(), form.getPassword());
         userService.register(user);
         verificationTokenService.createVerification(user.getEmail());
+        Map<String, String> map = new HashMap<>();
+        map.put("email", user.getEmail());
+
+        return map;
     }
 
     @PostMapping("/login")
