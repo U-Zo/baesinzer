@@ -117,7 +117,7 @@ const auth = (state = initialState, action) => {
     case REGISTER_SUCCESS:
       return {
         ...state,
-        auth: action.meta.config.data,
+        auth: action.payload,
         authError: null,
       };
 

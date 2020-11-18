@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import AuthForm from '../components/auth/AuthForm';
 import { changeField, register, intializeField } from '../modules/auth';
 import { chkEmail } from '../modules/check';
+import { withRouter } from 'react-router-dom';
+import RegisterSuccess from '../components/auth/RegisterSuccess';
 
-const RegisterContainer = () => {
+const RegisterContainer = ({ history }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const dispatch = useDispatch();
@@ -68,7 +70,19 @@ const RegisterContainer = () => {
     }
   }, [auth]);
 
-  return (
+  // useEffect(() => {
+  //   if (auth) {
+  //     history.push('/login');
+  //     try {
+  //     } catch (e) {
+  //       console.log('localStorage is not working');
+  //     }
+  //   }
+  // }, [history, auth]);
+
+  return auth ? (
+    <RegisterSuccess email={auth.email} />
+  ) : (
     <AuthForm
       type="회원가입"
       form={form}
@@ -80,4 +94,4 @@ const RegisterContainer = () => {
   );
 };
 
-export default RegisterContainer;
+export default withRouter(RegisterContainer);
