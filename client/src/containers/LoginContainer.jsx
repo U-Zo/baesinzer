@@ -6,12 +6,14 @@ import { intializeField, login, changeField } from '../modules/auth';
 import AuthForm from '../components/auth/AuthForm';
 import { chkEmail } from '../modules/check';
 import { check } from '../modules/user';
+import { withRouter } from 'react-router-dom';
 
-const LoginContainer = () => {
-  const { form, auth, authError } = useSelector(({ auth }) => ({
+const LoginContainer = ({ history }) => {
+  const { form, auth, authError, userInfo } = useSelector(({ auth, user }) => ({
     form: auth.login,
     auth: auth.auth,
     authError: auth.authError,
+    userInfo: user.userInfo,
   }));
 
   const [error, setError] = useState(null);
@@ -54,6 +56,17 @@ const LoginContainer = () => {
     dispatch(check());
   }, [auth]);
 
+  useEffect(() => {
+    if (userInfo) {
+      history.push('/');
+      try {
+        localStorage.setItem('user', JSON.stringify(userInfo));
+      } catch (e) {
+        console.log('localStorage is not working');
+      }
+    }
+  }, [history, userInfo]);
+
   return (
     <AuthForm
       type="로그인"
@@ -65,4 +78,4 @@ const LoginContainer = () => {
   );
 };
 
-export default LoginContainer;
+export default withRouter(LoginContainer);
