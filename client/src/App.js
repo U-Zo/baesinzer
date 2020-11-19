@@ -6,7 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 const App = () => {
   return (
     <>
-      <Route path="/login" component={LoginPage} />
+      <Route path="/" component={LoginPage} exact />
       <Route path="/register" component={RegisterPage} />
     </>
   );
