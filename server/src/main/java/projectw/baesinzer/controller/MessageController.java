@@ -13,6 +13,9 @@ import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.service.RoomService;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 @Controller
 @RequiredArgsConstructor
 public class MessageController {
@@ -41,6 +44,27 @@ public class MessageController {
                         break;
                     }
                 }
+                break;
+            case START:
+                UserInfo sys = new UserInfo();
+                sys.setUsername("System");
+                message.setUserInfo(sys);
+                message.setMessage("5초 뒤 게임이 시작됩니다.");
+                Timer timer = new Timer();
+                TimerTask timerTask = new TimerTask() {
+                    int count = 4;
+                    @Override
+                    public void run() {
+                        if (count > 0) {
+                            message.setMessage(count + "초 뒤 게임이 시작됩니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                            count--;
+                        } else {
+                            timer.cancel();
+                        }
+                    }
+                };
+                timer.schedule(timerTask, 1000, 1000);
                 break;
             case VOTE_START:
                 for (int i = 1; i <= room.getCount(); i++) {
