@@ -28,8 +28,7 @@ const rooms = handleActions(
   {
     [LOAD_ROOMS_SUCCESS]: (state, { payload: roomList }) => ({
       ...state,
-      roomList: state.roomList.concat(roomList),
-      error: null,
+      roomList, // 기존 것은 없애야한다.
     }),
     [LOAD_ROOMS_FAILURE]: (state, { payload: error }) => ({
       ...state,

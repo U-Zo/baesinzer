@@ -4,8 +4,8 @@ import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import Room from '../../components/chat/Room';
+
 import {
-  getUserInfo,
   changeField,
   initialField,
   logMessage,
@@ -22,27 +22,16 @@ const RoomContainer = ({ match, history }) => {
   const { roomId } = match.params;
   // server에서 전달받은 상태를 받아 redux에 저장된 room 정보를 가져다 room에 접근 / 불가
   const dispatch = useDispatch();
-  const [userinfo, setUserinfo] = useState();
 
-  const {
-    username,
-    message,
-    messageLog,
-    userInfo2,
-    room,
-    userInfo,
-  } = useSelector(({ user, messages, room }) => ({
-    username: user.username,
-    userInfo: user.userInfo,
-    message: messages.message,
-    messageLog: messages.messageLog,
-    userInfo2: messages.userInfo,
-    room: room.room,
-  }));
+  const { username, message, messageLog, room } = useSelector(
+    ({ user, messages, room }) => ({
+      username: user.username,
+      message: messages.message,
+      messageLog: messages.messageLog,
+      room: room.room,
+    })
+  );
 
-  useEffect(() => {
-    userInfo && console.log(userInfo);
-  });
   const onChange = (e) => {
     const value = e.target.value;
     dispatch(changeField(value)); //message에 저장
@@ -53,7 +42,7 @@ const RoomContainer = ({ match, history }) => {
 
     //서버에 정보 전달
     //dispatch로유저 정보를 저장한다.
-    dispatch(logMessage(userInfo2.username, message));
+    // dispatch(logMessage(username, message));
     stompClient.send(
       '/pub/socket/message',
       {},
@@ -61,7 +50,7 @@ const RoomContainer = ({ match, history }) => {
         type: 'ROOM',
         roomCode: roomId,
         userInfo: {
-          userInfo,
+          // userInfo,
         },
         message: message,
       })
@@ -76,20 +65,21 @@ const RoomContainer = ({ match, history }) => {
   // 접속했을 때 구독
 
   const stompSubscribe = () =>
-    stompClient.subscribe(`/sub/socket/message/${roomId}`, (data) => {
+    stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       console.log(serverMesg);
+      dispatch(loadRoom({ roomId }));
+
       const userInfo = serverMesg.userInfo;
       console.log(userInfo);
-      setUserinfo(userInfo);
+      // setUserinfo(userInfo);
       // room에다가 넘기기
-      dispatch(getUserInfo(userInfo));
 
       // const message = serverMesg.message;
 
       //메세지 정보 받기
-      dispatch(logMessage(userInfo.username, serverMesg.message));
+      dispatch(logMessage(username, serverMesg.message));
     });
 
   useEffect(() => {
@@ -102,15 +92,12 @@ const RoomContainer = ({ match, history }) => {
     stompClient.send(
       '/pub/socket/message',
       {},
-      JSON.stringify(
-        {
-          type: 'JOIN',
-          roomCode: roomId,
-          userInfo: { username: username },
-          message: message,
-        },
-        [dispatch]
-      )
+      JSON.stringify({
+        type: 'JOIN',
+        roomCode: roomId,
+        userInfo: { username: username },
+        message: message,
+      })
     );
     return () => {
       //컴포넌트 끝
@@ -120,7 +107,7 @@ const RoomContainer = ({ match, history }) => {
         JSON.stringify({
           type: 'EXIT',
           roomCode: roomId,
-          userInfo: userinfo,
+          // userInfo,
           message: message,
         })
       );

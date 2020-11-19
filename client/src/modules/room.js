@@ -30,7 +30,6 @@ export const exitRoom = createAction(EXIT_ROOM);
 
 const createRoomSaga = createRequestSaga(CREATE_ROOM, roomsAPI.createRoom);
 const loadRoomSaga = createRequestSaga(LOAD_ROOM, roomsAPI.loadRoom);
-//exit일 때 axios주소??
 const exitRoomSaga = createRequestSaga(EXIT_ROOM, roomsAPI.getRoomList);
 
 export function* roomSaga() {
@@ -56,17 +55,9 @@ const room = handleActions(
       room: null,
       error,
     }),
-    [LOAD_ROOM_SUCCESS]: (
-      state,
-      { payload: { roomCode, roomName, count, users } }
-    ) => ({
+    [LOAD_ROOM_SUCCESS]: (state, { payload: room }) => ({
       ...state,
-      room: {
-        roomCode,
-        roomName,
-        count,
-        users,
-      },
+      room,
       error: null,
     }),
     [LOAD_ROOM_FAILURE]: (state, { payload: { error } }) => ({
@@ -74,10 +65,7 @@ const room = handleActions(
       room: null,
       error,
     }),
-    [EXIT_ROOM_SUCESS]: (
-      state,
-      { payload: { roomCode, roomName, count, users } }
-    ) => ({
+    [EXIT_ROOM_SUCESS]: (state, { payload: room }) => ({
       ...state,
       room: null,
     }),
