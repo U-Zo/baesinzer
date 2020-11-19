@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AuthForm from '../components/auth/AuthForm';
+import AuthForm from '../../components/auth/AuthForm';
 import {
   changeField,
   register,
   intializeField,
   intializeAuth,
-} from '../modules/auth';
-import { chkEmail } from '../modules/check';
+} from '../../modules/auth';
+import { chkEmail } from '../../modules/check';
 import { withRouter } from 'react-router-dom';
-import RegisterSuccess from '../components/auth/RegisterSuccess';
+import RegisterSuccess from '../../components/auth/RegisterSuccess';
 
 const RegisterContainer = ({ history }) => {
   const [error, setError] = useState(null);

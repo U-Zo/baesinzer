@@ -1,5 +1,5 @@
 import React from 'react';
-import RegisterContainer from '../containers/RegisterContainer';
+import RegisterContainer from '../containers/auth/RegisterContainer';
 
 const RegisterPage = () => {
   return <RegisterContainer />;

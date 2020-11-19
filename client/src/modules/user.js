@@ -27,7 +27,6 @@ export function* userSaga() {
 const initialState = {
   userInfo: null,
   error: null,
-  username: '',
 };
 
 const user = handleActions(
@@ -51,7 +50,11 @@ const user = handleActions(
       initialState,
     }),
     [SET_USERNAME]: (state, { payload: username }) => ({
-      username,
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        username,
+      },
     }),
   },
   initialState
