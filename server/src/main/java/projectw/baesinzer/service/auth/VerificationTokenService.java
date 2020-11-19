@@ -1,4 +1,4 @@
-package projectw.baesinzer.service;
+package projectw.baesinzer.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +23,7 @@ public class VerificationTokenService {
     private final EmailService emailService;
 
     public void createVerification(String email) {
-        final String VERIFICATION_LINK = "http://localhost:8080/api/verify?code=";
+        final String VERIFICATION_LINK = "http://localhost:8080/api/auth/verify?code=";
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -32,7 +32,7 @@ public class VerificationTokenService {
                 .findByUserEmail(email).orElseGet(VerificationToken::new);
 
         verificationTokens.setToken(UUID.randomUUID().toString());
-        verificationTokens.setExpireDateTime(LocalDateTime.now().plusSeconds(20));
+        verificationTokens.setExpireDateTime(LocalDateTime.now().plusDays(1));
 
         if (verificationTokens.getUser() == null) {
             verificationTokens.setUser(user);
@@ -58,7 +58,6 @@ public class VerificationTokenService {
 
         verificationToken.setStatus(VerificationToken.STATUS_VERIFIED);
         verificationToken.getUser().setRole(UserRole.ROLE_USER);
-        verificationTokenRepository.save(verificationToken);
 
         return "인증이 완료되었습니다.";
     }

@@ -1,15 +1,19 @@
 package projectw.baesinzer.domain;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class Message {
 
-    private String userNickname;
+    // 메시지 타입: 입장, 대기방, 인 게임, 퇴장
+    public enum MessageType {
+        JOIN, ROOM, START, PLAY, VOTE_START, VOTE, END, EXIT
+    }
+
+    private MessageType type;   // 메시지 타입
+    private String roomCode;
+    private UserInfo userInfo;
     private String message;
-    private String roomId;
 }

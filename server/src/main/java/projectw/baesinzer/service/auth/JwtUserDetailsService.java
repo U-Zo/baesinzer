@@ -1,4 +1,4 @@
-package projectw.baesinzer.service;
+package projectw.baesinzer.service.auth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,11 +1,11 @@
-package projectw.baesinzer.service;
+package projectw.baesinzer.util;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-@Service
+@Component
 public class CookieUtil {
 
     public Cookie createCookie(String cookie, String value) {
