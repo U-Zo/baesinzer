@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RoomListPage from './pages/RoomListPage';
-import RoomContainer from './containers/chat/RoomContainer';
+import RoomPage from './pages/RoomPage';
 
 const App = () => {
   return (
@@ -12,7 +12,7 @@ const App = () => {
       <Route path="/" component={LoginPage} exact />
       <Route path="/register" component={RegisterPage} />
       <Route path="/lobby" component={RoomListPage} />
-      <Route path="/room/:roomId" component={RoomContainer} />
+      <Route path="/room/:roomId" component={RoomPage} />
     </>
   );
 };

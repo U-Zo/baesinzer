@@ -2,10 +2,10 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { intializeField, login, changeField } from '../modules/auth';
-import AuthForm from '../components/auth/AuthForm';
-import { chkEmail } from '../modules/check';
-import { check } from '../modules/user';
+import { intializeField, login, changeField } from '../../modules/auth';
+import AuthForm from '../../components/auth/AuthForm';
+import { chkEmail } from '../../modules/check';
+import { check } from '../../modules/user';
 import { withRouter } from 'react-router-dom';
 
 const LoginContainer = ({ history }) => {
