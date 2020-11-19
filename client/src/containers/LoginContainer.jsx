@@ -9,12 +9,15 @@ import { check } from '../modules/user';
 import { withRouter } from 'react-router-dom';
 
 const LoginContainer = ({ history }) => {
-  const { form, auth, authError, userInfo } = useSelector(({ auth, user }) => ({
-    form: auth.login,
-    auth: auth.auth,
-    authError: auth.authError,
-    userInfo: user.userInfo,
-  }));
+  const { form, auth, authError, userInfo, loading } = useSelector(
+    ({ auth, user, loading }) => ({
+      form: auth.login,
+      auth: auth.auth,
+      authError: auth.authError,
+      userInfo: user.userInfo,
+      loading: loading['auth/LOGIN'],
+    })
+  );
 
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -74,6 +77,7 @@ const LoginContainer = ({ history }) => {
       onSubmit={onSubmit}
       form={form}
       error={error}
+      loading={loading}
     />
   );
 };

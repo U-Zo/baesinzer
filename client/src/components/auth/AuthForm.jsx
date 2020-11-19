@@ -7,12 +7,12 @@ const AuthBlock = styled.div`
   margin: 0 auto;
   width: 970px;
   height: 720px;
-  border: 2px solid #00ff66;
+  border: 2px solid var(--color-green);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: #131314;
+  background-color: var(--color-background);
 `;
 const StyledForm = styled.form`
   display: flex;
@@ -26,13 +26,13 @@ const InputStyled = styled.input`
   margin-bottom: 1rem;
   width: 15rem;
   height: 1.5rem;
-  border: 1.5px solid #00ff66;
-  color: #00ff66;
+  border: 1.5px solid var(--color-green);
+  color: var(--color-green);
   outline: none;
-  background-color: #131314;
+  background-color: var(--color-background);
 
   :-webkit-autofill {
-    -webkit-text-fill-color: #00ff66;
+    -webkit-text-fill-color: var(--color-green);
   }
   :-webkit-autofill,
   :-webkit-autofill:active {
@@ -40,7 +40,7 @@ const InputStyled = styled.input`
   }
 
   ::placeholder {
-    color: #00ff66;
+    color: var(--color-green);
   }
   :focus {
     ::placeholder {
@@ -53,8 +53,8 @@ const ButtonStyled = styled.button`
   height: 2rem;
   border-style: none;
   outline: none;
-  background-color: #131314;
-  color: #00ff66;
+  background-color: var(--color-background);
+  color: var(--color-green);
   font-size: 1.3rem;
   padding: 0;
   :hover {
@@ -77,12 +77,12 @@ const BaesinZerMain = styled.div`
   align-items: center;
   font-size: 3rem;
   font-weight: bolder;
-  color: #00ff66;
+  color: var(--color-green);
 `;
 
 const Footer = styled.div`
   a {
-    color: #00ff66;
+    color: var(--color-green);
     text-decoration: none;
     font-size: 1.3rem;
     width: 7rem;
@@ -95,7 +95,7 @@ const Footer = styled.div`
   }
 `;
 const ErrorBlock = styled.div`
-  color: red;
+  color: var(--color-red);
   position: absolute;
   &#로그인 {
     padding-bottom: 4rem;
@@ -104,8 +104,19 @@ const ErrorBlock = styled.div`
     padding-bottom: 7rem;
   }
 `;
+const LoadingBlock = styled.div`
+  color: var(--color-red);
+`;
 
-const AuthForm = ({ success, form, type, onSubmit, onChange, error }) => {
+const AuthForm = ({
+  success,
+  form,
+  type,
+  onSubmit,
+  onChange,
+  error,
+  loading,
+}) => {
   return (
     <AuthBlock>
       <BaesinZerMain>BaesinZer</BaesinZerMain>
@@ -135,6 +146,7 @@ const AuthForm = ({ success, form, type, onSubmit, onChange, error }) => {
             value={form.passwordConfirm}
           />
         ) : null}
+        {loading && <LoadingBlock>로딩중...</LoadingBlock>}
         <ButtonBlock>
           <ButtonStyled>{type}</ButtonStyled>
           {type === '로그인' ? (
@@ -143,7 +155,7 @@ const AuthForm = ({ success, form, type, onSubmit, onChange, error }) => {
             </Footer>
           ) : (
             <Footer>
-              <Link to="/login">로그인</Link>
+              <Link to="/">로그인</Link>
             </Footer>
           )}
         </ButtonBlock>

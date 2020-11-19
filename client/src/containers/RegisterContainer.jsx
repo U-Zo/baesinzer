@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthForm from '../components/auth/AuthForm';
-import { changeField, register, intializeField } from '../modules/auth';
+import {
+  changeField,
+  register,
+  intializeField,
+  intializeAuth,
+} from '../modules/auth';
 import { chkEmail } from '../modules/check';
 import { withRouter } from 'react-router-dom';
 import RegisterSuccess from '../components/auth/RegisterSuccess';
@@ -10,17 +15,24 @@ const RegisterContainer = ({ history }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const dispatch = useDispatch();
-  const { form, auth, authError } = useSelector(({ auth }) => ({
-    form: auth.register,
-    auth: auth.auth,
-    authError: auth.authError,
-  }));
+  const { form, auth, authError, loading } = useSelector(
+    ({ auth, loading }) => ({
+      form: auth.register,
+      auth: auth.auth,
+      authError: auth.authError,
+      loading: loading['auth/REGISTER'],
+    })
+  );
 
   const onChange = (e) => {
     const { name, value } = e.target;
     dispatch(changeField({ form: 'register', name, value }));
   };
 
+  const onClick = () => {
+    dispatch(intializeAuth());
+    history.push('/');
+  };
   const onSubmit = (e) => {
     const { email, password, passwordConfirm } = form;
     e.preventDefault();
@@ -81,7 +93,7 @@ const RegisterContainer = ({ history }) => {
   // }, [history, auth]);
 
   return auth ? (
-    <RegisterSuccess email={auth.email} />
+    <RegisterSuccess email={form.email} onClick={onClick} />
   ) : (
     <AuthForm
       type="회원가입"
@@ -90,6 +102,7 @@ const RegisterContainer = ({ history }) => {
       onSubmit={onSubmit}
       error={error}
       success={success}
+      loading={loading}
     />
   );
 };
