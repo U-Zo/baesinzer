@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
-import { createRoom } from '../../modules/room';
+import { createRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
 import { setUserinfo } from '../../modules/user';
 
@@ -31,10 +31,16 @@ const RoomListContainer = ({ history }) => {
   const onClick = () => {
     setVisible(!visible);
   };
+
+  const onJoin = (roomId) => {
+    dispatch(loadRoom({ roomId }));
+  };
+
   const onChangeRoomName = (e) => {
     const roomname = e.target.value;
     setRoomName(roomname);
   };
+
   const makeRoom = (e) => {
     e.preventDefault();
     // if (roomName === null) setError(`방 제목을 입력하세요.`);
@@ -66,6 +72,7 @@ const RoomListContainer = ({ history }) => {
       makeRoom={makeRoom}
       onChangeRoomName={onChangeRoomName}
       error={error}
+      onJoin={onJoin}
     />
   );
 };

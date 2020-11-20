@@ -52,12 +52,14 @@ const RoomLi = styled.li`
 `;
 
 const RoomLink = styled.div`
-  a {
+  li {
     color: var(--color-green);
     text-decoration: none;
     font-size: 2rem;
+    cursor: pointer;
   }
 `;
+
 const InputNickname = styled.input`
   text-align: center;
   font-size: 2rem;
@@ -176,9 +178,10 @@ const ErrorBox = styled.div`
   color: var(--color-red);
 `;
 
-const Room = React.memo(({ name, count }) => {
+const Room = React.memo(({ name, count, onClick }) => {
+  console.log(onClick);
   return (
-    <RoomLi>
+    <RoomLi onClick={onClick}>
       <span>{name}</span>
       <CountSpan>{count}/6</CountSpan>
     </RoomLi>
@@ -196,6 +199,7 @@ const RoomList = ({
   visible,
   makeRoom,
   onChangeRoomName,
+  onJoin,
 }) => {
   if (roomerror) {
     return <div>에러가 발생했습니다.</div>;
@@ -226,9 +230,11 @@ const RoomList = ({
             roomList &&
             roomList.map((room) => (
               <RoomLink>
-                <Link to={`/room/${room.roomCode}`}>
-                  <Room name={room.roomName} count={room.count} />
-                </Link>
+                <Room
+                  onClick={() => onJoin(room.roomCode)}
+                  name={room.roomName}
+                  count={room.count}
+                />
               </RoomLink>
             ))}
         </RoomBox>

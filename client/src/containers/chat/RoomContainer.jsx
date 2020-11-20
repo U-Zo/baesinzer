@@ -33,6 +33,8 @@ const RoomContainer = ({ match, history }) => {
     })
   );
 
+  let isConnect = false;
+
   const onChange = (e) => {
     const value = e.target.value;
     dispatch(changeField(value)); //message에 저장
@@ -69,24 +71,23 @@ const RoomContainer = ({ match, history }) => {
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       console.log(serverMesg);
 
-      dispatch(loadRoom({ roomId }));
-
       const userInfoServer = serverMesg.userInfo;
       console.log(userInfoServer);
 
       // 수정 userInfo update
-      dispatch(tempUser(userInfoServer));
+      if (!isConnect && serverMesg.type === 'JOIN') {
+        console.log(isConnect);
+        dispatch(tempUser(userInfoServer));
+        isConnect = true;
+      }
 
       //메세지 정보 받기
       dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      dispatch(loadRoom({ roomId }));
     });
 
   useEffect(() => {
-    if (!stompClient.connected) {
-      stompClient.connect({}, stompSubscribe); //{}서버주소
-    } else {
-      stompSubscribe();
-    }
+    const sub = stompSubscribe();
     dispatch(loadRoom({ roomId }));
     stompClient.send(
       '/pub/socket/message',
@@ -107,26 +108,28 @@ const RoomContainer = ({ match, history }) => {
         JSON.stringify({
           type: 'EXIT',
           roomCode: roomId,
-          // userInfo,
+          userInfo,
           message: message,
         })
       );
       //수정
       dispatch(exitRoom());
-      stompClient.unsubscribe();
+      sub.unsubscribe();
       dispatch(initializeMessageLog());
     };
   }, [roomId]); // roomId가 바뀌면 새로운 접속
+
   useEffect(() => {
-    if (room === null) {
+    if (!room) {
       history.push(`/lobby`); //room의 정보가 null이면(exit), lobby로 이동
     }
   }, [room, history]);
+
   return (
     <Room
       onSubmit={sendMessage}
       onChange={onChange}
-      username={userInfo.username}
+      username={userInfo && userInfo.username}
       message={message}
       messageLog={messageLog}
       exit={exit}
