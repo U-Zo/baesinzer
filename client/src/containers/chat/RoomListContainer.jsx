@@ -4,27 +4,27 @@ import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
 import { createRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
-import { setUsername } from '../../modules/user';
+import { setUserinfo } from '../../modules/user';
 
 const RoomListContainer = ({ history }) => {
+  const [error, setError] = useState(null);
   const [visible, setVisible] = useState(false);
   const [roomName, setRoomName] = useState();
 
-  const { username, loading, roomList, error, room } = useSelector(
+  const { username, loading, roomList, roomerror, room } = useSelector(
     ({ loading, rooms, user, room }) => ({
       loading: loading['roomList/GET_ROOM_LIST'],
       roomList: rooms.roomList,
       username: user.username,
-      error: rooms.error,
+      roomerror: rooms.error,
       room: room.room,
     })
   );
-
   const dispatch = useDispatch();
 
   const changeUsername = (e) => {
     const inputUsername = e.target.value;
-    dispatch(setUsername(inputUsername));
+    dispatch(setUserinfo(inputUsername));
   };
 
   // start modal option
@@ -37,6 +37,7 @@ const RoomListContainer = ({ history }) => {
   };
   const makeRoom = (e) => {
     e.preventDefault();
+    // if (roomName === null) setError(`방 제목을 입력하세요.`);
     dispatch(createRoom(roomName));
   };
 
@@ -57,13 +58,14 @@ const RoomListContainer = ({ history }) => {
     <RoomList
       username={username}
       loading={loading}
-      error={error}
+      roomerror={roomerror}
       roomList={roomList}
       changeUsername={changeUsername}
       onClick={onClick}
       visible={visible}
       makeRoom={makeRoom}
       onChangeRoomName={onChangeRoomName}
+      error={error}
     />
   );
 };

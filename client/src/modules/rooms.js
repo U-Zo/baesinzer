@@ -1,12 +1,15 @@
 import { createAction, handleActions } from 'redux-actions';
-import createActionTypes from '../lib/createActionTypes';
-import createRequestSaga from '../lib/createRequestSaga';
+import createRequestSaga, {
+  createRequestActionTypes,
+} from '../lib/createRequestSaga';
 import * as roomsAPI from '../lib/api/rooms';
 import { takeLatest } from 'redux-saga/effects';
 
-const [LOAD_ROOMS, LOAD_ROOMS_SUCCESS, LOAD_ROOMS_FAILURE] = createActionTypes(
-  'rooms/LOAD_ROOMS'
-);
+const [
+  LOAD_ROOMS,
+  LOAD_ROOMS_SUCCESS,
+  LOAD_ROOMS_FAILURE,
+] = createRequestActionTypes('rooms/LOAD_ROOMS');
 
 const UNLOAD_ROOM_LIST = 'rooms/UNLOAD_ROOM_LIST';
 

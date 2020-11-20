@@ -1,6 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
-import createActionTypes from '../lib/createActionTypes';
-import createRequestSaga from '../lib/createRequestSaga';
+import createRequestSaga, {
+  createRequestActionTypes,
+} from '../lib/createRequestSaga';
 import * as roomsAPI from '../lib/api/rooms';
 import { takeLatest } from 'redux-saga/effects';
 
@@ -8,15 +9,19 @@ const [
   CREATE_ROOM,
   CREATE_ROOM_SUCCESS,
   CREATE_ROOM_FAILURE,
-] = createActionTypes('room/CREATE_ROOM');
+] = createRequestActionTypes('room/CREATE_ROOM');
 
-const [LOAD_ROOM, LOAD_ROOM_SUCCESS, LOAD_ROOM_FAILURE] = createActionTypes(
-  'room/LOAD_ROOM'
-);
+const [
+  LOAD_ROOM,
+  LOAD_ROOM_SUCCESS,
+  LOAD_ROOM_FAILURE,
+] = createRequestActionTypes('room/LOAD_ROOM');
 
-const [EXIT_ROOM, EXIT_ROOM_SUCESS, EXIT_ROOM_FAILURE] = createActionTypes(
-  'room/EXIT_ROOM'
-);
+const [
+  EXIT_ROOM,
+  EXIT_ROOM_SUCESS,
+  EXIT_ROOM_FAILURE,
+] = createRequestActionTypes('room/EXIT_ROOM');
 
 export const createRoom = createAction(CREATE_ROOM, (roomName) => ({
   roomName,
@@ -65,7 +70,7 @@ const room = handleActions(
       room: null,
       error,
     }),
-    [EXIT_ROOM_SUCESS]: (state, { payload: room }) => ({
+    [EXIT_ROOM_SUCESS]: (state) => ({
       ...state,
       room: null,
     }),

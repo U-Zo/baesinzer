@@ -5,12 +5,16 @@ const ModalBlock = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  position: fixed;
-  border: 3px solid green;
-  height: 200px;
-  width: 250px;
+  border: 0.3rem solid var(--color-green);
+  height: 25rem;
+  width: 45rem;
   padding: 15px;
-  background-color: white;
+  //수정
+  background-color: var(--color-background);
+  position: absolute;
+  left: 31.5%;
+  top: 20%;
+
   > .hh {
     margin-bottom: 10px;
   }
@@ -28,18 +32,7 @@ const ModalFooter = styled.div`
  * chileren은 Modal버튼을 눌렀을때 나타나는 component
  */
 const Modal = ({ visible, onClick, children }) => {
-  return (
-    visible && (
-      <ModalBlock>
-        {children}
-        <ModalFooter>
-          <button class="b" onClick={onClick}>
-            닫기
-          </button>
-        </ModalFooter>
-      </ModalBlock>
-    )
-  );
+  return visible && <ModalBlock>{children}</ModalBlock>;
 };
 
 export default Modal;
