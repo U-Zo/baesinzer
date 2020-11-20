@@ -10,12 +10,14 @@ React + Spring Boot 텍스트 기반 웹 게임
 - Redux
 - Redux-saga
 - Styled-components
+- SockJS
+- Stomp
 
 ### Server
 
 - Spring-boot
 - SockJS
-- Stamp
+- Stomp
 - JPA (Hibernate)
 - Oracle DB
 
@@ -23,5 +25,4 @@ React + Spring Boot 텍스트 기반 웹 게임
 
 - 김우조 (PM)
 - 박세진
-- 권준
 - 박성원
