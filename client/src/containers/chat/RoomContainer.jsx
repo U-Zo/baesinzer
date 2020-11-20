@@ -24,10 +24,9 @@ const RoomContainer = ({ match, history }) => {
   // server에서 전달받은 상태를 받아 redux에 저장된 room 정보를 가져다 room에 접근 / 불가
   const dispatch = useDispatch();
 
-  const { userInfo, username, message, messageLog, room } = useSelector(
+  const { userInfo, message, messageLog, room } = useSelector(
     ({ user, messages, room }) => ({
       userInfo: user.userInfo,
-      username: user.userInfo.username,
       message: messages.message,
       messageLog: messages.messageLog,
       room: room.room,
@@ -127,7 +126,7 @@ const RoomContainer = ({ match, history }) => {
     <Room
       onSubmit={sendMessage}
       onChange={onChange}
-      username={username}
+      username={userInfo.username}
       message={message}
       messageLog={messageLog}
       exit={exit}
