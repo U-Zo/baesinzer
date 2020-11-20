@@ -10,13 +10,13 @@ const TEMP_USER = 'auth/TEMP_SET_USER';
 const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
   'user/CHECK'
 );
-const SET_USERNAME = 'user/SET_USERNAME';
+const SET_USERINFO = 'user/SET_USERINFO';
 const LOGOUT = 'user/LOGOUT';
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
-export const setUsername = createAction(SET_USERNAME, (username) => username);
+export const setUserinfo = createAction(SET_USERINFO, (username) => username);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 
@@ -49,7 +49,7 @@ const user = handleActions(
     [LOGOUT]: () => ({
       initialState,
     }),
-    [SET_USERNAME]: (state, { payload: username }) => ({
+    [SET_USERINFO]: (state, { payload: username }) => ({
       ...state,
       userInfo: {
         ...state.userInfo,

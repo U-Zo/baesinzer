@@ -12,6 +12,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
+import { tempUser } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -23,14 +24,16 @@ const RoomContainer = ({ match, history }) => {
   // server에서 전달받은 상태를 받아 redux에 저장된 room 정보를 가져다 room에 접근 / 불가
   const dispatch = useDispatch();
 
-  const { username, message, messageLog, room } = useSelector(
+  const { userInfo, message, messageLog, room } = useSelector(
     ({ user, messages, room }) => ({
-      username: user.username,
+      userInfo: user.userInfo,
       message: messages.message,
       messageLog: messages.messageLog,
       room: room.room,
     })
   );
+
+  let isConnect = false;
 
   const onChange = (e) => {
     const value = e.target.value;
@@ -49,9 +52,7 @@ const RoomContainer = ({ match, history }) => {
       JSON.stringify({
         type: 'ROOM',
         roomCode: roomId,
-        userInfo: {
-          // userInfo,
-        },
+        userInfo: userInfo,
         message: message,
       })
     );
@@ -69,25 +70,24 @@ const RoomContainer = ({ match, history }) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       console.log(serverMesg);
-      dispatch(loadRoom({ roomId }));
 
-      const userInfo = serverMesg.userInfo;
-      console.log(userInfo);
-      // setUserinfo(userInfo);
-      // room에다가 넘기기
+      const userInfoServer = serverMesg.userInfo;
+      console.log(userInfoServer);
 
-      // const message = serverMesg.message;
+      // 수정 userInfo update
+      if (!isConnect && serverMesg.type === 'JOIN') {
+        console.log(isConnect);
+        dispatch(tempUser(userInfoServer));
+        isConnect = true;
+      }
 
       //메세지 정보 받기
-      dispatch(logMessage(username, serverMesg.message));
+      dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      dispatch(loadRoom({ roomId }));
     });
 
   useEffect(() => {
-    if (!stompClient.connected) {
-      stompClient.connect({}, stompSubscribe); //{}서버주소
-    } else {
-      stompSubscribe();
-    }
+    const sub = stompSubscribe();
     dispatch(loadRoom({ roomId }));
     stompClient.send(
       '/pub/socket/message',
@@ -95,7 +95,8 @@ const RoomContainer = ({ match, history }) => {
       JSON.stringify({
         type: 'JOIN',
         roomCode: roomId,
-        userInfo: { username: username },
+        // 수정
+        userInfo: userInfo,
         message: message,
       })
     );
@@ -107,24 +108,28 @@ const RoomContainer = ({ match, history }) => {
         JSON.stringify({
           type: 'EXIT',
           roomCode: roomId,
-          // userInfo,
+          userInfo,
           message: message,
         })
       );
-      stompClient.unsubscribe();
+      //수정
+      dispatch(exitRoom());
+      sub.unsubscribe();
       dispatch(initializeMessageLog());
     };
   }, [roomId]); // roomId가 바뀌면 새로운 접속
+
   useEffect(() => {
-    if (room === null) {
+    if (!room) {
       history.push(`/lobby`); //room의 정보가 null이면(exit), lobby로 이동
     }
   }, [room, history]);
+
   return (
     <Room
       onSubmit={sendMessage}
       onChange={onChange}
-      username={username}
+      username={userInfo && userInfo.username}
       message={message}
       messageLog={messageLog}
       exit={exit}

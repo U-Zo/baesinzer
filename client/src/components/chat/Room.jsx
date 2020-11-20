@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 const RoomBlock = styled.div`
   background-color: black;
-  border: 0.2rem solid #00ff66;
+  border: 0.2rem solid var(--color--green);
   width: 970px;
   height: 720px;
   margin: 0 auto;
 `;
+
 const MessageLogs = styled.div`
   position: relative;
   display: flex;
@@ -15,6 +16,11 @@ const MessageLogs = styled.div`
 `;
 const InputStyle = styled.input`
   width: 100%;
+`;
+
+const Chat = styled.ul`
+  font-size: 1.5rem;
+  color: var(--color-green);
 `;
 const Message = React.memo(({ username, message }) => {
   return (
@@ -28,12 +34,12 @@ const Room = ({ onSubmit, onChange, username, message, messageLog, exit }) => {
   return (
     <div>
       <div>
-        <ul>
+        <Chat>
           {messageLog &&
             messageLog.map((message) => (
-              <Message username={username} message={message.message} />
+              <Message username={message.username} message={message.message} />
             ))}
-        </ul>
+        </Chat>
       </div>
       <form onSubmit={onSubmit}>
         <input type="text" name="message" onChange={onChange} value={message} />
