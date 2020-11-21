@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
 import { createRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
-import { setUserinfo } from '../../modules/user';
+import { setUsername } from '../../modules/user';
 
 const RoomListContainer = ({ history }) => {
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ const RoomListContainer = ({ history }) => {
 
   const changeUsername = (e) => {
     const inputUsername = e.target.value;
-    dispatch(setUserinfo(inputUsername));
+    dispatch(setUsername(inputUsername));
   };
 
   // start modal option

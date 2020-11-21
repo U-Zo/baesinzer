@@ -10,13 +10,23 @@ const TEMP_USER = 'auth/TEMP_SET_USER';
 const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
   'user/CHECK'
 );
-const SET_USERINFO = 'user/SET_USERINFO';
+const SET_USERNAME = 'user/SET_USERNAME';
 const LOGOUT = 'user/LOGOUT';
+
+const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
+const VOTE = 'user/VOTE'; // 투표 액션 타입
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
-export const setUserinfo = createAction(SET_USERINFO, (username) => username);
+export const setUsername = createAction(SET_USERNAME, (username) => username);
+
+export const moveLocation = createAction(
+  MOVE_LOCATION,
+  (locationId) => locationId
+);
+
+export const vote = createAction(VOTE, (userNo) => userNo);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 
@@ -49,11 +59,25 @@ const user = handleActions(
     [LOGOUT]: () => ({
       initialState,
     }),
-    [SET_USERINFO]: (state, { payload: username }) => ({
+    [SET_USERNAME]: (state, { payload: username }) => ({
       ...state,
       userInfo: {
         ...state.userInfo,
         username,
+      },
+    }),
+    [MOVE_LOCATION]: (state, { payload: locationId }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        locationId,
+      },
+    }),
+    [VOTE]: (state, { payload: userNo }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        hasVoted: userNo,
       },
     }),
   },
