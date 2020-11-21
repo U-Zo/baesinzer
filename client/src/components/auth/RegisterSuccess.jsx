@@ -2,6 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+const Block = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const AuthBlock = styled.div`
   position: relative;
   margin: 0 auto;
@@ -17,11 +24,12 @@ const AuthBlock = styled.div`
 
 const BaesinZerMain = styled.div`
   width: 100%;
-  height: 12rem;
+  height: 10rem;
   display: flex;
   justify-content: center;
-  align-items: center;
-  font-size: 3rem;
+  font-size: 9rem;
+  position: absolute;
+  top: 15rem;
   font-weight: bolder;
   color: var(--color-green);
 `;
@@ -32,59 +40,48 @@ const MessageBlock = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 3rem;
+  font-size: 5rem;
   font-weight: bolder;
   color: var(--color-green);
-  margin: 2rem 0rem 2rem 0rem;
+  margin-top: 12rem;
+  margin-bottom: 6rem;
 `;
 const MessageStyle = styled.div`
   text-align: center;
   width: 800%;
   height: 12rem;
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: normal;
   color: var(--color-green);
   &.email {
     padding-top: 4rem;
   }
 `;
-const Footer = styled.div`
-  a {
-    color: #00ff66;
-    text-decoration: none;
-    font-size: 2rem;
-    cursor: default;
-    :hover {
-      font-weight: bold;
-    }
-  }
-`;
 const ButtonStyled = styled.button`
-  width: 7rem;
+  width: 10rem;
   height: 2rem;
   border-style: none;
   outline: none;
   background-color: var(--color-background);
   color: var(--color-green);
-  font-size: 1.3rem;
-  padding: 0;
+  font-size: 3rem;
   :hover {
     font-weight: bold;
   }
 `;
 const RegisterSuccess = ({ email, onClick }) => {
   return (
-    <AuthBlock>
-      <BaesinZerMain>BaesinZer</BaesinZerMain>
-      <MessageBlock>
-        <MessageStyle>이메일 등록이 완료 되었습니다.</MessageStyle>
-        <MessageStyle>이메일을 확인해주십시오.</MessageStyle>
-        <MessageStyle className="email">{email}</MessageStyle>
-      </MessageBlock>
-      <Footer>
+    <Block>
+      <AuthBlock>
+        <BaesinZerMain>BaesinZer</BaesinZerMain>
+        <MessageBlock>
+          <MessageStyle>이메일 등록이 완료 되었습니다.</MessageStyle>
+          <MessageStyle>이메일을 확인해주십시오.</MessageStyle>
+          <MessageStyle className="email">{email}</MessageStyle>
+        </MessageBlock>
         <ButtonStyled onClick={onClick}>로그인</ButtonStyled>
-      </Footer>
-    </AuthBlock>
+      </AuthBlock>
+    </Block>
   );
 };
 
