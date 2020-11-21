@@ -12,11 +12,14 @@ const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
 );
 const SET_USERINFO = 'user/SET_USERINFO';
 const LOGOUT = 'user/LOGOUT';
+const KILL = 'uaer/KILL';
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
 export const setUserinfo = createAction(SET_USERINFO, (username) => username);
+
+export const kill = createAction(KILL, (userNo) => userNo);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 
@@ -54,6 +57,13 @@ const user = handleActions(
       userInfo: {
         ...state.userInfo,
         username,
+      },
+    }),
+    [KILL]: (state, { payload: userNo }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        kill: userNo,
       },
     }),
   },
