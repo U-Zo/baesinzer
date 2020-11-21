@@ -12,21 +12,20 @@ const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
 );
 const SET_USERNAME = 'user/SET_USERNAME';
 const LOGOUT = 'user/LOGOUT';
-
 const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
 const VOTE = 'user/VOTE'; // 투표 액션 타입
+const KILL = 'uaer/KILL';
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
 export const setUsername = createAction(SET_USERNAME, (username) => username);
-
 export const moveLocation = createAction(
   MOVE_LOCATION,
   (locationId) => locationId
 );
-
 export const vote = createAction(VOTE, (userNo) => userNo);
+export const kill = createAction(KILL, (userNo) => userNo);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 
@@ -78,6 +77,13 @@ const user = handleActions(
       userInfo: {
         ...state.userInfo,
         hasVoted: userNo,
+      },
+    }),
+    [KILL]: (state, { payload: userNo }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        kill: userNo,
       },
     }),
   },
