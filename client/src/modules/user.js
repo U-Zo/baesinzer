@@ -16,7 +16,7 @@ const LOGOUT = 'user/LOGOUT';
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
-export const setUserinfo = createAction(SET_USERINFO, (username) => username);
+export const setUsername = createAction(SET_USERINFO, (username) => username);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 

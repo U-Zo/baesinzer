@@ -12,8 +12,9 @@ const ModalBlock = styled.div`
   //수정
   background-color: var(--color-background);
   position: absolute;
-  left: 31.5%;
-  top: 20%;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
 
   > .hh {
     margin-bottom: 10px;
