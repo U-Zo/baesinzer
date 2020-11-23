@@ -202,7 +202,9 @@ const Username = ({ username, userNo }) => {
 const Room = ({
   onSubmit,
   onChange,
-  // username,
+  startHandler,
+  username,
+  userInfo,
   message,
   messageLog,
   usersArray,
@@ -244,7 +246,7 @@ const Room = ({
               userNo={user.userNo}
             />
           ))}
-        <Start>START</Start>
+        {userInfo.host && <Start onClick={startHandler}>START</Start>}
         <Exit onClick={exit}>EXIT</Exit>
       </AllUsersBox>
     </RoomBlock>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
@@ -11,7 +11,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
-import user, { tempUser } from '../../modules/user';
+import user, { start, tempUser, update } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -39,6 +39,19 @@ const RoomContainer = ({ match, history }) => {
   const onChange = (e) => {
     const value = e.target.value;
     dispatch(changeField(value)); //message에 저장
+  };
+
+  const startHandler = () => {
+    stompClient.send(
+      '/pub/socket/message',
+      {},
+      JSON.stringify({
+        type: 'START',
+        roomCode: roomId,
+        userInfo: userInfo,
+        message: message,
+      })
+    );
   };
 
   const sendMessage = (e) => {
@@ -130,11 +143,21 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [room, history]);
 
+  useEffect(() => {
+    for (let key in room.users) {
+      if (parseInt(key) === parseInt(userInfo.userNo)) {
+        dispatch(update(room.users[key]));
+        console.log('업데이트 실행');
+      }
+    }
+  }, [room]);
+
   return (
     <Room
       onSubmit={sendMessage}
       onChange={onChange}
-      // username={userInfo && userInfo.username}
+      startHandler={startHandler}
+      username={userInfo && userInfo.username}
       //수정
       message={message}
       messageLog={messageLog}
