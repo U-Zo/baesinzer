@@ -10,12 +10,13 @@ const RoomListContainer = ({ history }) => {
   const [error, setError] = useState(null);
   const [visible, setVisible] = useState(false);
   const [roomName, setRoomName] = useState();
-
-  const { username, loading, roomList, roomerror, room } = useSelector(
+  const [type, setType] = useState();
+  const { userInfo, loading, roomList, roomerror, room } = useSelector(
     ({ loading, rooms, user, room }) => ({
       loading: loading['roomList/GET_ROOM_LIST'],
       roomList: rooms.roomList,
-      username: user.username,
+      //확인---- username을 userinfo로 받아오는 것으로 수정ㅇ
+      userInfo: user.userInfo,
       roomerror: rooms.error,
       room: room.room,
     })
@@ -29,21 +30,36 @@ const RoomListContainer = ({ history }) => {
 
   // start modal option
   const onClick = () => {
-    setVisible(!visible);
+    //수정-----
+    if (userInfo.username == null || userInfo.username == '') {
+      console.log(userInfo.username);
+      setVisible(false);
+      setType('닉네임');
+      setError('닉네임을 입력하세요.');
+      setTimeout(function () {
+        setError(null);
+      }, 2000);
+    } else setVisible(!visible);
+    // setVisible(!visible);
   };
 
   const onJoin = (roomId) => {
     dispatch(loadRoom({ roomId }));
   };
-
   const onChangeRoomName = (e) => {
     const roomname = e.target.value;
     setRoomName(roomname);
   };
-
   const makeRoom = (e) => {
     e.preventDefault();
-    // if (roomName === null) setError(`방 제목을 입력하세요.`);
+    if (roomName == null) {
+      setError('방 제목을 입력하세요.');
+      setType('방제목');
+      setTimeout(function () {
+        setError(null);
+      }, 2000);
+    }
+
     dispatch(createRoom(roomName));
   };
 
@@ -62,7 +78,7 @@ const RoomListContainer = ({ history }) => {
 
   return (
     <RoomList
-      username={username}
+      username={userInfo.username}
       loading={loading}
       roomerror={roomerror}
       roomList={roomList}
@@ -71,8 +87,11 @@ const RoomListContainer = ({ history }) => {
       visible={visible}
       makeRoom={makeRoom}
       onChangeRoomName={onChangeRoomName}
+      type={type}
       error={error}
       onJoin={onJoin}
+      //수정
+      // inputUsername={inputUsername}
     />
   );
 };

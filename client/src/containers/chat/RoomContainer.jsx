@@ -12,7 +12,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
-import { tempUser } from '../../modules/user';
+import user, { tempUser } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -29,6 +29,9 @@ const RoomContainer = ({ match, history }) => {
       userInfo: user.userInfo,
       message: messages.message,
       messageLog: messages.messageLog,
+      room: room.room,
+
+      // users: room.room.users,
       room: room.room,
     })
   );
@@ -130,8 +133,11 @@ const RoomContainer = ({ match, history }) => {
       onSubmit={sendMessage}
       onChange={onChange}
       username={userInfo && userInfo.username}
+      //수정
+      userInfo={userInfo}
       message={message}
       messageLog={messageLog}
+      usersArray={room && Object.values(room.users)} // json형태를 배열로 변환
       exit={exit}
     />
   );

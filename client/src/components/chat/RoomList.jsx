@@ -61,6 +61,7 @@ const RoomLink = styled.div`
 `;
 
 const InputNickname = styled.input`
+  display: block;
   text-align: center;
   font-size: 2rem;
   background-color: var(--color-background);
@@ -85,6 +86,9 @@ const InputNickname = styled.input`
 const CountSpan = styled.span`
   float: right;
   margin-right: 2rem;
+  &#full {
+    color: var(--color-red);
+  }
 `;
 
 const ButtonStyle = styled.button`
@@ -100,6 +104,9 @@ const ButtonStyle = styled.button`
   float: right;
   margin-right: 25rem;
   top: 7rem;
+  :focus {
+    outline: none;
+  }
 `;
 const CodeInputStyle = styled.input`
   position: relative;
@@ -135,6 +142,13 @@ const ModalInput = styled.input`
   height: 4rem;
   border: 3px solid var(--color-green);
   color: var(--color-green);
+  :-webkit-autofill {
+    -webkit-text-fill-color: var(--color-green);
+  }
+  :-webkit-autofill,
+  :-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+  }
   ::placeholder {
     color: var(--color-green);
     font-size: 2rem;
@@ -162,6 +176,10 @@ const MakeRoomButton = styled.button`
 
   width: 15rem;
   height: 3.5rem;
+
+  :focus {
+    outline: none;
+  }
 `;
 
 const CancelButton = styled.button`
@@ -173,9 +191,22 @@ const CancelButton = styled.button`
   display: inline-block;
   width: 15rem;
   height: 3.5rem;
+  :focus {
+    outline: none;
+  }
 `;
 const ErrorBox = styled.div`
+  position: fixed;
+  transform: translate(-50%, -50%);
   color: var(--color-red);
+  &#닉네임 {
+    top: 4%;
+    left: 50%;
+  }
+  &#방제목 {
+    top: 19%;
+    left: 50%;
+  }
 `;
 
 const Room = React.memo(({ name, count, onClick }) => {
@@ -183,7 +214,12 @@ const Room = React.memo(({ name, count, onClick }) => {
   return (
     <RoomLi onClick={onClick}>
       <span>{name}</span>
-      <CountSpan>{count}/6</CountSpan>
+      {/* 수정 */}
+      {count === 6 ? (
+        <CountSpan id="full">{count}/6</CountSpan>
+      ) : (
+        <CountSpan>{count}/6</CountSpan>
+      )}
     </RoomLi>
   );
 });
@@ -200,6 +236,7 @@ const RoomList = ({
   makeRoom,
   onChangeRoomName,
   onJoin,
+  type,
 }) => {
   if (roomerror) {
     return <div>에러가 발생했습니다.</div>;
@@ -207,6 +244,8 @@ const RoomList = ({
 
   return (
     <LobbyBlock>
+      {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
+
       <NicknameBox>
         {username == null ? (
           <InputNickname
@@ -246,7 +285,7 @@ const RoomList = ({
       <Modal visible={visible} onClick={onClick}>
         <div>
           <form onSubmit={makeRoom}>
-            <ErrorBox>{error}</ErrorBox>
+            {type === '방제목' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
             <ModalInput
               onChange={onChangeRoomName}
               type="text"
