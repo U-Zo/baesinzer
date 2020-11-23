@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
 
             if (email != null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                UserDetails userDetails = null;
+                try {
+                    userDetails = userDetailsService.loadUserByUsername(email);
+                } catch (UsernameNotFoundException e) {
+                    Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, "");
+                    Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, "");
+                    response.addCookie(accessTokenCookie);
+                    response.addCookie(refreshTokenCookie);
+                    e.printStackTrace();
+                }
 
                 if (jwtTokenUtil.validateToken(accessToken, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken

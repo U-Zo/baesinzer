@@ -17,4 +17,5 @@ public class UserInfo {
     private int hasVoted;
     private int votedNum;
     private List<Mission> missionList;
+    private boolean host;
 }

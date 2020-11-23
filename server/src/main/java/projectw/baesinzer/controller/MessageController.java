@@ -2,16 +2,23 @@ package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.service.RoomService;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +38,10 @@ public class MessageController {
 
                 // 최대 6명 까지 할당 번호 검사하여 없으면 할당
                 for (int i = 1; i <= 6; i++) {
+                    if (room.getCount() == 0) { // 방이 처음 만들어졌을 시 방장 설정
+                        userInfo.setHost(true);
+                    }
+
                     if (room.getUsers().get(i) == null) {
                         room.getUsers().put(i, userInfo);
                         userInfo.setUserNo(i);
@@ -41,6 +52,31 @@ public class MessageController {
                         break;
                     }
                 }
+                break;
+            case START:
+                UserInfo sys = new UserInfo();
+                sys.setUsername("System");
+                message.setUserInfo(sys);
+                message.setMessage("5초 뒤 게임이 시작됩니다.");
+                Timer timer = new Timer();
+                TimerTask timerTask = new TimerTask() {
+                    int count = 4;
+
+                    @Override
+                    public void run() {
+                        if (count > 0) {
+                            message.setMessage(count + "초 뒤 게임이 시작됩니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                            count--;
+                        } else {
+                            room.setStart(true);
+                            message.setMessage("게임이 시작되었습니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                            timer.cancel();
+                        }
+                    }
+                };
+                timer.schedule(timerTask, 1000, 1000);
                 break;
             case VOTE_START:
                 for (int i = 1; i <= room.getCount(); i++) {
@@ -62,6 +98,20 @@ public class MessageController {
                 if (room.getUsers().size() == 0) {
                     roomService.removeRoom(room);
                     break;
+                }
+
+                for (int i = 1; i <= 6; i++) {
+                    UserInfo nextHost = room.getUsers().get(i);
+                    System.out.println(nextHost);
+                    if (nextHost != null) {
+                        nextHost.setHost(true);
+                        Message nextHostMessage = new Message();
+                        nextHostMessage.setType(Message.MessageType.ROOM);
+                        nextHostMessage.setUserInfo(nextHost);
+                        nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
+                        operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
+                        break;
+                    }
                 }
 
                 headerAccessor.getSessionAttributes().remove("user");
