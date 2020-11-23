@@ -90,7 +90,11 @@ const RoomContainer = ({ match, history }) => {
     });
 
   useEffect(() => {
-    const sub = stompSubscribe();
+    let sub;
+    if (!stompClient.connected) {
+      sub = stompClient.connect({}, stompSubscribe);
+    }
+    sub = stompSubscribe();
     dispatch(loadRoom({ roomId }));
     stompClient.send(
       '/pub/socket/message',
