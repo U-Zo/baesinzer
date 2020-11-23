@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import Room from '../../components/chat/Room';
-
 import {
   changeField,
   initialField,
@@ -18,10 +17,8 @@ const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 �
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
 stompClient.connect(); // 서버에 접속
 
-//방 누르면 서버오 ㅏ통신하여 방 코드를 요청 보냄 방코드를 받아오면 useEffect를통해 방접속할 수 있도록
 const RoomContainer = ({ match, history }) => {
   const { roomId } = match.params;
-  // server에서 전달받은 상태를 받아 redux에 저장된 room 정보를 가져다 room에 접근 / 불가
   const dispatch = useDispatch();
 
   const { userInfo, message, messageLog, room } = useSelector(
@@ -35,6 +32,7 @@ const RoomContainer = ({ match, history }) => {
       room: room.room,
     })
   );
+  const [error, setError] = useState();
 
   let isConnect = false;
 
@@ -103,7 +101,11 @@ const RoomContainer = ({ match, history }) => {
     });
 
   useEffect(() => {
-    const sub = stompSubscribe();
+    let sub;
+    if (!stompClient.connected) {
+      sub = stompClient.connect({}, stompSubscribe);
+    }
+    sub = stompSubscribe();
     dispatch(loadRoom({ roomId }));
     stompClient.send(
       '/pub/socket/message',
@@ -157,7 +159,6 @@ const RoomContainer = ({ match, history }) => {
       startHandler={startHandler}
       username={userInfo && userInfo.username}
       //수정
-      userInfo={userInfo}
       message={message}
       messageLog={messageLog}
       usersArray={room && Object.values(room.users)} // json형태를 배열로 변환

@@ -18,4 +18,5 @@ public class Room {
     private String roomName;
     private int count;
     private Map<Integer, UserInfo> users;
+    private boolean start;
 }

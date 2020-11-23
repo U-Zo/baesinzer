@@ -1,10 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-function myFunction() {
-  var elmnt = document.getElementById('myDIV');
-  var y = elmnt.scrollHeight;
-  elmnt.scrollTop = y;
-}
+
 const RoomBlock = styled.div`
   background-color: var(--color-background);
   border: 0.2rem solid var(--color-green);
@@ -106,16 +102,17 @@ const Code = styled.div`
 
 const BaesinzerText = styled.div`
   color: var(--color-green);
-  position: fixed;
-  left: 64%;
-  top: 6%;
+  position: relative;
+  left: 125%;
+  top: -85%;
+  transform: translate(-50%, -50%);
   font-size: 3rem;
 `;
 
 const AllUsersBox = styled.div`
   color: var(--color-green);
   position: relative;
-  top: -70%;
+  top: -80%;
   right: 8%;
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
@@ -124,12 +121,29 @@ const AllUsersBox = styled.div`
   width: 18rem;
 `;
 const AllUsers = styled.div`
-  color: var(--color-green);
   padding-top: 1rem;
   text-align: center;
-  font-size: 1.5rem;
-  &#myusername {
+  font-size: 2rem;
+  /* &#myusername {
     color: var(--color-red);
+  } */
+  &#color1 {
+    color: red;
+  }
+  &#color2 {
+    color: yellow;
+  }
+  &#color3 {
+    color: blue;
+  }
+  &#color4 {
+    color: green;
+  }
+  &#color5 {
+    color: purple;
+  }
+  &#color6 {
+    color: pink;
   }
   & + & {
     margin: 3rem;
@@ -146,6 +160,9 @@ const Start = styled.button`
   border: 3px solid var(--color-green);
   color: var(--color-green);
   transform: translate(-50%, -50%);
+  :focus {
+    outline: none;
+  }
 `;
 const Exit = styled.button`
   position: absolute;
@@ -158,6 +175,9 @@ const Exit = styled.button`
   border: 3px solid var(--color-green);
   color: var(--color-green);
   transform: translate(-50%, -50%);
+  :focus {
+    outline: none;
+  }
 `;
 // ================================================== //
 const Message = React.memo(({ username, message }) => {
@@ -167,14 +187,15 @@ const Message = React.memo(({ username, message }) => {
     </UserMessage>
   );
 });
-const Username = ({ username, userNo, mine }) => {
+const Username = ({ username, userNo }) => {
   return (
     <div>
-      {username === mine.username && userNo === mine.userNo ? (
-        <AllUsers id="myusername">{username}</AllUsers>
+      {/* {username === mine.username && userNo === mine.userNo ? (
+        <AllUsers  id="myusername">{username}</AllUsers>
       ) : (
         <AllUsers>{username}</AllUsers>
-      )}
+      )} */}
+      <AllUsers id={'color' + userNo}>{username}</AllUsers>
     </div>
   );
 };
@@ -210,6 +231,7 @@ const Room = ({
           name="message"
           onChange={onChange}
           value={message}
+          autocomplete="off"
         />
         <ButtonStyle>입력</ButtonStyle>
       </form>
@@ -222,7 +244,6 @@ const Room = ({
               key={index}
               username={user.username}
               userNo={user.userNo}
-              mine={userInfo}
             />
           ))}
         {userInfo.host && <Start onClick={startHandler}>START</Start>}
