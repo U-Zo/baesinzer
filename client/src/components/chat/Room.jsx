@@ -203,7 +203,6 @@ const Room = ({
   onSubmit,
   onChange,
   startHandler,
-  username,
   userInfo,
   message,
   messageLog,
