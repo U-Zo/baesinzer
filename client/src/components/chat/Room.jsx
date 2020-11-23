@@ -181,6 +181,7 @@ const Username = ({ username, userNo, mine }) => {
 const Room = ({
   onSubmit,
   onChange,
+  startHandler,
   username,
   userInfo,
   message,
@@ -224,7 +225,7 @@ const Room = ({
               mine={userInfo}
             />
           ))}
-        <Start>START</Start>
+        {userInfo.host && <Start onClick={startHandler}>START</Start>}
         <Exit onClick={exit}>EXIT</Exit>
       </AllUsersBox>
     </RoomBlock>

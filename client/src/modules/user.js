@@ -15,6 +15,7 @@ const LOGOUT = 'user/LOGOUT';
 const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
 const VOTE = 'user/VOTE'; // 투표 액션 타입
 const KILL = 'uaer/KILL';
+const UPDATE = 'user/UPDATE';
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
@@ -26,9 +27,8 @@ export const moveLocation = createAction(
 );
 export const vote = createAction(VOTE, (userNo) => userNo);
 export const kill = createAction(KILL, (userNo) => userNo);
-
+export const update = createAction(UPDATE, (userInfo) => userInfo);
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
-
 export function* userSaga() {
   yield takeLatest(CHECK, checkSaga);
 }
@@ -41,6 +41,11 @@ const initialState = {
 const user = handleActions(
   {
     [TEMP_USER]: (state, { payload: userInfo }) => ({
+      ...state,
+      userInfo,
+      error: null,
+    }),
+    [UPDATE]: (state, { payload: userInfo }) => ({
       ...state,
       userInfo,
       error: null,
