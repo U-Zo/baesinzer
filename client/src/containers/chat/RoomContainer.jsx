@@ -29,13 +29,19 @@ const RoomContainer = ({ match, history }) => {
       room: room.room,
     })
   );
-  const [error, setError] = useState();
+
+  //modal
+  const [visible, setVisible] = useState(false);
 
   let isConnect = false;
 
   const onChange = (e) => {
     const value = e.target.value;
     dispatch(changeField(value)); //message에 저장
+  };
+
+  const closeModal = () => {
+    setVisible(!visible);
   };
 
   const startHandler = () => {
@@ -152,6 +158,17 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [room]);
 
+  // dead 시 모달창 띄우기
+  useEffect(() => {
+    if (room.start && userInfo.dead) {
+      setVisible(true);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (room && room.start) dispatch(initializeMessageLog());
+  }, [room]);
+
   return (
     <Room
       onSubmit={sendMessage}
@@ -162,6 +179,8 @@ const RoomContainer = ({ match, history }) => {
       messageLog={messageLog}
       usersArray={room && Object.values(room.users)} // json형태를 배열로 변환
       exit={exit}
+      visible={visible}
+      closeModal={closeModal}
     />
   );
 };
