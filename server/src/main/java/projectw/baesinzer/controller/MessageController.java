@@ -2,21 +2,18 @@ package projectw.baesinzer.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.service.RoomService;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -69,6 +66,16 @@ public class MessageController {
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                             count--;
                         } else {
+                            // 랜덤으로 baesinzer 선정
+                            Random random = new Random();
+                            while (true) {
+                                int ranNum = random.nextInt(6) + 1; // 1 ~ 6까지 난수
+                                UserInfo nextBaesinzer = room.getUsers().get(ranNum); // 난수에 해당하는 사용자
+                                if (nextBaesinzer != null) { // 사용자가 존재하면
+                                    nextBaesinzer.setBaesinzer(true); // baesinzer로 선정
+                                    break;
+                                }
+                            }
                             room.setStart(true);
                             message.setMessage("게임이 시작되었습니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
@@ -76,6 +83,7 @@ public class MessageController {
                         }
                     }
                 };
+
                 timer.schedule(timerTask, 1000, 1000);
                 break;
             case VOTE_START:
@@ -100,17 +108,19 @@ public class MessageController {
                     break;
                 }
 
-                for (int i = 1; i <= 6; i++) {
-                    UserInfo nextHost = room.getUsers().get(i);
-                    System.out.println(nextHost);
-                    if (nextHost != null) {
-                        nextHost.setHost(true);
-                        Message nextHostMessage = new Message();
-                        nextHostMessage.setType(Message.MessageType.ROOM);
-                        nextHostMessage.setUserInfo(nextHost);
-                        nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
-                        operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
-                        break;
+                if (_userInfo.isHost()) {
+                    for (int i = 1; i <= 6; i++) {
+                        UserInfo nextHost = room.getUsers().get(i);
+                        System.out.println(nextHost);
+                        if (nextHost != null) {
+                            nextHost.setHost(true);
+                            Message nextHostMessage = new Message();
+                            nextHostMessage.setType(Message.MessageType.ROOM);
+                            nextHostMessage.setUserInfo(nextHost);
+                            nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
+                            break;
+                        }
                     }
                 }
 
