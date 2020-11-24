@@ -31,7 +31,7 @@ const RoomListContainer = ({ history }) => {
   // start modal option
   const onClick = () => {
     //수정-----
-    if (userInfo.username == null || userInfo.username == '') {
+    if (userInfo.username === null || userInfo.username === '') {
       console.log(userInfo.username);
       setVisible(false);
       setType('닉네임');
@@ -78,7 +78,7 @@ const RoomListContainer = ({ history }) => {
 
   return (
     <RoomList
-      username={userInfo.username}
+      username={userInfo?.username}
       loading={loading}
       roomerror={roomerror}
       roomList={roomList}

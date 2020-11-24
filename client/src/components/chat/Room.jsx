@@ -134,13 +134,13 @@ const AllUsers = styled.div`
     color: yellow;
   }
   &#color3 {
-    color: blue;
+    color: #00d9ff;
   }
   &#color4 {
-    color: green;
+    color: #00cc00;
   }
   &#color5 {
-    color: purple;
+    color: #bb00bb;
   }
   &#color6 {
     color: pink;
