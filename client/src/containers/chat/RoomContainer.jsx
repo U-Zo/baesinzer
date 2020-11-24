@@ -44,17 +44,21 @@ const RoomContainer = ({ match, history }) => {
     setVisible(!visible);
   };
 
-  const startHandler = () => {
+  const stompSend = (type) => {
     stompClient.send(
       '/pub/socket/message',
       {},
       JSON.stringify({
-        type: 'START',
+        type,
         roomCode: roomId,
-        userInfo: userInfo,
-        message: message,
+        userInfo,
+        message,
       })
     );
+  };
+
+  const startHandler = () => {
+    stompSend('START');
   };
 
   const sendMessage = (e) => {
@@ -76,19 +80,11 @@ const RoomContainer = ({ match, history }) => {
       dispatch(logMessage(userInfo.username, message));
       dispatch(initialField());
     } else {
-      stompClient.send(
-        '/pub/socket/message',
-        {},
-        JSON.stringify({
-          type: 'ROOM',
-          roomCode: roomId,
-          userInfo: userInfo,
-          message: message,
-        })
-      );
+      stompSend('ROOM');
       dispatch(initialField());
     }
   };
+
   const exit = () => {
     dispatch(exitRoom());
   };
@@ -125,29 +121,10 @@ const RoomContainer = ({ match, history }) => {
       sub = stompSubscribe();
     }
     dispatch(loadRoom({ roomId }));
-    stompClient.send(
-      '/pub/socket/message',
-      {},
-      JSON.stringify({
-        type: 'JOIN',
-        roomCode: roomId,
-        // 수정
-        userInfo: userInfo,
-        message: message,
-      })
-    );
+    stompSend('JOIN');
     return () => {
       //컴포넌트 끝
-      stompClient.send(
-        '/pub/socket/message',
-        {},
-        JSON.stringify({
-          type: 'EXIT',
-          roomCode: roomId,
-          userInfo,
-          message: message,
-        })
-      );
+      stompSend('EXIT');
       //수정
       dispatch(exitRoom());
       sub.unsubscribe();
