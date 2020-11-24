@@ -134,13 +134,13 @@ const AllUsers = styled.div`
     color: #f5fa4e;
   }
   &#color3 {
-    color: #68d9df;
+    color: #00d9ff;
   }
   &#color4 {
-    color: #4efa6b;
+    color: #00cc00;
   }
   &#color5 {
-    color: #cf78c5;
+    color: #bb00bb;
   }
   &#color6 {
     color: #7a68df;

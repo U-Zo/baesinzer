@@ -259,7 +259,6 @@ const RoomList = ({
             type="text"
             value={username}
             onChange={changeUsername}
-            placeholder={username}
           />
         )}
       </NicknameBox>
