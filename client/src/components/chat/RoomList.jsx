@@ -283,7 +283,7 @@ const RoomList = ({
       <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
       <Modal visible={visible} onClick={onClick}>
         <div>
-          <form onSubmit={makeRoom}>
+          <form onSubmit={makeRoom} autoComplete="off">
             {type === '방제목' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
             <ModalInput
               onChange={onChangeRoomName}

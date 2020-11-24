@@ -40,7 +40,6 @@ const RoomListContainer = ({ history }) => {
         setError(null);
       }, 2000);
     } else setVisible(!visible);
-    // setVisible(!visible);
   };
 
   const onJoin = (roomId) => {

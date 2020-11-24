@@ -29,13 +29,19 @@ const RoomContainer = ({ match, history }) => {
       room: room.room,
     })
   );
-  const [error, setError] = useState();
+
+  //modal
+  const [visible, setVisible] = useState(false);
 
   let isConnect = false;
 
   const onChange = (e) => {
     const value = e.target.value;
     dispatch(changeField(value)); //message에 저장
+  };
+
+  const closeModal = () => {
+    setVisible(!visible);
   };
 
   const startHandler = () => {
@@ -57,17 +63,31 @@ const RoomContainer = ({ match, history }) => {
     //서버에 정보 전달
     //dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
-    stompClient.send(
-      '/pub/socket/message',
-      {},
-      JSON.stringify({
-        type: 'ROOM',
-        roomCode: roomId,
-        userInfo: userInfo,
-        message: message,
-      })
-    );
-    dispatch(initialField());
+    if (room.start) {
+      if (message.includes('이동') || message.includes('move')) {
+        console.log('이동 실행');
+      } else if (
+        message.includes('살해') ||
+        message.includes('kill') ||
+        message.includes('죽')
+      ) {
+        console.log('살해 실행');
+      }
+      dispatch(logMessage(userInfo.username, message));
+      dispatch(initialField());
+    } else {
+      stompClient.send(
+        '/pub/socket/message',
+        {},
+        JSON.stringify({
+          type: 'ROOM',
+          roomCode: roomId,
+          userInfo: userInfo,
+          message: message,
+        })
+      );
+      dispatch(initialField());
+    }
   };
   const exit = () => {
     dispatch(exitRoom());
@@ -156,6 +176,17 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [room]);
 
+  // dead 시 모달창 띄우기
+  useEffect(() => {
+    if (room.start && userInfo.dead) {
+      setVisible(true);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (room && room.start) dispatch(initializeMessageLog());
+  }, [room]);
+
   return (
     <Room
       onSubmit={sendMessage}
@@ -166,6 +197,8 @@ const RoomContainer = ({ match, history }) => {
       messageLog={messageLog}
       usersArray={room && Object.values(room.users)} // json형태를 배열로 변환
       exit={exit}
+      visible={visible}
+      closeModal={closeModal}
     />
   );
 };

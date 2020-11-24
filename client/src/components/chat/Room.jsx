@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
-
+import Modal from '../common/Modal';
 const RoomBlock = styled.div`
   background-color: var(--color-background);
   border: 0.2rem solid var(--color-green);
@@ -128,10 +128,10 @@ const AllUsers = styled.div`
     color: var(--color-red);
   } */
   &#color1 {
-    color: red;
+    color: #fb4d51;
   }
   &#color2 {
-    color: yellow;
+    color: #f5fa4e;
   }
   &#color3 {
     color: #00d9ff;
@@ -143,7 +143,7 @@ const AllUsers = styled.div`
     color: #bb00bb;
   }
   &#color6 {
-    color: pink;
+    color: #7a68df;
   }
   & + & {
     margin: 3rem;
@@ -179,6 +179,18 @@ const Exit = styled.button`
     outline: none;
   }
 `;
+
+const ModalText = styled.div`
+  color: var(--color-green);
+`;
+const ModalButton = styled.button`
+  background-color: var(--color-background);
+  border: 3px solid var(--color-green);
+  color: var(--color-green);
+  :focus {
+    outline: none;
+  }
+`;
 // ================================================== //
 const Message = React.memo(({ username, message }) => {
   return (
@@ -208,6 +220,8 @@ const Room = ({
   messageLog,
   usersArray,
   exit,
+  visible,
+  closeModal,
 }) => {
   return (
     <RoomBlock>
@@ -224,7 +238,7 @@ const Room = ({
         </Chat>
       </ChatBlock>
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} autoComplete="off">
         <InputStyle
           type="text"
           name="message"
@@ -248,6 +262,10 @@ const Room = ({
         {userInfo.host && <Start onClick={startHandler}>START</Start>}
         <Exit onClick={exit}>EXIT</Exit>
       </AllUsersBox>
+      <Modal visible={visible}>
+        <ModalText>죽음</ModalText>
+        <ModalButton onClick={closeModal}>확인</ModalButton>
+      </Modal>
     </RoomBlock>
   );
 };
