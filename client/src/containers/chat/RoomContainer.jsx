@@ -57,17 +57,31 @@ const RoomContainer = ({ match, history }) => {
     //서버에 정보 전달
     //dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
-    stompClient.send(
-      '/pub/socket/message',
-      {},
-      JSON.stringify({
-        type: 'ROOM',
-        roomCode: roomId,
-        userInfo: userInfo,
-        message: message,
-      })
-    );
-    dispatch(initialField());
+    if (room.start) {
+      if (message.includes('이동') || message.includes('move')) {
+        console.log('이동 실행');
+      } else if (
+        message.includes('살해') ||
+        message.includes('kill') ||
+        message.includes('죽')
+      ) {
+        console.log('살해 실행');
+      }
+      dispatch(logMessage(userInfo.username, message));
+      dispatch(initialField());
+    } else {
+      stompClient.send(
+        '/pub/socket/message',
+        {},
+        JSON.stringify({
+          type: 'ROOM',
+          roomCode: roomId,
+          userInfo: userInfo,
+          message: message,
+        })
+      );
+      dispatch(initialField());
+    }
   };
   const exit = () => {
     dispatch(exitRoom());
