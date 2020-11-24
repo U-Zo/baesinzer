@@ -101,8 +101,9 @@ const RoomContainer = ({ match, history }) => {
     let sub;
     if (!stompClient.connected) {
       sub = stompClient.connect({}, stompSubscribe);
+    } else {
+      sub = stompSubscribe();
     }
-    sub = stompSubscribe();
     dispatch(loadRoom({ roomId }));
     stompClient.send(
       '/pub/socket/message',
@@ -143,9 +144,12 @@ const RoomContainer = ({ match, history }) => {
 
   useEffect(() => {
     if (room) {
-      for (let key in room.users) {
+      for (const key in room.users) {
         if (parseInt(key) === parseInt(userInfo.userNo)) {
           dispatch(update(room.users[key]));
+          if (room.users[key].baesinzer) {
+            dispatch(logMessage('System', '당신은 BaesinZer입니다.'));
+          }
           console.log('업데이트 실행');
         }
       }
