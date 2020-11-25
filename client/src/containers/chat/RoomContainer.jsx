@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
@@ -11,7 +11,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
-import user, { check, start, tempUser, update } from '../../modules/user';
+import user, { check, kill, start, tempUser, update } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -61,6 +61,12 @@ const RoomContainer = ({ match, history }) => {
     stompSend('START');
   };
 
+  // scroll관련
+  const scrollRef = useRef();
+  const scrollToBottom = () => {
+    scrollRef.current.scrollIntoView(0); // scroll을 항상 아래로 내리기
+  };
+
   const sendMessage = (e) => {
     e.preventDefault();
 
@@ -75,7 +81,15 @@ const RoomContainer = ({ match, history }) => {
         message.includes('kill') ||
         message.includes('죽')
       ) {
-        console.log('살해 실행');
+        if (userInfo.baesinzer) {
+          let usersArray = Object.values(room.users);
+          let userWord = message.split(' ');
+          for (let i = 0; i < usersArray.length; i++) {
+            if (userWord[1] === usersArray[i].username) {
+              dispatch(kill(usersArray[i].userNo));
+            }
+          }
+        }
       }
       dispatch(logMessage(userInfo.username, message));
       dispatch(initialField());
@@ -164,6 +178,18 @@ const RoomContainer = ({ match, history }) => {
     if (room && room.start) dispatch(initializeMessageLog());
   }, [room]);
 
+  //scroll
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageLog]);
+
+  // kill
+  useEffect(() => {
+    if (userInfo.baesinzer) {
+      stompSend('KILL');
+    }
+  }, [userInfo.kill]);
+
   return (
     <Room
       onSubmit={sendMessage}
@@ -176,6 +202,7 @@ const RoomContainer = ({ match, history }) => {
       exit={exit}
       visible={visible}
       closeModal={closeModal}
+      scrollRef={scrollRef}
     />
   );
 };

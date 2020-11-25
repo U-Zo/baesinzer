@@ -222,11 +222,12 @@ const Room = ({
   exit,
   visible,
   closeModal,
+  scrollRef,
 }) => {
   return (
     <RoomBlock>
       <ChatBlock>
-        <Chat>
+        <Chat ref={scrollRef}>
           {messageLog &&
             messageLog.map((message, index) => (
               <Message
