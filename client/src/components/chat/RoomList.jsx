@@ -107,6 +107,9 @@ const ButtonStyle = styled.button`
   :focus {
     outline: none;
   }
+  :hover {
+    font-weight: bold;
+  }
 `;
 const CodeInputStyle = styled.input`
   position: relative;
@@ -180,6 +183,9 @@ const MakeRoomButton = styled.button`
   :focus {
     outline: none;
   }
+  :hover {
+    font-weight: bold;
+  }
 `;
 
 const CancelButton = styled.button`
@@ -193,6 +199,9 @@ const CancelButton = styled.button`
   height: 3.5rem;
   :focus {
     outline: none;
+  }
+  :hover {
+    font-weight: bold;
   }
 `;
 const ErrorBox = styled.div`

@@ -220,6 +220,16 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo && userInfo.kill]);
 
+  const [baesinzer, setBaesinzer] = useState();
+
+  // baesinzer일 경우 baesinzer로고 붉은색으로
+  useEffect(() => {
+    if (userInfo.baesinzer) {
+      console.log('dfdf');
+      setBaesinzer('배신저');
+    }
+  }, [userInfo.baesinzer]);
+
   return (
     <Room
       onSubmit={sendMessage}
@@ -233,6 +243,7 @@ const RoomContainer = ({ match, history }) => {
       visible={visible}
       closeModal={closeModal}
       scrollRef={scrollRef}
+      baesinzer={baesinzer}
     />
   );
 };

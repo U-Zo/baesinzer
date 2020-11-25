@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Modal from '../common/Modal';
 const RoomBlock = styled.div`
   background-color: var(--color-background);
-  border: 0.2rem solid var(--color-green);
   border: 3px solid var(--color-green);
   margin: 0 auto;
   margin-top: 1rem;
@@ -75,6 +74,9 @@ const ButtonStyle = styled.button`
   :focus {
     outline: none;
   }
+  :hover {
+    font-weight: bold;
+  }
 `;
 
 const Chat = styled.ul`
@@ -107,6 +109,9 @@ const BaesinzerText = styled.div`
   top: -85%;
   transform: translate(-50%, -50%);
   font-size: 3rem;
+  &#배신저 {
+    color: var(--color-red);
+  }
 `;
 
 const AllUsersBox = styled.div`
@@ -120,8 +125,9 @@ const AllUsersBox = styled.div`
   height: 30rem;
   width: 18rem;
 `;
+
 const AllUsers = styled.div`
-  padding-top: 1rem;
+  padding-top: 2.3rem;
   text-align: center;
   font-size: 2rem;
   /* &#myusername {
@@ -146,7 +152,7 @@ const AllUsers = styled.div`
     color: #7a68df;
   }
   & + & {
-    margin: 3rem;
+    margin: 5rem;
   }
 `;
 const Start = styled.button`
@@ -163,6 +169,9 @@ const Start = styled.button`
   :focus {
     outline: none;
   }
+  :hover {
+    font-weight: bold;
+  }
 `;
 const Exit = styled.button`
   position: absolute;
@@ -178,6 +187,9 @@ const Exit = styled.button`
   :focus {
     outline: none;
   }
+  :hover {
+    font-weight: bold;
+  }
 `;
 
 const ModalText = styled.div`
@@ -189,6 +201,9 @@ const ModalButton = styled.button`
   color: var(--color-green);
   :focus {
     outline: none;
+  }
+  :hover {
+    font-weight: bold;
   }
 `;
 // ================================================== //
@@ -223,6 +238,7 @@ const Room = ({
   visible,
   closeModal,
   scrollRef,
+  baesinzer,
 }) => {
   return (
     <RoomBlock>
@@ -250,7 +266,7 @@ const Room = ({
         <ButtonStyle>입력</ButtonStyle>
       </form>
       <Code>코드 : 1234</Code>
-      <BaesinzerText>Baesinzer</BaesinzerText>
+      <BaesinzerText id={baesinzer}>Baesinzer</BaesinzerText>
       <AllUsersBox>
         {usersArray &&
           usersArray.map((user, index) => (

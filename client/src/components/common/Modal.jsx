@@ -11,13 +11,17 @@ const ModalBlock = styled.div`
   padding: 15px;
   //수정
   background-color: var(--color-background);
-  position: absolute;
+  /* position: relative; */
+  position: relative;
   left: 50%;
-  top: 30%;
+  top: -35%;
   transform: translate(-50%, -50%);
 
   > .hh {
     margin-bottom: 10px;
+  }
+  :hover {
+    font-weight: bold;
   }
 `;
 const ModalFooter = styled.div`
