@@ -54,6 +54,7 @@ public class MessageController {
                 break;
             case START:
                 message.setUserInfo(system);
+                message.setType(Message.MessageType.ROOM);
                 message.setMessage("5초 뒤 게임이 시작됩니다.");
                 Timer timer = new Timer();
                 TimerTask timerTask = new TimerTask() {
@@ -88,6 +89,7 @@ public class MessageController {
                 break;
             case PLAY:
                 room.getUsers().put(userInfo.getUserNo(), userInfo);
+                break;
             case KILL:
                 int killNo = userInfo.getKill();
                 UserInfo deadUser = room.getUsers().get(killNo);
