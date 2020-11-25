@@ -11,11 +11,10 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
-import user, {
+import {
   check,
   kill,
   moveLocation,
-  start,
   tempUser,
   update,
 } from '../../modules/user';
@@ -37,14 +36,14 @@ const RoomContainer = ({ match, history }) => {
     })
   );
 
-  //modal
+  // modal
   const [visible, setVisible] = useState(false);
 
   let isConnect = false;
 
   const onChange = (e) => {
     const value = e.target.value;
-    dispatch(changeField(value)); //message에 저장
+    dispatch(changeField(value)); // message에 저장
   };
 
   const closeModal = () => {
@@ -52,16 +51,17 @@ const RoomContainer = ({ match, history }) => {
   };
 
   const stompSend = (type) => {
-    stompClient.send(
-      '/pub/socket/message',
-      {},
-      JSON.stringify({
-        type,
-        roomCode: roomId,
-        userInfo,
-        message,
-      })
-    );
+    stompClient.connected &&
+      stompClient.send(
+        '/pub/socket/message',
+        {},
+        JSON.stringify({
+          type,
+          roomCode: roomId,
+          userInfo,
+          message,
+        })
+      );
   };
 
   const startHandler = () => {
@@ -77,15 +77,14 @@ const RoomContainer = ({ match, history }) => {
   const sendMessage = (e) => {
     e.preventDefault();
 
-    //서버에 정보 전달
-    //dispatch로유저 정보를 저장한다.
+    // 서버에 정보 전달
+    // dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
     if (room.start) {
       if (message.includes('이동') || message.includes('move')) {
-        console.log('이동 실행');
-        const mapLocation = message.replace(/[^0-9]/g, '');
-        console.log(mapLocation);
+        const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
         dispatch(moveLocation(mapLocation));
+        dispatch(logMessage('System', `${mapLocation}으로 이동했다.`));
       } else if (
         message.includes('살해') ||
         message.includes('kill') ||
@@ -97,11 +96,18 @@ const RoomContainer = ({ match, history }) => {
           for (let i = 0; i < usersArray.length; i++) {
             if (userWord[1] === usersArray[i].username) {
               dispatch(kill(usersArray[i].userNo));
+              dispatch(
+                logMessage(
+                  userInfo.username,
+                  `${usersArray[i].username}을 처리했다.`
+                )
+              );
             }
           }
         }
+      } else {
+        dispatch(logMessage(userInfo.username, message));
       }
-      dispatch(logMessage(userInfo.username, message));
       dispatch(initialField());
     } else {
       stompSend('ROOM');
@@ -120,38 +126,47 @@ const RoomContainer = ({ match, history }) => {
     stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
-      console.log(serverMesg);
-
       const userInfoServer = serverMesg.userInfo;
-      console.log(userInfoServer);
 
       // 수정 userInfo update
       if (!isConnect && serverMesg.type === 'JOIN') {
-        console.log(isConnect);
         dispatch(tempUser(userInfoServer));
         isConnect = true;
       }
 
-      //메세지 정보 받기
-      dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      // 메세지 정보 받기
+      if (
+        serverMesg.type === 'ROOM' ||
+        serverMesg.type === 'JOIN' ||
+        serverMesg.type === 'EXIT'
+      ) {
+        dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      }
       dispatch(loadRoom({ roomId }));
     });
 
+  const stompConnection = () =>
+    new Promise((resolve, reject) => {
+      if (!stompClient.connected) {
+        resolve(stompClient.connect({}, stompSubscribe));
+      } else {
+        resolve(stompSubscribe());
+      }
+    });
+
   useEffect(() => {
-    let sub;
-    if (!stompClient.connected) {
-      sub = stompClient.connect({}, stompSubscribe);
-    } else {
-      sub = stompSubscribe();
-    }
-    dispatch(loadRoom({ roomId }));
-    stompSend('JOIN');
+    let subId;
+    stompConnection().then((connection) => {
+      subId = connection;
+      dispatch(loadRoom({ roomId }));
+      stompSend('JOIN');
+    });
     return () => {
       //컴포넌트 끝
       stompSend('EXIT');
       //수정
       dispatch(exitRoom());
-      sub.unsubscribe();
+      stompClient.connected && subId.unsubscribe();
       dispatch(initializeMessageLog());
       dispatch(check());
     };
@@ -159,7 +174,7 @@ const RoomContainer = ({ match, history }) => {
 
   useEffect(() => {
     if (!room) {
-      history.push(`/lobby`); //room의 정보가 null이면(exit), lobby로 이동
+      history.push(`/lobby`); // room의 정보가 null이면(exit), lobby로 이동
     }
   }, [room, history]);
 
@@ -168,41 +183,42 @@ const RoomContainer = ({ match, history }) => {
       for (const key in room.users) {
         if (parseInt(key) === parseInt(userInfo.userNo)) {
           dispatch(update(room.users[key]));
-          if (room.users[key].baesinzer) {
-            dispatch(logMessage('System', '당신은 BaesinZer입니다.'));
-          }
-          console.log('업데이트 실행');
         }
       }
     }
-  }, [room.start]);
+  }, [room]);
 
   // dead 시 모달창 띄우기
   useEffect(() => {
-    if (room.start && userInfo.dead) {
+    if (room && room.start && userInfo.dead) {
       setVisible(true);
     }
   }, [userInfo]);
 
   useEffect(() => {
-    if (room && room.start) dispatch(initializeMessageLog());
-  }, [room.start]);
-  //move
-  useEffect(() => {
-    stompSend('PLAY');
-  }, [userInfo.locationId]);
+    if (room && room.start) {
+      dispatch(initializeMessageLog());
+    }
+  }, [room && room.start]);
 
-  //scroll
+  // move
+  useEffect(() => {
+    if (room && room.start) {
+      stompSend('PLAY');
+    }
+  }, [userInfo && userInfo.locationId]);
+
+  // scroll
   useEffect(() => {
     scrollToBottom();
   }, [messageLog]);
 
   // kill
   useEffect(() => {
-    if (userInfo.baesinzer) {
+    if (userInfo && userInfo.baesinzer) {
       stompSend('KILL');
     }
-  }, [userInfo.kill]);
+  }, [userInfo && userInfo.kill]);
 
   return (
     <Room

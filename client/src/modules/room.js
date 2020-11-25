@@ -19,7 +19,7 @@ const [
 
 const [
   EXIT_ROOM,
-  EXIT_ROOM_SUCESS,
+  EXIT_ROOM_SUCCESS,
   EXIT_ROOM_FAILURE,
 ] = createRequestActionTypes('room/EXIT_ROOM');
 
@@ -70,7 +70,7 @@ const room = handleActions(
       room: null,
       error,
     }),
-    [EXIT_ROOM_SUCESS]: (state) => ({
+    [EXIT_ROOM_SUCCESS]: (state) => ({
       ...state,
       room: null,
     }),
