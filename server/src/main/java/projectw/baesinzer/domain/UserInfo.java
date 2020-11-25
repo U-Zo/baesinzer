@@ -18,4 +18,5 @@ public class UserInfo {
     private int votedNum;
     private List<Mission> missionList;
     private boolean host;
+    private int kill;
 }

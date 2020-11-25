@@ -28,6 +28,8 @@ public class MessageController {
     public void sendMessage(Message message, SimpMessageHeaderAccessor headerAccessor) {
         UserInfo userInfo = message.getUserInfo();
         Room room = roomService.findOne(message.getRoomCode());
+        UserInfo system = new UserInfo();
+        system.setUsername("System");
 
         switch (message.getType()) { // 메시지 타입 검사
             case JOIN: // 방 입장
@@ -51,9 +53,7 @@ public class MessageController {
                 }
                 break;
             case START:
-                UserInfo sys = new UserInfo();
-                sys.setUsername("System");
-                message.setUserInfo(sys);
+                message.setUserInfo(system);
                 message.setMessage("5초 뒤 게임이 시작됩니다.");
                 Timer timer = new Timer();
                 TimerTask timerTask = new TimerTask() {
@@ -86,6 +86,14 @@ public class MessageController {
 
                 timer.schedule(timerTask, 1000, 1000);
                 break;
+            case PLAY:
+                room.getUsers().put(userInfo.getUserNo(), userInfo);
+            case KILL:
+                int killNo = userInfo.getKill();
+                UserInfo deadUser = room.getUsers().get(killNo);
+                deadUser.setDead(true);
+                room.getUsers().put(userInfo.getUserNo(), userInfo);
+                break;
             case VOTE_START:
                 for (int i = 1; i <= room.getCount(); i++) {
                     room.getUsers().get(i).setHasVoted(0);
@@ -96,6 +104,7 @@ public class MessageController {
                 int userNo = userInfo.getHasVoted();
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
                 votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
+                room.getUsers().put(userInfo.getUserNo(), userInfo);
                 break;
             case EXIT:
                 UserInfo _userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
@@ -116,7 +125,7 @@ public class MessageController {
                             nextHost.setHost(true);
                             Message nextHostMessage = new Message();
                             nextHostMessage.setType(Message.MessageType.ROOM);
-                            nextHostMessage.setUserInfo(nextHost);
+                            nextHostMessage.setUserInfo(system);
                             nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
                             break;
