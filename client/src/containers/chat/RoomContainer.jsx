@@ -37,7 +37,7 @@ const RoomContainer = ({ match, history }) => {
     })
   );
 
-  //modal
+  // modal
   const [visible, setVisible] = useState(false);
 
   let isConnect = false;
@@ -187,12 +187,13 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start) dispatch(initializeMessageLog());
   }, [room.start]);
-  //move
+
+  // move
   useEffect(() => {
     stompSend('PLAY');
   }, [userInfo.locationId]);
 
-  //scroll
+  // scroll
   useEffect(() => {
     scrollToBottom();
   }, [messageLog]);
@@ -203,6 +204,16 @@ const RoomContainer = ({ match, history }) => {
       stompSend('KILL');
     }
   }, [userInfo.kill]);
+
+  const [baesinzer, setBaesinzer] = useState();
+
+  // baesinzer일 경우 baesinzer로고 붉은색으로
+  useEffect(() => {
+    if (userInfo.baesinzer) {
+      console.log('dfdf');
+      setBaesinzer('배신저');
+    }
+  }, [userInfo.baesinzer]);
 
   return (
     <Room
@@ -217,6 +228,7 @@ const RoomContainer = ({ match, history }) => {
       visible={visible}
       closeModal={closeModal}
       scrollRef={scrollRef}
+      baesinzer={baesinzer}
     />
   );
 };
