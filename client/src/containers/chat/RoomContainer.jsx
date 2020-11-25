@@ -11,7 +11,13 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoom } from '../../modules/room';
-import user, { check, start, tempUser, update } from '../../modules/user';
+import user, {
+  check,
+  moveLocation,
+  start,
+  tempUser,
+  update,
+} from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -70,12 +76,17 @@ const RoomContainer = ({ match, history }) => {
     if (room.start) {
       if (message.includes('이동') || message.includes('move')) {
         console.log('이동 실행');
+        const mapLocation = message.replace(/[^0-9]/g, '');
+        console.log(mapLocation);
+        dispatch(moveLocation(mapLocation));
       } else if (
         message.includes('살해') ||
         message.includes('kill') ||
         message.includes('죽')
       ) {
-        console.log('살해 실행');
+        if (userInfo.baesinzer) {
+          console.log('살해 실행');
+        }
       }
       dispatch(logMessage(userInfo.username, message));
       dispatch(initialField());
@@ -151,7 +162,7 @@ const RoomContainer = ({ match, history }) => {
         }
       }
     }
-  }, [room]);
+  }, [room.start]);
 
   // dead 시 모달창 띄우기
   useEffect(() => {
@@ -162,7 +173,11 @@ const RoomContainer = ({ match, history }) => {
 
   useEffect(() => {
     if (room && room.start) dispatch(initializeMessageLog());
-  }, [room]);
+  }, [room.start]);
+  //move
+  useEffect(() => {
+    stompSend('PLAY');
+  }, [userInfo.locationId]);
 
   return (
     <Room
