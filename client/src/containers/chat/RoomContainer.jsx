@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
@@ -13,6 +13,7 @@ import {
 import { exitRoom, loadRoom } from '../../modules/room';
 import user, {
   check,
+  kill,
   moveLocation,
   start,
   tempUser,
@@ -67,6 +68,12 @@ const RoomContainer = ({ match, history }) => {
     stompSend('START');
   };
 
+  // scroll관련
+  const scrollRef = useRef();
+  const scrollToBottom = () => {
+    scrollRef.current.scrollIntoView(0); // scroll을 항상 아래로 내리기
+  };
+
   const sendMessage = (e) => {
     e.preventDefault();
 
@@ -85,7 +92,13 @@ const RoomContainer = ({ match, history }) => {
         message.includes('죽')
       ) {
         if (userInfo.baesinzer) {
-          console.log('살해 실행');
+          let usersArray = Object.values(room.users);
+          let userWord = message.split(' ');
+          for (let i = 0; i < usersArray.length; i++) {
+            if (userWord[1] === usersArray[i].username) {
+              dispatch(kill(usersArray[i].userNo));
+            }
+          }
         }
       }
       dispatch(logMessage(userInfo.username, message));
@@ -179,6 +192,18 @@ const RoomContainer = ({ match, history }) => {
     stompSend('PLAY');
   }, [userInfo.locationId]);
 
+  //scroll
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageLog]);
+
+  // kill
+  useEffect(() => {
+    if (userInfo.baesinzer) {
+      stompSend('KILL');
+    }
+  }, [userInfo.kill]);
+
   return (
     <Room
       onSubmit={sendMessage}
@@ -191,6 +216,7 @@ const RoomContainer = ({ match, history }) => {
       exit={exit}
       visible={visible}
       closeModal={closeModal}
+      scrollRef={scrollRef}
     />
   );
 };
