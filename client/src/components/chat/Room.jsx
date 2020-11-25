@@ -276,7 +276,9 @@ const Room = ({
               userNo={user.userNo}
             />
           ))}
-        {userInfo.host && <Start onClick={startHandler}>START</Start>}
+        {userInfo && userInfo.host && (
+          <Start onClick={startHandler}>START</Start>
+        )}
         <Exit onClick={exit}>EXIT</Exit>
       </AllUsersBox>
       <Modal visible={visible}>
