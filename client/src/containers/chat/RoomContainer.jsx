@@ -84,7 +84,7 @@ const RoomContainer = ({ match, history }) => {
       if (message.includes('이동') || message.includes('move')) {
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
         dispatch(moveLocation(mapLocation));
-        dispatch(logMessage('System', `${mapLocation}으로 이동했다.`));
+        dispatch(logMessage(userInfo.username, `${mapLocation}으로 이동했다.`));
       } else if (
         message.includes('살해') ||
         message.includes('kill') ||
@@ -225,10 +225,11 @@ const RoomContainer = ({ match, history }) => {
   // baesinzer일 경우 baesinzer로고 붉은색으로
   useEffect(() => {
     if (userInfo.baesinzer) {
-      console.log('dfdf');
       setBaesinzer('배신저');
+      dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
+      dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
     }
-  }, [userInfo.baesinzer]);
+  }, [userInfo && userInfo.baesinzer]);
 
   return (
     <Room
