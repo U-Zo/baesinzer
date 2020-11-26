@@ -87,7 +87,7 @@ const RoomContainer = ({ match, history }) => {
       if (message.includes('이동') || message.includes('move')) {
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
         dispatch(moveLocation(mapLocation));
-        dispatch(logMessage('System', `${mapLocation}으로 이동했다.`));
+        dispatch(logMessage(userInfo.username, `${mapLocation}으로 이동했다.`));
       } else if (
         message.includes('살해') ||
         message.includes('kill') ||
@@ -228,13 +228,16 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (userInfo.baesinzer) {
       setBaesinzer('배신저');
+      dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
+      dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
     }
     for (let i = 0; i < Object.values(room.users).length; i++) {
       if (Object.values(room.users)[i].kill > 0) {
         setKilledby(Object.values(room.users)[i].username);
       }
     }
-  }, [userInfo.baesinzer, room.users]);
+  }, [userInfo && userInfo.baesinzer]);
+
   return (
     <Room
       onSubmit={sendMessage}

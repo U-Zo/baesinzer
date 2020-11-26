@@ -272,13 +272,16 @@ const Room = ({
       <BaesinzerText id={baesinzer}>Baesinzer</BaesinzerText>
       <AllUsersBox>
         {usersArray &&
-          usersArray.map((user, index) => (
-            <Username
-              key={index}
-              username={user.username}
-              userNo={user.userNo}
-            />
-          ))}
+          usersArray.map(
+            (user, index) =>
+              user.locationId === userInfo.locationId && (
+                <Username
+                  key={index}
+                  username={user.username}
+                  userNo={user.userNo}
+                />
+              )
+          )}
         {userInfo && userInfo.host && (
           <Start onClick={startHandler}>START</Start>
         )}

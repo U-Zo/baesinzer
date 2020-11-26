@@ -32,7 +32,6 @@ const RoomListContainer = ({ history }) => {
   const onClick = () => {
     //수정-----
     if (userInfo.username === null || userInfo.username === '') {
-      console.log(userInfo.username);
       setVisible(false);
       setType('닉네임');
       setError('닉네임을 입력하세요.');
