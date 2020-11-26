@@ -20,9 +20,6 @@ const ModalBlock = styled.div`
   > .hh {
     margin-bottom: 10px;
   }
-  :hover {
-    font-weight: bold;
-  }
 `;
 const ModalFooter = styled.div`
   margin-top: 10px;

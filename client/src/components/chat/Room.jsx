@@ -105,12 +105,13 @@ const Code = styled.div`
 const BaesinzerText = styled.div`
   color: var(--color-green);
   position: relative;
-  left: 125%;
+  left: 126%;
   top: -85%;
   transform: translate(-50%, -50%);
   font-size: 3rem;
   &#배신저 {
     color: var(--color-red);
+    font-weight: bold;
   }
 `;
 
@@ -130,25 +131,23 @@ const AllUsers = styled.div`
   padding-top: 2.3rem;
   text-align: center;
   font-size: 2rem;
-  /* &#myusername {
-    color: var(--color-red);
-  } */
-  &#color1 {
+
+  &#user1 {
     color: #fb4d51;
   }
-  &#color2 {
+  &#user2 {
     color: #f5fa4e;
   }
-  &#color3 {
+  &#user3 {
     color: #00d9ff;
   }
-  &#color4 {
+  &#user4 {
     color: #00cc00;
   }
-  &#color5 {
+  &#user5 {
     color: #bb00bb;
   }
-  &#color6 {
+  &#user6 {
     color: #7a68df;
   }
   & + & {
@@ -191,11 +190,19 @@ const Exit = styled.button`
     font-weight: bold;
   }
 `;
+const NewModal = styled(Modal)`
+  background-color: var(--color-red);
+`;
 
 const ModalText = styled.div`
+  font-size: 2.3rem;
   color: var(--color-green);
 `;
 const ModalButton = styled.button`
+  margin-top: 5rem;
+  width: 18rem;
+  height: 4rem;
+  font-size: 3rem;
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
   color: var(--color-green);
@@ -217,12 +224,7 @@ const Message = React.memo(({ username, message }) => {
 const Username = ({ username, userNo }) => {
   return (
     <div>
-      {/* {username === mine.username && userNo === mine.userNo ? (
-        <AllUsers  id="myusername">{username}</AllUsers>
-      ) : (
-        <AllUsers>{username}</AllUsers>
-      )} */}
-      <AllUsers id={'color' + userNo}>{username}</AllUsers>
+      <AllUsers id={'user' + userNo}>{username}</AllUsers>
     </div>
   );
 };
@@ -239,6 +241,7 @@ const Room = ({
   closeModal,
   scrollRef,
   baesinzer,
+  killedby,
 }) => {
   return (
     <RoomBlock>
@@ -284,10 +287,10 @@ const Room = ({
         )}
         <Exit onClick={exit}>EXIT</Exit>
       </AllUsersBox>
-      <Modal visible={visible}>
-        <ModalText>죽음</ModalText>
-        <ModalButton onClick={closeModal}>확인</ModalButton>
-      </Modal>
+      <NewModal visible={visible}>
+        <ModalText>윽.. [ {killedby} ].. 널 믿었는데.. </ModalText>
+        <ModalButton onClick={closeModal}>CLOSE</ModalButton>
+      </NewModal>
     </RoomBlock>
   );
 };
