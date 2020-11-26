@@ -1,3 +1,4 @@
+import { getSuggestedQuery } from '@testing-library/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -38,6 +39,8 @@ const RoomContainer = ({ match, history }) => {
 
   // modal
   const [visible, setVisible] = useState(false);
+  const [baesinzer, setBaesinzer] = useState();
+  const [killedby, setKilledby] = useState();
 
   let isConnect = false;
 
@@ -91,6 +94,7 @@ const RoomContainer = ({ match, history }) => {
         message.includes('죽')
       ) {
         if (userInfo.baesinzer) {
+          setKilledby(userInfo.username);
           let usersArray = Object.values(room.users);
           let userWord = message.split(' ');
           for (let i = 0; i < usersArray.length; i++) {
@@ -220,16 +224,17 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo && userInfo.kill]);
 
-  const [baesinzer, setBaesinzer] = useState();
-
-  // baesinzer일 경우 baesinzer로고 붉은색으로
+  // baesinzer
   useEffect(() => {
     if (userInfo.baesinzer) {
-      console.log('dfdf');
       setBaesinzer('배신저');
     }
-  }, [userInfo.baesinzer]);
-
+    for (let i = 0; i < Object.values(room.users).length; i++) {
+      if (Object.values(room.users)[i].kill > 0) {
+        setKilledby(Object.values(room.users)[i].username);
+      }
+    }
+  }, [userInfo.baesinzer, room.users]);
   return (
     <Room
       onSubmit={sendMessage}
@@ -244,6 +249,7 @@ const RoomContainer = ({ match, history }) => {
       closeModal={closeModal}
       scrollRef={scrollRef}
       baesinzer={baesinzer}
+      killedby={killedby}
     />
   );
 };
