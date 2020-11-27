@@ -212,6 +212,10 @@ const ErrorBox = styled.div`
     top: 4%;
     left: 50%;
   }
+  &#인원 {
+    top: 4%;
+    left: 50%;
+  }
   &#방제목 {
     top: 19%;
     left: 50%;
@@ -253,7 +257,9 @@ const RoomList = ({
 
   return (
     <LobbyBlock>
-      {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
+      {type === '닉네임' || '인원' ? (
+        <ErrorBox id={type}>{error}</ErrorBox>
+      ) : null}
 
       <NicknameBox>
         {username == null ? (

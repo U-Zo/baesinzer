@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import user from '../../modules/user';
 import Modal from '../common/Modal';
+
 const RoomBlock = styled.div`
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
@@ -128,10 +130,34 @@ const AllUsersBox = styled.div`
 `;
 
 const AllUsers = styled.div`
-  padding-top: 2.3rem;
+  padding-top: 2rem;
   text-align: center;
-  font-size: 2rem;
-
+  font-size: 2.5rem;
+  letter-spacing: 0.3rem;
+  &#dead1 {
+    color: #fb4d51;
+    text-decoration: line-through;
+  }
+  &#dead2 {
+    color: #f5fa4e;
+    text-decoration: line-through;
+  }
+  &#dead3 {
+    color: #00d9ff;
+    text-decoration: line-through;
+  }
+  &#dead4 {
+    color: #00cc00;
+    text-decoration: line-through;
+  }
+  &#dead5 {
+    color: #bb00bb;
+    text-decoration: line-through;
+  }
+  &#dead6 {
+    color: rgb(122, 104, 223);
+    text-decoration: line-through;
+  }
   &#user1 {
     color: #fb4d51;
   }
@@ -148,8 +174,9 @@ const AllUsers = styled.div`
     color: #bb00bb;
   }
   &#user6 {
-    color: #7a68df;
+    color: rgb(122, 104, 223);
   }
+
   & + & {
     margin: 5rem;
   }
@@ -221,10 +248,14 @@ const Message = React.memo(({ username, message }) => {
     </UserMessage>
   );
 });
-const Username = ({ username, userNo }) => {
+const Username = ({ username, userNo, dead }) => {
   return (
     <div>
-      <AllUsers id={'user' + userNo}>{username}</AllUsers>
+      {dead ? (
+        <AllUsers id={'dead' + userNo}>{username}</AllUsers>
+      ) : (
+        <AllUsers id={'user' + userNo}>{username}</AllUsers>
+      )}
     </div>
   );
 };
@@ -279,6 +310,7 @@ const Room = ({
                   key={index}
                   username={user.username}
                   userNo={user.userNo}
+                  dead={user.dead}
                 />
               )
           )}
