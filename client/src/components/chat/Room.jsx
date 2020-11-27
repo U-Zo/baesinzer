@@ -275,7 +275,6 @@ const Room = ({
   visible,
   closeModal,
   scrollRef,
-  baesinzer,
   killedby,
 }) => {
   return (
@@ -287,9 +286,8 @@ const Room = ({
               messageLog.map((message, index) => (
                 <Message
                   key={index}
-                  username={user.username}
-                  userNo={user.userNo}
-                  dead={user.dead}
+                  username={message.username}
+                  message={message.message}
                 />
               ))}
           </Chat>
@@ -320,6 +318,7 @@ const Room = ({
                     key={index}
                     username={user.username}
                     userNo={user.userNo}
+                    dead={user.dead}
                   />
                 )
             )}
