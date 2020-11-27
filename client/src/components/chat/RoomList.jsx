@@ -263,7 +263,6 @@ const RoomList = ({
     <Block>
       <LobbyBlock>
         {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
-
         <NicknameBox>
           {username == null ? (
             <InputNickname
