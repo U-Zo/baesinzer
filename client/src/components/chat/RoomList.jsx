@@ -264,53 +264,15 @@ const RoomList = ({
   }
 
   return (
-  <Block>
-    <LobbyBlock>
-      {type === '닉네임' || '인원' ? (
-        <ErrorBox id={type}>{error}</ErrorBox>
-      ) : null}
+    <Block>
+      <LobbyBlock>
+        {type === '닉네임' || '인원' ? (
+          <ErrorBox id={type}>{error}</ErrorBox>
+        ) : null}
 
-      <NicknameBox>
-        {username == null ? (
-          <InputNickname
-            type="text"
-            value={username}
-            onChange={changeUsername}
-            placeholder="NICKNAME"
-          />
-        ) : (
-          <InputNickname
-            type="text"
-            value={username}
-            onChange={changeUsername}
-          />
-        )}
-      </NicknameBox>
-      <RoomListBox>
-        <RoomBox>
-          {!loading &&
-            roomList &&
-            roomList.map((room) => (
-              <RoomLink>
-                <Room
-                  onClick={() => onJoin(room.roomCode)}
-                  name={room.roomName}
-                  count={room.count}
-                />
-              </RoomLink>
-            ))}
-        </RoomBox>
-      </RoomListBox>
-      {/* modal */}
-
-      <CodeInputStyle type="text" placeholder="CDOE" />
-      <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
-      <Modal visible={visible} onClick={onClick}>
-        <div>
-          <form onSubmit={makeRoom} autoComplete="off">
-            {type === '방제목' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
-            <ModalInput
-              onChange={onChangeRoomName}
+        <NicknameBox>
+          {username == null ? (
+            <InputNickname
               type="text"
               value={username}
               onChange={changeUsername}
