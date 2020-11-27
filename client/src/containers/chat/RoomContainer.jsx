@@ -93,7 +93,7 @@ const RoomContainer = ({ match, history }) => {
         message.includes('kill') ||
         message.includes('죽')
       ) {
-        if (userInfo.baesinzer) {
+        if (userInfo && userInfo.baesinzer) {
           setKilledby(userInfo.username);
           let usersArray = Object.values(room.users);
           let userWord = message.split(' ');
@@ -145,6 +145,9 @@ const RoomContainer = ({ match, history }) => {
         serverMesg.type === 'EXIT'
       ) {
         dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      } else if (serverMesg.type === 'END') {
+        dispatch(initializeMessageLog());
+        dispatch(logMessage(userInfoServer.username, serverMesg.message));
       }
       dispatch(loadRoom({ roomId }));
     });

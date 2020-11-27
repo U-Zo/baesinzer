@@ -288,7 +288,7 @@ const RoomList = ({
       </RoomListBox>
       {/* modal */}
 
-      <CodeInputStyle type="text" placeholder="CDOE" />
+      <CodeInputStyle type="text" placeholder="CODE" />
       <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
       <Modal visible={visible} onClick={onClick}>
         <div>

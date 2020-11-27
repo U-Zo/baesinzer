@@ -97,7 +97,7 @@ public class MessageController {
                 room.getUsers().put(userInfo.getUserNo(), userInfo);
                 break;
             case VOTE_START:
-                for (int i = 1; i <= room.getCount(); i++) {
+                for (int i = 1; i <= 6; i++) {
                     room.getUsers().get(i).setHasVoted(0);
                     room.getUsers().get(i).setVotedNum(0);
                 }
@@ -143,6 +143,47 @@ public class MessageController {
         }
 
         operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+
+        System.out.println("메시지 보내고 나서");
+
+        if (room.isStart()) {
+            int alive = room.getCount() - 1;
+
+            // 생존자 수 확인
+            for (int i = 1; i <= 6; i++) {
+                UserInfo user = room.getUsers().get(i);
+                if (user != null && user.isDead()) {
+                    alive--;
+                }
+            }
+
+            // 생존자 수가 1명 이하일 경우 게임 종료
+            if (alive <= 1) {
+                message.setType(Message.MessageType.END);
+                message.setUserInfo(system);
+                room.setStart(false);
+
+                // 게임 종료 시 게임 내 정보 초기화
+                for (int i = 1; i <= 6; i++) {
+                    UserInfo user = room.getUsers().get(i);
+                    if (user != null) {
+                        if (user.isBaesinzer()) {
+                            message.setMessage(user.getUsername() + "이(가) 시민을 모두 처리하였습니다.");
+                            user.setBaesinzer(false);
+                        }
+                        user.setBaesinzer(false);
+                        user.setDead(false);
+                        user.setLocationId(0);
+                        user.setVotedNum(0);
+                        user.setHasVoted(0);
+                        user.setMissionList(null);
+                        user.setKill(0);
+                    }
+                }
+
+                operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+            }
+        }
     }
 
     @EventListener
