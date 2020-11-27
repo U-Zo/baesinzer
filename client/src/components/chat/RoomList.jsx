@@ -5,6 +5,14 @@ import Modal from '../common/Modal';
 import { createRoom } from '../../lib/api/rooms';
 import styled from 'styled-components';
 
+const Block = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const LobbyBlock = styled.div`
   /* position: relative; */
   margin: 0 auto;
@@ -256,6 +264,7 @@ const RoomList = ({
   }
 
   return (
+  <Block>
     <LobbyBlock>
       {type === '닉네임' || '인원' ? (
         <ErrorBox id={type}>{error}</ErrorBox>
@@ -303,20 +312,61 @@ const RoomList = ({
             <ModalInput
               onChange={onChangeRoomName}
               type="text"
-              name="roomName"
-              placeholder="방 제목을 입력하세요."
+              value={username}
+              onChange={changeUsername}
+              placeholder="NICKNAME"
             />
-            <br></br>
-            <div>
-              <Buttons>
-                <MakeRoomButton>방만들기</MakeRoomButton>
-                <CancelButton onClick={onClick}>취소</CancelButton>
-              </Buttons>
-            </div>
-          </form>
-        </div>
-      </Modal>
-    </LobbyBlock>
+          ) : (
+            <InputNickname
+              type="text"
+              value={username}
+              onChange={changeUsername}
+            />
+          )}
+        </NicknameBox>
+        <RoomListBox>
+          <RoomBox>
+            {!loading &&
+              roomList &&
+              roomList.map((room) => (
+                <RoomLink>
+                  <Room
+                    onClick={() => onJoin(room.roomCode)}
+                    name={room.roomName}
+                    count={room.count}
+                  />
+                </RoomLink>
+              ))}
+          </RoomBox>
+        </RoomListBox>
+        {/* modal */}
+
+        <CodeInputStyle type="text" placeholder="CDOE" />
+        <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
+        <Modal visible={visible} onClick={onClick}>
+          <div>
+            <form onSubmit={makeRoom} autoComplete="off">
+              {type === '방제목' ? (
+                <ErrorBox id={type}>{error}</ErrorBox>
+              ) : null}
+              <ModalInput
+                onChange={onChangeRoomName}
+                type="text"
+                name="roomName"
+                placeholder="방 제목을 입력하세요."
+              />
+              <br></br>
+              <div>
+                <Buttons>
+                  <MakeRoomButton>방만들기</MakeRoomButton>
+                  <CancelButton onClick={onClick}>취소</CancelButton>
+                </Buttons>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      </LobbyBlock>
+    </Block>
   );
 };
 

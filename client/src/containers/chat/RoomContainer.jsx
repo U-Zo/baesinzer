@@ -39,7 +39,6 @@ const RoomContainer = ({ match, history }) => {
 
   // modal
   const [visible, setVisible] = useState(false);
-  const [baesinzer, setBaesinzer] = useState();
   const [killedby, setKilledby] = useState();
 
   let isConnect = false;
@@ -93,7 +92,7 @@ const RoomContainer = ({ match, history }) => {
         message.includes('kill') ||
         message.includes('죽')
       ) {
-        if (userInfo.baesinzer) {
+        if (userInfo && userInfo.baesinzer) {
           setKilledby(userInfo.username);
           let usersArray = Object.values(room.users);
           let userWord = message.split(' ');
@@ -148,6 +147,9 @@ const RoomContainer = ({ match, history }) => {
         serverMesg.type === 'EXIT'
       ) {
         dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      } else if (serverMesg.type === 'END') {
+        dispatch(initializeMessageLog());
+        dispatch(logMessage(userInfoServer.username, serverMesg.message));
       }
       dispatch(loadRoom({ roomId }));
     });
@@ -192,6 +194,13 @@ const RoomContainer = ({ match, history }) => {
           dispatch(update(room.users[key]));
         }
       }
+
+      // baesinzer로부터 죽음 모달 pop
+      for (let i = 0; i < Object.values(room.users).length; i++) {
+        if (Object.values(room.users)[i].kill > 0) {
+          setKilledby(Object.values(room.users)[i].username);
+        }
+      }
     }
   }, [room]);
 
@@ -230,14 +239,8 @@ const RoomContainer = ({ match, history }) => {
   // baesinzer
   useEffect(() => {
     if (userInfo.baesinzer) {
-      setBaesinzer('배신저');
       dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
       dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
-    }
-    for (let i = 0; i < Object.values(room.users).length; i++) {
-      if (Object.values(room.users)[i].kill > 0) {
-        setKilledby(Object.values(room.users)[i].username);
-      }
     }
   }, [userInfo && userInfo.baesinzer]);
 
@@ -249,12 +252,11 @@ const RoomContainer = ({ match, history }) => {
       userInfo={userInfo}
       message={message}
       messageLog={messageLog}
-      usersArray={room && Object.values(room.users)} // json형태를 배열로 변환
+      usersArray={room && Object.values(room.users)}
       exit={exit}
       visible={visible}
       closeModal={closeModal}
       scrollRef={scrollRef}
-      baesinzer={baesinzer}
       killedby={killedby}
     />
   );

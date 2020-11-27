@@ -3,7 +3,15 @@ import styled from 'styled-components';
 import user from '../../modules/user';
 import Modal from '../common/Modal';
 
+const Block = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const RoomBlock = styled.div`
+  position: relative;
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
   margin: 0 auto;
@@ -105,16 +113,13 @@ const Code = styled.div`
 `;
 
 const BaesinzerText = styled.div`
-  color: var(--color-green);
   position: relative;
   left: 126%;
   top: -85%;
   transform: translate(-50%, -50%);
   font-size: 3rem;
-  &#배신저 {
-    color: var(--color-red);
-    font-weight: bold;
-  }
+  color: ${(props) =>
+    props.baesinzer ? 'var(--color-red)' : 'var(--color-green)'};
 `;
 
 const AllUsersBox = styled.div`
@@ -176,7 +181,6 @@ const AllUsers = styled.div`
   &#user6 {
     color: rgb(122, 104, 223);
   }
-
   & + & {
     margin: 5rem;
   }
@@ -275,55 +279,61 @@ const Room = ({
   killedby,
 }) => {
   return (
-    <RoomBlock>
-      <ChatBlock>
-        <Chat ref={scrollRef}>
-          {messageLog &&
-            messageLog.map((message, index) => (
-              <Message
-                key={index}
-                username={message.username}
-                message={message.message}
-              />
-            ))}
-        </Chat>
-      </ChatBlock>
-
-      <form onSubmit={onSubmit} autoComplete="off">
-        <InputStyle
-          type="text"
-          name="message"
-          onChange={onChange}
-          value={message}
-          autocomplete="off"
-        />
-        <ButtonStyle>입력</ButtonStyle>
-      </form>
-      <Code>코드 : 1234</Code>
-      <BaesinzerText id={baesinzer}>Baesinzer</BaesinzerText>
-      <AllUsersBox>
-        {usersArray &&
-          usersArray.map(
-            (user, index) =>
-              user.locationId === userInfo.locationId && (
-                <Username
+    <Block>
+      <RoomBlock>
+        <ChatBlock>
+          <Chat ref={scrollRef}>
+            {messageLog &&
+              messageLog.map((message, index) => (
+                <Message
                   key={index}
                   username={user.username}
                   userNo={user.userNo}
                   dead={user.dead}
                 />
-              )
-          )}
-        {userInfo && userInfo.host && (
-          <Start onClick={startHandler}>START</Start>
+              ))}
+          </Chat>
+        </ChatBlock>
+
+        <form onSubmit={onSubmit} autoComplete="off">
+          <InputStyle
+            type="text"
+            name="message"
+            onChange={onChange}
+            value={message}
+            autocomplete="off"
+          />
+          <ButtonStyle>입력</ButtonStyle>
+        </form>
+        <Code>코드 : 1234</Code>
+        {userInfo.baesinzer ? (
+          <BaesinzerText baesinzer>Baesinzer</BaesinzerText>
+        ) : (
+          <BaesinzerText>Baesinzer</BaesinzerText>
         )}
-        <Exit onClick={exit}>EXIT</Exit>
-      </AllUsersBox>
-      <NewModal visible={visible}>
-        <ModalText>윽.. [ {killedby} ].. 널 믿었는데.. </ModalText>
-        <ModalButton onClick={closeModal}>CLOSE</ModalButton>
-      </NewModal>
-    </RoomBlock>
+        <AllUsersBox>
+          {usersArray &&
+            usersArray.map(
+              (user, index) =>
+                user.locationId === userInfo.locationId && (
+                  <Username
+                    key={index}
+                    username={user.username}
+                    userNo={user.userNo}
+                  />
+                )
+            )}
+          {userInfo && userInfo.host && (
+            <Start onClick={startHandler}>START</Start>
+          )}
+          <Exit onClick={exit}>EXIT</Exit>
+        </AllUsersBox>
+        <NewModal visible={visible}>
+          <ModalText>윽.. [ {killedby} ].. 널 믿었는데.. </ModalText>
+          <ModalButton onClick={closeModal}>CLOSE</ModalButton>
+        </NewModal>
+      </RoomBlock>
+    </Block>
   );
 };
 
