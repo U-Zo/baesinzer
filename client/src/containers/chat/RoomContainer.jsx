@@ -97,7 +97,10 @@ const RoomContainer = ({ match, history }) => {
           let usersArray = Object.values(room.users);
           let userWord = message.split(' ');
           for (let i = 0; i < usersArray.length; i++) {
-            if (userWord[1] === usersArray[i].username) {
+            if (
+              userWord[1] === usersArray[i].username &&
+              userInfo.locationId === usersArray[i].locationId
+            ) {
               dispatch(kill(usersArray[i].userNo));
               dispatch(
                 logMessage(

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
-import { createRoom, loadRoom } from '../../modules/room';
+import { createRoom, exitRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
 import { setUsername } from '../../modules/user';
 
@@ -44,6 +44,7 @@ const RoomListContainer = ({ history }) => {
   const onJoin = (roomId) => {
     dispatch(loadRoom({ roomId }));
   };
+
   const onChangeRoomName = (e) => {
     const roomname = e.target.value;
     setRoomName(roomname);
@@ -70,7 +71,17 @@ const RoomListContainer = ({ history }) => {
 
   useEffect(() => {
     if (room) {
-      history.push(`/room/${room.roomCode}`);
+      if (room.count === 6) {
+        dispatch(loadRooms());
+        dispatch(exitRoom());
+        setType('인원');
+        setError('방이 가득 찼습니다.');
+        setTimeout(function () {
+          setError(null);
+        }, 2000);
+      } else {
+        history.push(`/room/${room.roomCode}`);
+      }
     }
   }, [room, history]); //방만들기 하면, 그 방으로 이동!
 

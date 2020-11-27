@@ -220,6 +220,10 @@ const ErrorBox = styled.div`
     top: 4%;
     left: 50%;
   }
+  &#인원 {
+    top: 4%;
+    left: 50%;
+  }
   &#방제목 {
     top: 19%;
     left: 50%;
@@ -260,12 +264,53 @@ const RoomList = ({
   }
 
   return (
-    <Block>
-      <LobbyBlock>
-        {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
-        <NicknameBox>
-          {username == null ? (
-            <InputNickname
+  <Block>
+    <LobbyBlock>
+      {type === '닉네임' || '인원' ? (
+        <ErrorBox id={type}>{error}</ErrorBox>
+      ) : null}
+
+      <NicknameBox>
+        {username == null ? (
+          <InputNickname
+            type="text"
+            value={username}
+            onChange={changeUsername}
+            placeholder="NICKNAME"
+          />
+        ) : (
+          <InputNickname
+            type="text"
+            value={username}
+            onChange={changeUsername}
+          />
+        )}
+      </NicknameBox>
+      <RoomListBox>
+        <RoomBox>
+          {!loading &&
+            roomList &&
+            roomList.map((room) => (
+              <RoomLink>
+                <Room
+                  onClick={() => onJoin(room.roomCode)}
+                  name={room.roomName}
+                  count={room.count}
+                />
+              </RoomLink>
+            ))}
+        </RoomBox>
+      </RoomListBox>
+      {/* modal */}
+
+      <CodeInputStyle type="text" placeholder="CDOE" />
+      <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
+      <Modal visible={visible} onClick={onClick}>
+        <div>
+          <form onSubmit={makeRoom} autoComplete="off">
+            {type === '방제목' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
+            <ModalInput
+              onChange={onChangeRoomName}
               type="text"
               value={username}
               onChange={changeUsername}
