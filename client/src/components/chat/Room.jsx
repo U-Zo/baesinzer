@@ -112,16 +112,13 @@ const Code = styled.div`
 `;
 
 const BaesinzerText = styled.div`
-  color: var(--color-green);
   position: relative;
   left: 126%;
   top: -85%;
   transform: translate(-50%, -50%);
   font-size: 3rem;
-  &#배신저 {
-    color: var(--color-red);
-    font-weight: bold;
-  }
+  color: ${(props) =>
+    props.baesinzer ? 'var(--color-red)' : 'var(--color-green)'};
 `;
 
 const AllUsersBox = styled.div`
@@ -276,7 +273,11 @@ const Room = ({
           <ButtonStyle>입력</ButtonStyle>
         </form>
         <Code>코드 : 1234</Code>
-        <BaesinzerText id={baesinzer}>Baesinzer</BaesinzerText>
+        {userInfo.baesinzer ? (
+          <BaesinzerText baesinzer>Baesinzer</BaesinzerText>
+        ) : (
+          <BaesinzerText>Baesinzer</BaesinzerText>
+        )}
         <AllUsersBox>
           {usersArray &&
             usersArray.map(

@@ -39,7 +39,6 @@ const RoomContainer = ({ match, history }) => {
 
   // modal
   const [visible, setVisible] = useState(false);
-  const [baesinzer, setBaesinzer] = useState();
   const [killedby, setKilledby] = useState();
 
   let isConnect = false;
@@ -197,7 +196,6 @@ const RoomContainer = ({ match, history }) => {
       for (let i = 0; i < Object.values(room.users).length; i++) {
         if (Object.values(room.users)[i].kill > 0) {
           setKilledby(Object.values(room.users)[i].username);
-          console.log(Object.values(room.users)[i].uesrname);
         }
       }
     }
@@ -238,7 +236,6 @@ const RoomContainer = ({ match, history }) => {
   // baesinzer
   useEffect(() => {
     if (userInfo.baesinzer) {
-      setBaesinzer('배신저');
       dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
       dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
     }
@@ -257,7 +254,6 @@ const RoomContainer = ({ match, history }) => {
       visible={visible}
       closeModal={closeModal}
       scrollRef={scrollRef}
-      baesinzer={baesinzer}
       killedby={killedby}
     />
   );
