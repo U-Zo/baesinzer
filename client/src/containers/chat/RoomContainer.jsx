@@ -189,6 +189,14 @@ const RoomContainer = ({ match, history }) => {
           dispatch(update(room.users[key]));
         }
       }
+
+      // baesinzer로부터 죽음 모달 pop
+      for (let i = 0; i < Object.values(room.users).length; i++) {
+        if (Object.values(room.users)[i].kill > 0) {
+          setKilledby(Object.values(room.users)[i].username);
+          console.log(Object.values(room.users)[i].uesrname);
+        }
+      }
     }
   }, [room]);
 
@@ -231,11 +239,6 @@ const RoomContainer = ({ match, history }) => {
       dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
       dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
     }
-    for (let i = 0; i < Object.values(room.users).length; i++) {
-      if (Object.values(room.users)[i].kill > 0) {
-        setKilledby(Object.values(room.users)[i].username);
-      }
-    }
   }, [userInfo && userInfo.baesinzer]);
 
   return (
@@ -246,7 +249,7 @@ const RoomContainer = ({ match, history }) => {
       userInfo={userInfo}
       message={message}
       messageLog={messageLog}
-      usersArray={room && Object.values(room.users)} // json형태를 배열로 변환
+      usersArray={room && Object.values(room.users)}
       exit={exit}
       visible={visible}
       closeModal={closeModal}
