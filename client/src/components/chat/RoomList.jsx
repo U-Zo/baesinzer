@@ -213,15 +213,15 @@ const CancelButton = styled.button`
   }
 `;
 const ErrorBox = styled.div`
-  position: fixed;
+  position: absolute;
   transform: translate(-50%, -50%);
   color: var(--color-red);
   &#닉네임 {
-    top: 4%;
+    top: 30%;
     left: 50%;
   }
   &#인원 {
-    top: 4%;
+    top: 30%;
     left: 50%;
   }
   &#방제목 {
@@ -266,9 +266,7 @@ const RoomList = ({
   return (
     <Block>
       <LobbyBlock>
-        {type === '닉네임' || '인원' ? (
-          <ErrorBox id={type}>{error}</ErrorBox>
-        ) : null}
+        {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
 
         <NicknameBox>
           {username == null ? (
