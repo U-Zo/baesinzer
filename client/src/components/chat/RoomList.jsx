@@ -257,6 +257,7 @@ const RoomList = ({
   makeRoom,
   onChangeRoomName,
   onJoin,
+  onRefresh,
   type,
 }) => {
   if (roomerror) {
@@ -283,6 +284,7 @@ const RoomList = ({
               onChange={changeUsername}
             />
           )}
+          <button onClick={onRefresh}>새로고침</button>
         </NicknameBox>
         <RoomListBox>
           <RoomBox>

@@ -97,9 +97,14 @@ public class MessageController {
                 room.getUsers().put(userInfo.getUserNo(), userInfo);
                 break;
             case VOTE_START:
+                message.setUserInfo(system);
+                message.setMessage("긴급 회의가 시작되었습니다.");
                 for (int i = 1; i <= 6; i++) {
-                    room.getUsers().get(i).setHasVoted(0);
-                    room.getUsers().get(i).setVotedNum(0);
+                    if (room.getUsers().get(i) != null) {
+                        room.getUsers().get(i).setHasVoted(0);
+                        room.getUsers().get(i).setVotedNum(0);
+                        room.getUsers().get(i).setLocationId(0);
+                    }
                 }
                 break;
             case VOTE:
@@ -107,6 +112,7 @@ public class MessageController {
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
                 votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
                 room.getUsers().put(userInfo.getUserNo(), userInfo);
+                message.setMessage(userInfo.getUsername() + "이(가) 투표했다.");
                 break;
             case EXIT:
                 UserInfo _userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");

@@ -49,6 +49,7 @@ const RoomListContainer = ({ history }) => {
     const roomname = e.target.value;
     setRoomName(roomname);
   };
+
   const makeRoom = (e) => {
     e.preventDefault();
     if (roomName == null) {
@@ -60,6 +61,10 @@ const RoomListContainer = ({ history }) => {
     }
 
     dispatch(createRoom(roomName));
+  };
+
+  const onRefresh = () => {
+    dispatch(loadRooms());
   };
 
   // end modal option
@@ -96,6 +101,7 @@ const RoomListContainer = ({ history }) => {
       visible={visible}
       makeRoom={makeRoom}
       onChangeRoomName={onChangeRoomName}
+      onRefresh={onRefresh}
       type={type}
       error={error}
       onJoin={onJoin}
