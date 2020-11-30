@@ -51,6 +51,8 @@ const RoomContainer = ({ match, history }) => {
   // 시체 발견
   const [findDead, setFindDead] = useState(false);
 
+  const [flag, setFlag] = useState(true);
+
   let isConnect = false;
 
   const onChange = (e) => {
@@ -119,7 +121,6 @@ const RoomContainer = ({ match, history }) => {
       ) {
         // 살해 명령
         if (userInfo && userInfo.baesinzer) {
-          setKilledby(userInfo.username);
           let usersArray = Object.values(room.users);
           let userWord = message.split(' ');
           for (let i = 0; i < usersArray.length; i++) {
@@ -238,20 +239,22 @@ const RoomContainer = ({ match, history }) => {
           dispatch(update(room.users[key]));
         }
       }
-
-      // baesinzer로부터 죽음 모달 pop
-      for (let i = 0; i < Object.values(room.users).length; i++) {
-        if (Object.values(room.users)[i].kill > 0) {
-          setKilledby(Object.values(room.users)[i].username);
-        }
-      }
     }
   }, [room]);
 
   // dead 시 모달창 띄우기
   useEffect(() => {
+    // baesinzer로부터 죽음 모달 pop
+    for (let i = 0; i < Object.values(room.users).length; i++) {
+      if (Object.values(room.users)[i].kill > 0) {
+        setKilledby(Object.values(room.users)[i].username);
+      }
+    }
     if (room && room.start && userInfo.dead) {
-      setVisible(true);
+      if (flag) {
+        setVisible(true);
+        setFlag(false);
+      }
     }
   }, [userInfo]);
 
