@@ -55,7 +55,7 @@ const InputStyle = styled.input`
   bottom: 0;
   display: inline;
   width: 53rem;
-  height: 3.5rem;
+  height: 4rem;
   color: var(--color-green);
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
@@ -77,7 +77,7 @@ const ButtonStyle = styled.button`
   bottom: 0;
   right: 0;
   width: 5rem;
-  height: 3.5rem;
+  height: 4rem;
   color: var(--color-green);
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
@@ -209,7 +209,7 @@ const Exit = styled.button`
   height: 4rem;
   font-size: 3rem;
   left: 50%;
-  top: 160%;
+  top: 158.5%;
   background-color: var(--color-background);
   border: 3px solid var(--color-green);
   color: var(--color-green);
@@ -223,6 +223,7 @@ const Exit = styled.button`
 `;
 const NewModal = styled(Modal)`
   background-color: var(--color-red);
+  top: 10%;
 `;
 
 const ModalText = styled.div`
