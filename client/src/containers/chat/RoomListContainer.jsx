@@ -76,9 +76,7 @@ const RoomListContainer = ({ history }) => {
         dispatch(exitRoom());
         setType('인원');
         setError('방이 가득 찼습니다.');
-        setTimeout(function () {
-          setError(null);
-        }, 2000);
+        setVisible(true);
       } else {
         history.push(`/room/${room.roomCode}`);
       }

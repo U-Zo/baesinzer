@@ -216,7 +216,6 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeMessageLog());
     }
   }, [room && room.start]);
-
   // move
   useEffect(() => {
     if (room && room.start) {
