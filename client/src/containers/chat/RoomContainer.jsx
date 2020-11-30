@@ -18,6 +18,7 @@ import {
   moveLocation,
   tempUser,
   update,
+  vote,
 } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
@@ -40,6 +41,15 @@ const RoomContainer = ({ match, history }) => {
   // modal
   const [visible, setVisible] = useState(false);
   const [killedby, setKilledby] = useState();
+
+  // 긴급 회의
+  const [meeting, setMeeting] = useState(false);
+
+  // 살해 현장
+  const [killLoc, setKillLoc] = useState(-1);
+
+  // 시체 발견
+  const [findDead, setFindDead] = useState(false);
 
   let isConnect = false;
 
@@ -66,6 +76,7 @@ const RoomContainer = ({ match, history }) => {
       );
   };
 
+  // 게임 시작 이벤트
   const startHandler = () => {
     stompSend('START');
   };
@@ -83,7 +94,21 @@ const RoomContainer = ({ match, history }) => {
     // dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
     if (room.start) {
-      if (message.includes('이동') || message.includes('move')) {
+      if (meeting) {
+        // 회의 진행 중 투표 명령
+        if (message.includes('투표')) {
+          if (!userInfo.hasVoted) {
+            const voteNo = parseInt(message.replace(/[^0-9]/g, ''));
+            dispatch(vote(voteNo));
+            dispatch(
+              logMessage(userInfo.username, `${voteNo}이(가) 의심스럽다.`)
+            );
+          }
+        } else {
+          stompSend('ROOM');
+        }
+      } else if (message.includes('이동') || message.includes('move')) {
+        // 맵 이동 명령
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
         dispatch(moveLocation(mapLocation));
         dispatch(logMessage(userInfo.username, `${mapLocation}으로 이동했다.`));
@@ -92,6 +117,7 @@ const RoomContainer = ({ match, history }) => {
         message.includes('kill') ||
         message.includes('죽')
       ) {
+        // 살해 명령
         if (userInfo && userInfo.baesinzer) {
           setKilledby(userInfo.username);
           let usersArray = Object.values(room.users);
@@ -111,6 +137,12 @@ const RoomContainer = ({ match, history }) => {
             }
           }
         }
+      } else if (
+        // 신고 명령
+        (findDead && message.includes('신고')) ||
+        message.includes('report')
+      ) {
+        stompSend('VOTE_START');
       } else {
         dispatch(logMessage(userInfo.username, message));
       }
@@ -127,7 +159,6 @@ const RoomContainer = ({ match, history }) => {
 
   // 서버로부터 메세지를 받아옴
   // 접속했을 때 구독
-
   const stompSubscribe = () =>
     stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
       // 서버로부터 데이터를 받음
@@ -144,10 +175,23 @@ const RoomContainer = ({ match, history }) => {
       if (
         serverMesg.type === 'ROOM' ||
         serverMesg.type === 'JOIN' ||
+        serverMesg.type === 'VOTE' ||
         serverMesg.type === 'EXIT'
       ) {
         dispatch(logMessage(userInfoServer.username, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      } else if (serverMesg.type === 'KILL') {
+        // 살해 발생된 지역 설정
+        setKillLoc(userInfoServer.locationId);
+      } else if (serverMesg.type === 'VOTE_START') {
+        // 회의 시작
+        setMeeting(true);
+        dispatch(logMessage(userInfoServer.username, serverMesg.message));
+        dispatch(logMessage('System', '모든 인원과 통신이 연결되었습니다.'));
+      } else if (serverMesg.type === 'VOTE_END') {
+        // 회의 종료
+        setMeeting(false);
       } else if (serverMesg.type === 'END') {
+        // 게임 종료
         dispatch(initializeMessageLog());
         dispatch(logMessage(userInfoServer.username, serverMesg.message));
       }
@@ -221,6 +265,28 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start) {
       stompSend('PLAY');
+      if (findDead) {
+        setFindDead(false);
+      }
+
+      if (meeting) {
+        return;
+      }
+
+      const userList = Object.values(room.users);
+      for (const userOnMap of userList) {
+        if (userInfo.locationId === userOnMap.locationId && userOnMap.dead) {
+          setFindDead(true);
+          dispatch(
+            logMessage(
+              userInfo.username,
+              `${userOnMap.username}이(가) 산송장이 되어있다. 신고할까?`
+            )
+          );
+
+          break;
+        }
+      }
     }
   }, [userInfo && userInfo.locationId]);
 
@@ -235,6 +301,32 @@ const RoomContainer = ({ match, history }) => {
       stompSend('KILL');
     }
   }, [userInfo && userInfo.kill]);
+
+  // 살해 현장 목격
+  useEffect(() => {
+    if (killLoc !== -1 && userInfo.locationId === killLoc) {
+      if (!userInfo.baesinzer) {
+        dispatch(
+          logMessage(
+            userInfo.username,
+            '지금 여기서 누군가가 살해당했다. 신고할까?'
+          )
+        );
+      } else {
+        dispatch(
+          logMessage(userInfo.username, '누군가 발견하기 전에 먼저 신고할까?')
+        );
+      }
+      setFindDead(true);
+      setKillLoc(-1);
+    }
+  }, [killLoc]);
+
+  useEffect(() => {
+    if (meeting) {
+      stompSend('VOTE');
+    }
+  }, [userInfo && userInfo.hasVoted]);
 
   // baesinzer
   useEffect(() => {
