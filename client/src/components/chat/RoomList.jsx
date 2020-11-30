@@ -223,6 +223,9 @@ const ErrorBox = styled.div`
   &#인원 {
     top: 30%;
     left: 50%;
+    font-size: 2.5rem;
+    width: 100%;
+    text-align: center;
   }
   &#방제목 {
     top: 19%;
@@ -305,28 +308,37 @@ const RoomList = ({
 
         <CodeInputStyle type="text" placeholder="CDOE" />
         <ButtonStyle onClick={onClick}>방만들기</ButtonStyle>
-        <Modal visible={visible} onClick={onClick}>
-          <div>
-            <form onSubmit={makeRoom} autoComplete="off">
-              {type === '방제목' ? (
-                <ErrorBox id={type}>{error}</ErrorBox>
-              ) : null}
-              <ModalInput
-                onChange={onChangeRoomName}
-                type="text"
-                name="roomName"
-                placeholder="방 제목을 입력하세요."
-              />
-              <br></br>
-              <div>
-                <Buttons>
-                  <MakeRoomButton>방만들기</MakeRoomButton>
-                  <CancelButton onClick={onClick}>취소</CancelButton>
-                </Buttons>
-              </div>
-            </form>
-          </div>
-        </Modal>
+        {type === '인원' ? (
+          <Modal visible={visible} onClick={onClick}>
+            <ErrorBox id={type}>{error}</ErrorBox>
+            <Buttons>
+              <CancelButton onClick={onClick}>닫기</CancelButton>
+            </Buttons>
+          </Modal>
+        ) : (
+          <Modal visible={visible} onClick={onClick}>
+            <div>
+              <form onSubmit={makeRoom} autoComplete="off">
+                {type === '방제목' ? (
+                  <ErrorBox id={type}>{error}</ErrorBox>
+                ) : null}
+                <ModalInput
+                  onChange={onChangeRoomName}
+                  type="text"
+                  name="roomName"
+                  placeholder="방 제목을 입력하세요."
+                />
+                <br></br>
+                <div>
+                  <Buttons>
+                    <MakeRoomButton>방만들기</MakeRoomButton>
+                    <CancelButton onClick={onClick}>취소</CancelButton>
+                  </Buttons>
+                </div>
+              </form>
+            </div>
+          </Modal>
+        )}
       </LobbyBlock>
     </Block>
   );
