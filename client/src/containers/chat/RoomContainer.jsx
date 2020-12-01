@@ -111,9 +111,19 @@ const RoomContainer = ({ match, history }) => {
         }
       } else if (message.includes('이동') || message.includes('move')) {
         // 맵 이동 명령
-        const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
-        dispatch(moveLocation(mapLocation));
-        dispatch(logMessage(userInfo.username, `${mapLocation}으로 이동했다.`));
+        if (movePossible) {
+          const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
+          if (mapLocation >= 0 && mapLocation <= 6) {
+            dispatch(moveLocation(mapLocation));
+            dispatch(
+              logMessage(userInfo.username, `${mapLocation}으로 이동했다.`)
+            );
+          } else {
+            dispatch(logMessage(userInfo.username, `${mapLocation}은 없군...`));
+          }
+        } else {
+          dispatch(logMessage(userInfo.username, '아직 움직일 수 없어..'));
+        }
       } else if (
         message.includes('살해') ||
         message.includes('kill') ||
@@ -263,9 +273,29 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeMessageLog());
     }
   }, [room && room.start]);
+
   // move
+  const id = useRef(null);
+  const [movePossible, setMovePossible] = useState(true);
+  const clear = () => {
+    window.clearInterval(id.current);
+  };
+
   useEffect(() => {
     if (room && room.start) {
+      let t = 3;
+      if (t === 3) {
+        setMovePossible(false);
+        id.current = window.setInterval(() => {
+          t = t - 1;
+          console.log(t);
+          if (t === 0) {
+            clear();
+            setMovePossible(true);
+          }
+        }, 1000);
+      }
+
       stompSend('PLAY');
       if (findDead) {
         setFindDead(false);

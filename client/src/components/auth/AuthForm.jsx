@@ -42,7 +42,6 @@ const InputStyled = styled.input`
   color: var(--color-green);
   outline: none;
   background-color: var(--color-background);
-
   :-webkit-autofill {
     -webkit-text-fill-color: var(--color-green);
   }
