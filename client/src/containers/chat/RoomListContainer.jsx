@@ -42,7 +42,15 @@ const RoomListContainer = ({ history }) => {
   };
 
   const onJoin = (roomId) => {
-    dispatch(loadRoom({ roomId }));
+    if (!userInfo.username) {
+      setType('닉네임');
+      setError('닉네임을 입력하세요.');
+      setTimeout(function () {
+        setError(null);
+      }, 2000);
+    } else {
+      dispatch(loadRoom({ roomId }));
+    }
   };
 
   const onChangeRoomName = (e) => {

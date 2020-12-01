@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import Modal from '../common/Modal';
-import { createRoom } from '../../lib/api/rooms';
 import styled from 'styled-components';
+import { BiRefresh } from 'react-icons/bi';
 
 const Block = styled.div`
   width: 100vw;
@@ -214,10 +212,12 @@ const CancelButton = styled.button`
 `;
 const ErrorBox = styled.div`
   position: absolute;
+  display: flex;
+  justify-content: center;
   transform: translate(-50%, -50%);
   color: var(--color-red);
   &#닉네임 {
-    top: 30%;
+    top: 12%;
     left: 50%;
   }
   &#인원 {
@@ -230,6 +230,27 @@ const ErrorBox = styled.div`
   &#방제목 {
     top: 19%;
     left: 50%;
+  }
+`;
+
+const Refresh = styled.div`
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--color-green);
+  transform: translate(-50%, -50%);
+  top: -3%;
+  left: 75%;
+  cursor: pointer;
+  #refresh {
+    transition: all ease 0.5s;
+    font-size: 3rem;
+    &:hover {
+      transform: rotate(90deg);
+    }
+    /* &:hover {
+      color: var(--color-dark-green);
+    } */
   }
 `;
 
@@ -271,7 +292,6 @@ const RoomList = ({
     <Block>
       <LobbyBlock>
         {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
-
         <NicknameBox>
           {username == null ? (
             <InputNickname
@@ -287,8 +307,11 @@ const RoomList = ({
               onChange={changeUsername}
             />
           )}
-          <button onClick={onRefresh}>새로고침</button>
         </NicknameBox>
+
+        <Refresh>
+          <BiRefresh id="refresh" size="3rem" onClick={onRefresh} />
+        </Refresh>
         <RoomListBox>
           <RoomBox>
             {!loading &&
