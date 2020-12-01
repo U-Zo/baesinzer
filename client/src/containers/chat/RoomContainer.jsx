@@ -227,12 +227,11 @@ const RoomContainer = ({ match, history }) => {
     });
     return () => {
       //컴포넌트 끝
+      stompClient.connected && subId.unsubscribe();
       stompSend('EXIT');
       //수정
       dispatch(exitRoom());
-      stompClient.connected && subId.unsubscribe();
       dispatch(initializeMessageLog());
-      dispatch(check());
     };
   }, [roomId]); // roomId가 바뀌면 새로운 접속
 

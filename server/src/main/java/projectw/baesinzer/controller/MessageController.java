@@ -110,8 +110,12 @@ public class MessageController {
             case VOTE:
                 int userNo = userInfo.getHasVoted();
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
+                if (userNo == userInfo.getUserNo()) {
+                    votedUserInfo.setHasVoted(userNo);
+                } else {
+                    room.getUsers().put(userInfo.getUserNo(), userInfo);
+                }
                 votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
-                room.getUsers().put(userInfo.getUserNo(), userInfo);
                 message.setMessage(userInfo.getUsername() + "이(가) 투표했다.");
                 break;
             case EXIT:
@@ -163,6 +167,85 @@ public class MessageController {
                 }
             }
 
+            if (message.getType().equals(Message.MessageType.VOTE)) {
+                int hasVoted = alive + 1;
+
+                // 투표 수 확인
+                UserInfo maxVoted = null;
+                boolean isEqual = false;
+                for (int i = 1; i <= 6; i++) {
+                    UserInfo user = room.getUsers().get(i);
+
+                    if (user == null) {
+                        continue;
+                    }
+
+                    if (user.getHasVoted() != 0) {
+                        hasVoted--;
+                    }
+
+                    // 투표를 제일 많이 받은 유저 초기화
+                    if (maxVoted == null) {
+                        maxVoted = user;
+                        continue;
+                    }
+
+                    // 제일 많은 득표자 선정
+                    if (maxVoted.getVotedNum() == user.getVotedNum()) {
+                        System.out.println(maxVoted.getUserNo() + ": " + maxVoted.getVotedNum());
+                        System.out.println(user.getUserNo() + ": " + user.getVotedNum());
+                        isEqual = true;
+                    } else if (maxVoted.getVotedNum() < user.getVotedNum()) {
+                        isEqual = false;
+                        maxVoted = user;
+                    }
+                    System.out.println(isEqual);
+                    System.out.println("남은 투표: " + hasVoted);
+                }
+
+                if (hasVoted == 0) {
+                    message.setType(Message.MessageType.VOTE_END);
+                    message.setUserInfo(system);
+                    message.setMessage("투표가 끝났습니다.");
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+
+                    if (isEqual) {
+                        message.setType(Message.MessageType.ROOM);
+                        message.setMessage("투표 수 동점으로 무효 처리 되었습니다.");
+                        operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                    } else {
+                        maxVoted.setDead(true);
+                        message.setType(Message.MessageType.ROOM);
+                        if (maxVoted.isBaesinzer()) {
+                            message.setMessage(maxVoted.getUsername() + "은(는) BaesinZer입니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                            message.setType(Message.MessageType.END);
+                            room.setStart(false);
+
+                            // 게임 종료 시 게임 내 정보 초기화
+                            for (int i = 1; i <= 6; i++) {
+                                UserInfo user = room.getUsers().get(i);
+                                if (user != null) {
+                                    user.setBaesinzer(false);
+                                    user.setDead(false);
+                                    user.setLocationId(0);
+                                    user.setVotedNum(0);
+                                    user.setHasVoted(0);
+                                    user.setMissionList(null);
+                                    user.setKill(0);
+                                }
+                            }
+                            message.setMessage("실험 종료, BaesinZer를 잡았습니다.");
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                        } else {
+                            message.setMessage(maxVoted.getUsername() + "은(는) 선량한 시민입니다.");
+                            alive--;
+                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                        }
+                    }
+                }
+            }
+
             // 생존자 수가 1명 이하일 경우 게임 종료
             if (alive <= 1) {
                 message.setType(Message.MessageType.END);
@@ -174,7 +257,7 @@ public class MessageController {
                     UserInfo user = room.getUsers().get(i);
                     if (user != null) {
                         if (user.isBaesinzer()) {
-                            message.setMessage(user.getUsername() + "이(가) 시민을 모두 처리하였습니다.");
+                            message.setMessage("실험 종료, " + user.getUsername() + "이(가) 시민을 모두 처리하였습니다.");
                             user.setBaesinzer(false);
                         }
                         user.setBaesinzer(false);
