@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
 import { createRoom, exitRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
-import { setUsername } from '../../modules/user';
+import { check, setUsername } from '../../modules/user';
 
 const RoomListContainer = ({ history }) => {
   const [error, setError] = useState(null);
@@ -71,6 +71,7 @@ const RoomListContainer = ({ history }) => {
 
   useEffect(() => {
     dispatch(loadRooms());
+    dispatch(check());
     return () => dispatch(unloadRooms());
   }, [dispatch]);
 
