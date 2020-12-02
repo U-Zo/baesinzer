@@ -23,6 +23,8 @@ const [
   EXIT_ROOM_FAILURE,
 ] = createRequestActionTypes('room/EXIT_ROOM');
 
+const LOAD_ROOM_ON_MESSAGE = 'room/LOAD_ROOM_ON_MESSAGE';
+
 export const createRoom = createAction(CREATE_ROOM, (roomName) => ({
   roomName,
 }));
@@ -30,6 +32,11 @@ export const createRoom = createAction(CREATE_ROOM, (roomName) => ({
 export const loadRoom = createAction(LOAD_ROOM, ({ roomId }) => ({
   roomId,
 }));
+
+export const loadRoomOnMessage = createAction(
+  LOAD_ROOM_ON_MESSAGE,
+  (room) => room
+);
 
 export const exitRoom = createAction(EXIT_ROOM);
 
@@ -69,6 +76,10 @@ const room = handleActions(
       ...state,
       room: null,
       error,
+    }),
+    [LOAD_ROOM_ON_MESSAGE]: (state, { payload: room }) => ({
+      ...state,
+      room,
     }),
     [EXIT_ROOM_SUCCESS]: (state) => ({
       ...state,

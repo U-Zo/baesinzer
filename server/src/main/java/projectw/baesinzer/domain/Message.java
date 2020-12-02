@@ -16,4 +16,5 @@ public class Message {
     private String roomCode;
     private UserInfo userInfo;
     private String message;
+    private Room room;
 }

@@ -30,6 +30,7 @@ public class MessageController {
         Room room = roomService.findOne(message.getRoomCode());
         UserInfo system = new UserInfo();
         system.setUsername("System");
+        message.setRoom(room);
 
         switch (message.getType()) { // 메시지 타입 검사
             case JOIN: // 방 입장
@@ -137,6 +138,7 @@ public class MessageController {
                             nextHost.setHost(true);
                             Message nextHostMessage = new Message();
                             nextHostMessage.setType(Message.MessageType.ROOM);
+                            nextHostMessage.setRoom(room);
                             nextHostMessage.setUserInfo(system);
                             nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
@@ -296,6 +298,7 @@ public class MessageController {
             message.setUserInfo(userInfo);
             message.setType(Message.MessageType.EXIT);
             message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
+            message.setRoom(room);
             headerAccessor.getSessionAttributes().remove("user");
             headerAccessor.getSessionAttributes().remove("room");
             operations.convertAndSend("/sub/socket/room/" + roomCode, message);
