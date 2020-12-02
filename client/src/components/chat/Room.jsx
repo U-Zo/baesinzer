@@ -305,7 +305,7 @@ const Room = ({
           <ButtonStyle>입력</ButtonStyle>
         </form>
         <Code>코드 : 1234</Code>
-        {userInfo.baesinzer ? (
+        {userInfo && userInfo.baesinzer ? (
           <BaesinzerText baesinzer>Baesinzer</BaesinzerText>
         ) : (
           <BaesinzerText>Baesinzer</BaesinzerText>

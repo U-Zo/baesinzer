@@ -1,4 +1,3 @@
-import { getSuggestedQuery } from '@testing-library/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -11,15 +10,8 @@ import {
   logMessage,
   initializeMessageLog,
 } from '../../modules/messages';
-import { exitRoom, loadRoom } from '../../modules/room';
-import {
-  check,
-  kill,
-  moveLocation,
-  tempUser,
-  update,
-  vote,
-} from '../../modules/user';
+import { exitRoom, loadRoomOnMessage } from '../../modules/room';
+import { kill, moveLocation, tempUser, update, vote } from '../../modules/user';
 
 const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
@@ -206,7 +198,7 @@ const RoomContainer = ({ match, history }) => {
         dispatch(initializeMessageLog());
         dispatch(logMessage(userInfoServer.username, serverMesg.message));
       }
-      dispatch(loadRoom({ roomId }));
+      dispatch(loadRoomOnMessage(serverMesg.room));
     });
 
   const stompConnection = () =>
@@ -222,7 +214,6 @@ const RoomContainer = ({ match, history }) => {
     let subId;
     stompConnection().then((connection) => {
       subId = connection;
-      dispatch(loadRoom({ roomId }));
       stompSend('JOIN');
     });
     return () => {
@@ -254,15 +245,17 @@ const RoomContainer = ({ match, history }) => {
   // dead 시 모달창 띄우기
   useEffect(() => {
     // baesinzer로부터 죽음 모달 pop
-    for (let i = 0; i < Object.values(room.users).length; i++) {
-      if (Object.values(room.users)[i].kill > 0) {
-        setKilledby(Object.values(room.users)[i].username);
+    if (room) {
+      for (let i = 0; i < Object.values(room.users).length; i++) {
+        if (Object.values(room.users)[i].kill > 0) {
+          setKilledby(Object.values(room.users)[i].username);
+        }
       }
-    }
-    if (room && room.start && userInfo.dead) {
-      if (flag) {
-        setVisible(true);
-        setFlag(false);
+      if (room.start && userInfo.dead) {
+        if (flag) {
+          setVisible(true);
+          setFlag(false);
+        }
       }
     }
   }, [userInfo]);
@@ -361,7 +354,7 @@ const RoomContainer = ({ match, history }) => {
 
   // baesinzer
   useEffect(() => {
-    if (userInfo.baesinzer) {
+    if (userInfo && userInfo.baesinzer) {
       dispatch(logMessage('System', '당신은 BaeSinZer입니다.'));
       dispatch(logMessage('System', '목표: 무고한 시민을 살해하십시오.'));
     }
