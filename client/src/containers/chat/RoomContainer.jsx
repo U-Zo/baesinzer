@@ -37,7 +37,8 @@ const RoomContainer = ({ match, history }) => {
       room: room.room,
     })
   );
-
+  //map정보
+  const map = ['안방', '화장실', '강의실1', '강의실2', '강의실3', '강의실4'];
   // modal
   const [visible, setVisible] = useState(false);
   const [killedby, setKilledby] = useState();
@@ -52,6 +53,8 @@ const RoomContainer = ({ match, history }) => {
   const [findDead, setFindDead] = useState(false);
 
   const [flag, setFlag] = useState(true);
+  //이동 키워드 작동
+  const [mapInfo, setMapInfo] = useState(false);
 
   let isConnect = false;
 
@@ -96,6 +99,21 @@ const RoomContainer = ({ match, history }) => {
     // dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
     if (room.start) {
+      if (mapInfo) {
+        setMapInfo(false);
+        const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
+        if (mapLocation >= 0 && mapLocation <= 6) {
+          dispatch(moveLocation(mapLocation));
+          dispatch(
+            logMessage(
+              userInfo.username,
+              `${map[mapLocation - 1]}으로 이동했다.`
+            )
+          );
+        } else {
+          dispatch(logMessage(userInfo.username, `갈수없는 곳이군...`));
+        }
+      }
       if (meeting) {
         // 회의 진행 중 투표 명령
         if (message.includes('투표')) {
@@ -109,18 +127,17 @@ const RoomContainer = ({ match, history }) => {
         } else {
           stompSend('ROOM');
         }
-      } else if (message.includes('이동') || message.includes('move')) {
+      } else if (message === '이동' || message === 'move') {
         // 맵 이동 명령
         if (movePossible) {
-          const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
-          if (mapLocation >= 0 && mapLocation <= 6) {
-            dispatch(moveLocation(mapLocation));
-            dispatch(
-              logMessage(userInfo.username, `${mapLocation}으로 이동했다.`)
-            );
-          } else {
-            dispatch(logMessage(userInfo.username, `${mapLocation}은 없군...`));
-          }
+          dispatch(
+            logMessage(
+              userInfo.username,
+              `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]} 6.${map[5]}`
+            )
+          );
+          setMapInfo(true);
+          console.log(mapInfo);
         } else {
           dispatch(logMessage(userInfo.username, '아직 움직일 수 없어..'));
         }
@@ -129,6 +146,13 @@ const RoomContainer = ({ match, history }) => {
         message.includes('kill') ||
         message.includes('죽')
       ) {
+        // let usersArray = Object.values(room.users);
+        // for (let i = 0; i < usersArray.length; i++) {
+        //   dispatch(
+        //     logMessage(userInfo.username, `1${usersArray[i].username}`)
+        //   );
+        // }
+
         // 살해 명령
         if (userInfo && userInfo.baesinzer) {
           let usersArray = Object.values(room.users);
