@@ -271,10 +271,10 @@ const Room = React.memo(({ name, count, onClick }) => {
 
 const RoomList = ({
   error,
-  username,
+  userInfo,
   loading,
   roomList,
-  roomerror,
+  roomError,
   changeUsername,
   onClick,
   visible,
@@ -284,7 +284,7 @@ const RoomList = ({
   onRefresh,
   type,
 }) => {
-  if (roomerror) {
+  if (roomError) {
     return <div>에러가 발생했습니다.</div>;
   }
 
@@ -293,20 +293,12 @@ const RoomList = ({
       <LobbyBlock>
         {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
         <NicknameBox>
-          {username == null ? (
-            <InputNickname
-              type="text"
-              value={username}
-              onChange={changeUsername}
-              placeholder="NICKNAME"
-            />
-          ) : (
-            <InputNickname
-              type="text"
-              value={username}
-              onChange={changeUsername}
-            />
-          )}
+          <InputNickname
+            type="text"
+            value={userInfo && userInfo.username}
+            onChange={changeUsername}
+            placeholder="NICKNAME"
+          />
         </NicknameBox>
 
         <Refresh>
