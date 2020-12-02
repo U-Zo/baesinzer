@@ -68,6 +68,10 @@ public class UserController {
     @GetMapping("/check")
     public UserInfo check(HttpServletRequest request) {
         Cookie jwtToken = cookieUtil.getCookie(request, JwtTokenUtil.ACCESS_TOKEN_NAME);
+        if (jwtToken.getValue().equals("")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
         if (jwtTokenUtil.getEmail(jwtToken.getValue()) != null) {
             return new UserInfo();
         } else {

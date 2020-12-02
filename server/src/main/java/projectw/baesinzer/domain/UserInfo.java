@@ -10,7 +10,7 @@ import java.util.List;
 public class UserInfo {
 
     private int userNo;
-    private String username;
+    private String username = "";
     private int locationId;
     private boolean dead;
     private boolean baesinzer;
