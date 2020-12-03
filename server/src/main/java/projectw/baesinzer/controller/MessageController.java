@@ -30,6 +30,7 @@ public class MessageController {
         Room room = roomService.findOne(message.getRoomCode());
         UserInfo system = new UserInfo();
         system.setUsername("System");
+        message.setRoom(room);
 
         switch (message.getType()) { // 메시지 타입 검사
             case JOIN: // 방 입장
@@ -88,13 +89,17 @@ public class MessageController {
                 timer.schedule(timerTask, 1000, 1000);
                 break;
             case PLAY:
-                room.getUsers().put(userInfo.getUserNo(), userInfo);
+                if (room.getUsers().get(userInfo.getUserNo()) != null) {
+                    room.getUsers().put(userInfo.getUserNo(), userInfo);
+                }
                 break;
             case KILL:
                 int killNo = userInfo.getKill();
                 UserInfo deadUser = room.getUsers().get(killNo);
                 deadUser.setDead(true);
-                room.getUsers().put(userInfo.getUserNo(), userInfo);
+                if (room.getUsers().get(userInfo.getUserNo()) != null) {
+                    room.getUsers().put(userInfo.getUserNo(), userInfo);
+                }
                 break;
             case VOTE_START:
                 message.setUserInfo(system);
@@ -113,7 +118,9 @@ public class MessageController {
                 if (userNo == userInfo.getUserNo()) {
                     votedUserInfo.setHasVoted(userNo);
                 } else {
-                    room.getUsers().put(userInfo.getUserNo(), userInfo);
+                    if (room.getUsers().get(userInfo.getUserNo()) != null) {
+                        room.getUsers().put(userInfo.getUserNo(), userInfo);
+                    }
                 }
                 votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
                 message.setMessage(userInfo.getUsername() + "이(가) 투표했다.");
@@ -137,6 +144,7 @@ public class MessageController {
                             nextHost.setHost(true);
                             Message nextHostMessage = new Message();
                             nextHostMessage.setType(Message.MessageType.ROOM);
+                            nextHostMessage.setRoom(room);
                             nextHostMessage.setUserInfo(system);
                             nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
@@ -254,6 +262,7 @@ public class MessageController {
 
                 // 게임 종료 시 게임 내 정보 초기화
                 for (int i = 1; i <= 6; i++) {
+                    System.out.println(room.getUsers());
                     UserInfo user = room.getUsers().get(i);
                     if (user != null) {
                         if (user.isBaesinzer()) {
@@ -282,23 +291,24 @@ public class MessageController {
         UserInfo userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
         String roomCode = (String) headerAccessor.getSessionAttributes().get("roomCode");
 
+        if (roomCode == null || userInfo == null) return;
+
         Room room = roomService.findOne(roomCode);
-        if (userInfo != null) {
-            room.getUsers().remove(userInfo.getUserNo());
-            room.setCount(room.getUsers().size());
+        room.getUsers().remove(userInfo.getUserNo());
+        room.setCount(room.getUsers().size());
 
-            // 방의 인원이 0이 되면 방 목록에서 삭제
-            if (room.getUsers().size() == 0) {
-                roomService.removeRoom(room);
-            }
-
-            Message message = new Message();
-            message.setUserInfo(userInfo);
-            message.setType(Message.MessageType.EXIT);
-            message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
-            headerAccessor.getSessionAttributes().remove("user");
-            headerAccessor.getSessionAttributes().remove("room");
-            operations.convertAndSend("/sub/socket/room/" + roomCode, message);
+        // 방의 인원이 0이 되면 방 목록에서 삭제
+        if (room.getUsers().size() == 0) {
+            roomService.removeRoom(room);
         }
+
+        Message message = new Message();
+        message.setUserInfo(userInfo);
+        message.setType(Message.MessageType.EXIT);
+        message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
+        message.setRoom(room);
+        headerAccessor.getSessionAttributes().remove("user");
+        headerAccessor.getSessionAttributes().remove("room");
+        operations.convertAndSend("/sub/socket/room/" + roomCode, message);
     }
 }

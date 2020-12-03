@@ -9,11 +9,8 @@ import { applyMiddleware, createStore } from 'redux';
 import rootReducer, { rootSaga } from './modules';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
-import { check } from './modules/user';
+import { check, tempUser } from './modules/user';
 const sagaMiddleware = createSagaMiddleware();
-
-const userInfo = check();
-console.log(userInfo);
 
 const store = createStore(
   rootReducer,
@@ -22,9 +19,10 @@ const store = createStore(
 
 function loadUser() {
   try {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem('userInfo');
     if (!user) return; // 로그인 상태가 아니라면 아무것도 안 함
 
+    store.dispatch(tempUser(user));
     store.dispatch(check());
   } catch (e) {
     console.log('localStorage is not working');
@@ -33,9 +31,10 @@ function loadUser() {
 
 sagaMiddleware.run(rootSaga);
 loadUser();
+
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store} userInfo={userInfo}>
+    <Provider store={store}>
       <BrowserRouter>
         <App />
       </BrowserRouter>

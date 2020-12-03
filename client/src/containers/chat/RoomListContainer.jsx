@@ -4,20 +4,20 @@ import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
 import { createRoom, exitRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
-import { check, setUsername } from '../../modules/user';
+import { setUsername } from '../../modules/user';
 
 const RoomListContainer = ({ history }) => {
   const [error, setError] = useState(null);
   const [visible, setVisible] = useState(false);
   const [roomName, setRoomName] = useState();
   const [type, setType] = useState();
-  const { userInfo, loading, roomList, roomerror, room } = useSelector(
+  const { userInfo, loading, roomList, roomError, room } = useSelector(
     ({ loading, rooms, user, room }) => ({
       loading: loading['roomList/GET_ROOM_LIST'],
       roomList: rooms.roomList,
       //확인---- username을 userinfo로 받아오는 것으로 수정ㅇ
       userInfo: user.userInfo,
-      roomerror: rooms.error,
+      roomError: rooms.error,
       room: room.room,
     })
   );
@@ -72,14 +72,15 @@ const RoomListContainer = ({ history }) => {
   };
 
   const onRefresh = () => {
-    dispatch(loadRooms());
+    if (!loading) {
+      dispatch(loadRooms());
+    }
   };
 
   // end modal option
 
   useEffect(() => {
     dispatch(loadRooms());
-    dispatch(check());
     return () => dispatch(unloadRooms());
   }, [dispatch]);
 
@@ -97,11 +98,17 @@ const RoomListContainer = ({ history }) => {
     }
   }, [room, history]); //방만들기 하면, 그 방으로 이동!
 
+  useEffect(() => {
+    if (!userInfo) {
+      history.push('/');
+    }
+  }, [userInfo]);
+
   return (
     <RoomList
-      username={userInfo?.username}
+      userInfo={userInfo}
       loading={loading}
-      roomerror={roomerror}
+      roomError={roomError}
       roomList={roomList}
       changeUsername={changeUsername}
       onClick={onClick}
@@ -112,8 +119,6 @@ const RoomListContainer = ({ history }) => {
       type={type}
       error={error}
       onJoin={onJoin}
-      //수정
-      // inputUsername={inputUsername}
     />
   );
 };
