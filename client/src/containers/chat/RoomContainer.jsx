@@ -11,14 +11,22 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoomOnMessage } from '../../modules/room';
-import { kill, moveLocation, tempUser, update, vote } from '../../modules/user';
+import {
+  initializeUser,
+  kill,
+  moveLocation,
+  tempUser,
+  update,
+  vote,
+} from '../../modules/user';
 
-const sockJS = new SockJS('http://localhost:8080/ws-stomp'); // 서버의 웹 소켓 주소
+const sockJS = new SockJS('/ws-stomp'); // 서버의 웹 소켓 주소
 const stompClient = (Stomp.Client = Stomp.over(sockJS)); //stomp Client 생성
-stompClient.connect(); // 서버에 접속
-
+stompClient.connect();
+let subId;
 const RoomContainer = ({ match, history }) => {
   const { roomId } = match.params;
+
   const dispatch = useDispatch();
 
   const { userInfo, message, messageLog, room } = useSelector(
@@ -29,6 +37,8 @@ const RoomContainer = ({ match, history }) => {
       room: room.room,
     })
   );
+
+  const [start, setStart] = useState(false);
 
   // modal
   const [visible, setVisible] = useState(false);
@@ -63,7 +73,7 @@ const RoomContainer = ({ match, history }) => {
         {},
         JSON.stringify({
           type,
-          roomCode: roomId,
+          roomCode: room.roomCode,
           userInfo,
           message,
         })
@@ -72,7 +82,10 @@ const RoomContainer = ({ match, history }) => {
 
   // 게임 시작 이벤트
   const startHandler = () => {
-    stompSend('START');
+    if (!start) {
+      stompSend('START');
+      setStart(true);
+    }
   };
 
   // scroll관련
@@ -158,11 +171,13 @@ const RoomContainer = ({ match, history }) => {
 
   const exit = () => {
     dispatch(exitRoom());
+    dispatch(initializeUser());
   };
 
   // 서버로부터 메세지를 받아옴
   // 접속했을 때 구독
   const stompSubscribe = () =>
+    stompClient.connected &&
     stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
@@ -197,6 +212,7 @@ const RoomContainer = ({ match, history }) => {
         // 게임 종료
         dispatch(initializeMessageLog());
         dispatch(logMessage(userInfoServer.username, serverMesg.message));
+        setStart(false);
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -204,14 +220,12 @@ const RoomContainer = ({ match, history }) => {
   const stompConnection = () =>
     new Promise((resolve, reject) => {
       if (!stompClient.connected) {
-        resolve(stompClient.connect({}, stompSubscribe));
-      } else {
-        resolve(stompSubscribe());
+        stompClient.connect();
       }
+      resolve(stompSubscribe());
     });
 
   useEffect(() => {
-    let subId;
     stompConnection().then((connection) => {
       subId = connection;
       stompSend('JOIN');
@@ -223,6 +237,7 @@ const RoomContainer = ({ match, history }) => {
       //수정
       dispatch(exitRoom());
       dispatch(initializeMessageLog());
+      dispatch(initializeUser());
     };
   }, [roomId]); // roomId가 바뀌면 새로운 접속
 

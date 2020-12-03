@@ -57,11 +57,10 @@ const user = handleActions(
       userInfo,
       error: null,
     }),
-    [CHECK_FAILURE]: (state, { payload: error }) => ({
-      ...state,
-      userInfo: null,
-      error,
-    }),
+    [CHECK_FAILURE]: (state, { payload: error }) => {
+      localStorage.removeItem('userInfo');
+      return { ...state, userInfo: null, error };
+    },
     [LOGOUT]: () => ({
       initialState,
     }),

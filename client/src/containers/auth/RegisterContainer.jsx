@@ -38,16 +38,16 @@ const RegisterContainer = ({ history }) => {
     e.preventDefault();
     if ([email, password, passwordConfirm].includes('')) {
       setError('빈 칸을 모두 입력하세요');
-      //   return;
-    } else {
-      if (password !== passwordConfirm) {
-        setError('비밀번호가 일치하지 않습니다.');
-      } else if (password.length < 6) {
-        setError('비밀번호가 너무 짧습니다');
-      }
-      if (!chkEmail(email)) {
-        setError('올바른 이메일 형식이 아닙니다');
-      }
+      return;
+    } else if (password !== passwordConfirm) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    } else if (password.length < 6) {
+      setError('비밀번호는 6글자 이상으로 작성해주세요.');
+      return;
+    } else if (!chkEmail(email)) {
+      setError('올바른 이메일 형식이 아닙니다');
+      return;
     }
 
     dispatch(register({ email, password }));
@@ -76,8 +76,6 @@ const RegisterContainer = ({ history }) => {
 
   useEffect(() => {
     if (auth) {
-      console.log('회원가입 성공');
-      console.log(auth);
       setSuccess('회원가입 성공');
     }
   }, [auth]);
