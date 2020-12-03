@@ -255,7 +255,6 @@ const Refresh = styled.div`
 `;
 
 const Room = React.memo(({ name, count, onClick }) => {
-  console.log(onClick);
   return (
     <RoomLi onClick={onClick}>
       <span>{name}</span>

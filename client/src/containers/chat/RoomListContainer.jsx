@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import RoomList from '../../components/chat/RoomList';
 import { createRoom, exitRoom, loadRoom } from '../../modules/room';
 import { loadRooms, unloadRooms } from '../../modules/rooms';
-import { check, setUsername } from '../../modules/user';
+import { setUsername } from '../../modules/user';
 
 const RoomListContainer = ({ history }) => {
   const [error, setError] = useState(null);
@@ -97,6 +97,12 @@ const RoomListContainer = ({ history }) => {
       }
     }
   }, [room, history]); //방만들기 하면, 그 방으로 이동!
+
+  useEffect(() => {
+    if (!userInfo) {
+      history.push('/');
+    }
+  }, [userInfo]);
 
   return (
     <RoomList

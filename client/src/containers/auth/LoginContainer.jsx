@@ -24,7 +24,6 @@ const LoginContainer = ({ history }) => {
 
   const onChange = (e) => {
     const { name, value } = e.target;
-    console.log(name);
     dispatch(changeField({ form: 'login', name, value }));
   };
 
@@ -35,12 +34,6 @@ const LoginContainer = ({ history }) => {
     }
     e.preventDefault();
     dispatch(login({ email, password }));
-    localStorage.setItem(
-      'userInfo',
-      JSON.stringify({
-        email,
-      })
-    );
   };
 
   useEffect(() => {
@@ -49,21 +42,22 @@ const LoginContainer = ({ history }) => {
 
   useEffect(() => {
     if (authError) {
-      console.log('오류발생');
       if (error === '올바른 이메일 형식이 아닙니다') {
       } else setError('이메일 인증이 필요합니다');
     }
   }, [authError, error]);
 
   useEffect(() => {
-    dispatch(check());
+    if (auth) {
+      dispatch(check());
+    }
   }, [auth]);
 
   useEffect(() => {
     if (userInfo) {
       history.push('/lobby');
       try {
-        localStorage.setItem('user', JSON.stringify(userInfo));
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
       } catch (e) {
         console.log('localStorage is not working');
       }
