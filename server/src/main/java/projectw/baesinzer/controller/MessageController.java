@@ -114,15 +114,18 @@ public class MessageController {
                 break;
             case VOTE:
                 int userNo = userInfo.getHasVoted();
+                if (userNo == 0) {
+                    userInfo.setHasVoted(-1);
+                }
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
                 if (userNo == userInfo.getUserNo()) {
-                    votedUserInfo.setHasVoted(userNo);
+                    if (votedUserInfo != null) votedUserInfo.setHasVoted(userNo);
                 } else {
                     if (room.getUsers().get(userInfo.getUserNo()) != null) {
                         room.getUsers().put(userInfo.getUserNo(), userInfo);
                     }
                 }
-                votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
+                if (votedUserInfo != null) votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
                 message.setMessage(userInfo.getUsername() + "이(가) 투표했다.");
                 break;
             case EXIT:
