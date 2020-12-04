@@ -247,7 +247,7 @@ public class MessageController {
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                         } else {
                             message.setMessage(maxVoted.getUsername() + "은(는) 선량한 시민입니다.");
-                            alive--;
+                            maxVoted.setDead(true);
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                         }
                     }

@@ -57,7 +57,7 @@ const RoomContainer = ({ match, history }) => {
   // 시체 발견
   const [findDead, setFindDead] = useState(false);
 
-  const [flag, setFlag] = useState(true);
+  const [flag, setFlag] = useState(false);
   //이동 키워드 작동
   const [mapInfo, setMapInfo] = useState(false);
   const [killPossible, setKillPossible] = useState(false);
@@ -280,6 +280,8 @@ const RoomContainer = ({ match, history }) => {
         dispatch(initializeMessageLog());
         dispatch(logMessage(userInfoServer.username, serverMesg.message));
         setStart(false);
+        setKilledby(null);
+        setFlag(false);
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -334,9 +336,9 @@ const RoomContainer = ({ match, history }) => {
         }
       }
       if (room.start && userInfo.dead) {
-        if (flag) {
+        if (!flag) {
           setVisible(true);
-          setFlag(false);
+          setFlag(true);
         }
       }
     }
