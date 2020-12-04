@@ -11,10 +11,10 @@ export const changeField = (message) => ({
   },
 });
 
-export const logMessage = (username, message) => ({
+export const logMessage = (userInfo, message) => ({
   type: LOG_MESSAGE,
   payload: {
-    username,
+    userInfo,
     message,
   },
 });
@@ -46,7 +46,10 @@ const messages = (state = initialState, action) => {
         ...state,
         messageLog: state.messageLog.concat({
           message: action.payload.message,
-          username: action.payload.username,
+          userInfo: {
+            userNo: action.payload.userInfo.userNo,
+            username: action.payload.userInfo.username,
+          },
         }),
       };
     case INITIALIZE_FIELD:

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import user from '../../modules/user';
 import Modal from '../common/Modal';
 
@@ -100,6 +100,34 @@ const UserMessage = styled.li`
   & + & {
     margin-top: 2.5rem;
   }
+
+  ${({ userNo }) => {
+    if (userNo === 1) {
+      return css`
+        color: var(--color-user1);
+      `;
+    } else if (userNo === 2) {
+      return css`
+        color: var(--color-user2);
+      `;
+    } else if (userNo === 3) {
+      return css`
+        color: var(--color-user3);
+      `;
+    } else if (userNo === 4) {
+      return css`
+        color: var(--color-user4);
+      `;
+    } else if (userNo === 5) {
+      return css`
+        color: var(--color-user5);
+      `;
+    } else if (userNo === 6) {
+      return css`
+        color: var(--color-user6);
+      `;
+    }
+  }}
 `;
 
 const Code = styled.div`
@@ -140,46 +168,46 @@ const AllUsers = styled.div`
   font-size: 2.5rem;
   letter-spacing: 0.3rem;
   &#dead1 {
-    color: #fb4d51;
+    color: var(--color-user1);
     text-decoration: line-through;
   }
   &#dead2 {
-    color: #f5fa4e;
+    color: var(--color-user2);
     text-decoration: line-through;
   }
   &#dead3 {
-    color: #00d9ff;
+    color: var(--color-user3);
     text-decoration: line-through;
   }
   &#dead4 {
-    color: #00cc00;
+    color: var(--color-user4);
     text-decoration: line-through;
   }
   &#dead5 {
-    color: #bb00bb;
+    color: var(--color-user5);
     text-decoration: line-through;
   }
   &#dead6 {
-    color: rgb(122, 104, 223);
+    color: var(--color-user6);
     text-decoration: line-through;
   }
   &#user1 {
-    color: #fb4d51;
+    color: var(--color-user1);
   }
   &#user2 {
-    color: #f5fa4e;
+    color: var(--color-user2);
   }
   &#user3 {
-    color: #00d9ff;
+    color: var(--color-user3);
   }
   &#user4 {
-    color: #00cc00;
+    color: var(--color-user4);
   }
   &#user5 {
-    color: #bb00bb;
+    color: var(--color-user5);
   }
   &#user6 {
-    color: rgb(122, 104, 223);
+    color: var(--color-user6);
   }
   & + & {
     margin: 5rem;
@@ -246,10 +274,10 @@ const ModalButton = styled.button`
   }
 `;
 // ================================================== //
-const Message = React.memo(({ username, message }) => {
+const Message = React.memo(({ userInfo, message }) => {
   return (
-    <UserMessage>
-      &lt;{username}&gt;<br></br> {message}
+    <UserMessage userNo={userInfo.userNo}>
+      &lt;{userInfo.username}&gt;<br></br> {message}
     </UserMessage>
   );
 });
@@ -287,7 +315,7 @@ const Room = ({
               messageLog.map((message, index) => (
                 <Message
                   key={index}
-                  username={message.username}
+                  userInfo={message.userInfo}
                   message={message.message}
                 />
               ))}
@@ -301,6 +329,7 @@ const Room = ({
             onChange={onChange}
             value={message}
             autocomplete="off"
+            maxLength="30"
           />
           <ButtonStyle>입력</ButtonStyle>
         </form>
