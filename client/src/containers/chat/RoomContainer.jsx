@@ -449,6 +449,64 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo && userInfo.baesinzer]);
 
+  const [voting, setVoting] = useState(false);
+  // kill 쿨타임
+  useEffect(() => {
+    if (room.start && userInfo.baesinzer) {
+      let t = 6;
+      if (t === 6) {
+        setKillPossible(false);
+        id.current = window.setInterval(() => {
+          t = t - 1;
+          // console.log(t);
+          if (t <= 0) {
+            clear();
+            setKillPossible(true);
+          }
+        }, 1000);
+      }
+    }
+  }, [userInfo.kill]);
+
+  // useEffect(() => {
+  //   if (room.start && meeting) {
+  //     setTimeout(() => {
+  //       console.log('setTimeout');
+  //       if (userInfo.hasVoted === 0) {
+  //         console.log('투표안한사람');
+  //         console.log(userInfo.username);
+  //         dispatch(vote(7));
+  //         dispatch(
+  //           logMessage(
+  //             userInfo.username,
+  //             '투표 시간 종료. 기권처리 되었습니다.'
+  //           )
+  //         );
+  //       }
+  //     }, 5000);
+  //   } else if (room.start && userInfo.hasVoted !== 0) {
+  //     console.log('투표 했다.');
+  //   }
+  // }, [messageLog]);
+
+  const [voteTime, setVoteTime] = useState(false);
+
+  useEffect(() => {
+    if (room && room.start && meeting) {
+      let t = 5;
+      if (t === 5) {
+        setVoteTime(true);
+        id.current = window.setInterval(() => {
+          t = t - 1;
+          console.log(t);
+          if (t < 1) {
+            setVoteTime(false);
+          }
+        }, 1000);
+      }
+    }
+  });
+
   return (
     <Room
       onSubmit={sendMessage}
