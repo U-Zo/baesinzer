@@ -294,7 +294,9 @@ const RoomContainer = ({ match, history }) => {
         // 회의 시작
         setMeeting(true);
         dispatch(logMessage(userInfoServer, serverMesg.message));
-        dispatch(logMessage('System', '모든 인원과 통신이 연결되었습니다.'));
+        dispatch(
+          logMessage(userInfoServer, '모든 인원과 통신이 연결되었습니다.')
+        );
       } else if (serverMesg.type === 'VOTE_END') {
         // 회의 종료
         setMeeting(false);
