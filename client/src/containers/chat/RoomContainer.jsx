@@ -11,7 +11,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoomOnMessage } from '../../modules/room';
-import {
+import user, {
   initializeUser,
   kill,
   moveLocation,
@@ -51,6 +51,7 @@ const RoomContainer = ({ match, history }) => {
   const [start, setStart] = useState(false);
 
   // modal
+  const [flag, setFlag] = useState(false);
   const [visible, setVisible] = useState(false);
   const [killedby, setKilledby] = useState();
 
@@ -63,10 +64,20 @@ const RoomContainer = ({ match, history }) => {
   // 시체 발견
   const [findDead, setFindDead] = useState(false);
 
-  const [flag, setFlag] = useState(false);
-  //이동 키워드 작동
+  // 이동 키워드 작동
   const [mapInfo, setMapInfo] = useState(false);
   const [killPossible, setKillPossible] = useState(false);
+
+  // 투표
+  const [voted, setVoted] = useState(false);
+
+  // 이동
+  const [movePossible, setMovePossible] = useState(true);
+
+  // ref
+  const moveRef = useRef(null);
+  const killRef = useRef(null);
+  const voteRef = useRef(null);
 
   let isConnect = false;
 
@@ -107,6 +118,7 @@ const RoomContainer = ({ match, history }) => {
     scrollRef.current.scrollIntoView(0); // scroll을 항상 아래로 내리기
   };
 
+  // 채팅 메시지 보내기
   const sendMessage = (e) => {
     e.preventDefault();
 
@@ -170,9 +182,10 @@ const RoomContainer = ({ match, history }) => {
       if (meeting) {
         // 회의 진행 중 투표 명령
         if (message.includes('투표')) {
-          if (!userInfo.hasVoted) {
+          if (!voted) {
             const voteNo = parseInt(message.replace(/[^0-9]/g, ''));
             dispatch(vote(voteNo));
+            setVoted(true);
             dispatch(logMessage(userInfo, `${voteNo}이(가) 의심스럽다.`));
           }
         } else {
@@ -285,6 +298,7 @@ const RoomContainer = ({ match, history }) => {
       } else if (serverMesg.type === 'VOTE_END') {
         // 회의 종료
         setMeeting(false);
+        setVoted(false);
       } else if (serverMesg.type === 'END') {
         // 게임 종료
         dispatch(initializeMessageLog());
@@ -319,6 +333,11 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeUser());
     };
   }, [roomId]); // roomId가 바뀌면 새로운 접속
+
+  // ref 타이머 초기화
+  const clear = (id) => {
+    window.clearInterval(id.current);
+  };
 
   useEffect(() => {
     if (!room) {
@@ -360,23 +379,16 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [room && room.start]);
 
-  // move
-  const id = useRef(null);
-  const [movePossible, setMovePossible] = useState(true);
-  const clear = () => {
-    window.clearInterval(id.current);
-  };
-
   useEffect(() => {
     if (room && room.start) {
       let t = 3;
       if (t === 3) {
         setMovePossible(false);
-        id.current = window.setInterval(() => {
+        moveRef.current = window.setInterval(() => {
           t = t - 1;
           console.log(t);
           if (t < 1) {
-            clear();
+            clear(moveRef);
             setMovePossible(true);
           }
         }, 1000);
@@ -436,10 +448,10 @@ const RoomContainer = ({ match, history }) => {
   }, [killLoc]);
 
   useEffect(() => {
-    if (meeting) {
+    if (meeting && voted) {
       stompSend('VOTE');
     }
-  }, [userInfo && userInfo.hasVoted]);
+  }, [voted]);
 
   // baesinzer
   useEffect(() => {
@@ -449,63 +461,41 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo && userInfo.baesinzer]);
 
-  const [voting, setVoting] = useState(false);
   // kill 쿨타임
   useEffect(() => {
-    if (room.start && userInfo.baesinzer) {
+    if (room && room.start && userInfo && userInfo.baesinzer) {
       let t = 6;
       if (t === 6) {
         setKillPossible(false);
-        id.current = window.setInterval(() => {
+        killRef.current = window.setInterval(() => {
           t = t - 1;
-          // console.log(t);
-          if (t <= 0) {
-            clear();
+          console.log(t);
+          if (t < 1) {
+            clear(killRef);
             setKillPossible(true);
           }
         }, 1000);
       }
     }
-  }, [userInfo.kill]);
-
-  // useEffect(() => {
-  //   if (room.start && meeting) {
-  //     setTimeout(() => {
-  //       console.log('setTimeout');
-  //       if (userInfo.hasVoted === 0) {
-  //         console.log('투표안한사람');
-  //         console.log(userInfo.username);
-  //         dispatch(vote(7));
-  //         dispatch(
-  //           logMessage(
-  //             userInfo.username,
-  //             '투표 시간 종료. 기권처리 되었습니다.'
-  //           )
-  //         );
-  //       }
-  //     }, 5000);
-  //   } else if (room.start && userInfo.hasVoted !== 0) {
-  //     console.log('투표 했다.');
-  //   }
-  // }, [messageLog]);
-
-  const [voteTime, setVoteTime] = useState(false);
+  }, [userInfo && userInfo.kill]);
 
   useEffect(() => {
     if (room && room.start && meeting) {
       let t = 5;
       if (t === 5) {
-        setVoteTime(true);
-        id.current = window.setInterval(() => {
+        voteRef.current = window.setInterval(() => {
           t = t - 1;
-          console.log(t);
-          if (t < 1) {
-            setVoteTime(false);
+          if (t < 1 && !voted && !userInfo.dead) {
+            setTimeout(() => {
+              dispatch(vote(-1));
+              setVoted(true);
+            }, 500 * userInfo.userNo);
+            clear(voteRef);
           }
         }, 1000);
       }
     }
-  });
+  }, [meeting]);
 
   return (
     <Room
