@@ -9,6 +9,7 @@ const Block = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 `;
 const RoomBlock = styled.div`
   position: relative;
@@ -52,6 +53,7 @@ const ChatBlock = styled.div`
 
 const InputStyle = styled.input`
   margin-left: 3rem;
+  padding-left: 1rem;
   bottom: 0;
   display: inline;
   width: 53rem;
@@ -93,41 +95,43 @@ const Chat = styled.ul`
   font-size: 1.8rem;
   color: var(--color-green);
   list-style-type: none;
+  padding: 1rem;
 `;
 
 const UserMessage = styled.li`
-  margin-left: 0.5rem;
   & + & {
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
   }
 
-  ${({ userNo }) => {
-    if (userNo === 1) {
-      return css`
-        color: var(--color-user1);
-      `;
-    } else if (userNo === 2) {
-      return css`
-        color: var(--color-user2);
-      `;
-    } else if (userNo === 3) {
-      return css`
-        color: var(--color-user3);
-      `;
-    } else if (userNo === 4) {
-      return css`
-        color: var(--color-user4);
-      `;
-    } else if (userNo === 5) {
-      return css`
-        color: var(--color-user5);
-      `;
-    } else if (userNo === 6) {
-      return css`
-        color: var(--color-user6);
-      `;
-    }
-  }}
+  .userName {
+    ${({ userNo }) => {
+      if (userNo === 1) {
+        return css`
+          color: var(--color-user1);
+        `;
+      } else if (userNo === 2) {
+        return css`
+          color: var(--color-user2);
+        `;
+      } else if (userNo === 3) {
+        return css`
+          color: var(--color-user3);
+        `;
+      } else if (userNo === 4) {
+        return css`
+          color: var(--color-user4);
+        `;
+      } else if (userNo === 5) {
+        return css`
+          color: var(--color-user5);
+        `;
+      } else if (userNo === 6) {
+        return css`
+          color: var(--color-user6);
+        `;
+      }
+    }}
+  }
 `;
 
 const Code = styled.div`
@@ -277,7 +281,8 @@ const ModalButton = styled.button`
 const Message = React.memo(({ userInfo, message }) => {
   return (
     <UserMessage userNo={userInfo.userNo}>
-      &lt;{userInfo.username}&gt;<br></br> {message}
+      <div className="userName">&lt;{userInfo.username}&gt;</div>
+      <div>{message}</div>
     </UserMessage>
   );
 });
