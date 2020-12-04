@@ -25,6 +25,12 @@ const RoomListContainer = ({ history }) => {
 
   const changeUsername = (e) => {
     const inputUsername = e.target.value;
+    // if (inputUsername.length > 8) {
+    //   setType('닉네임');
+    //   setError('닉네임이 너무 깁니다.');
+    // } else if (inputUsername <= 8) {
+    //   setError('');
+    // }
     dispatch(setUsername(inputUsername));
   };
 
@@ -35,10 +41,13 @@ const RoomListContainer = ({ history }) => {
       setVisible(false);
       setType('닉네임');
       setError('닉네임을 입력하세요.');
-      setTimeout(function () {
-        setError(null);
-      }, 2000);
+    } else if (userInfo.username.length > 8) {
+      setType('닉네임');
+      setError('닉네임이 너무 깁니다.');
     } else setVisible(!visible);
+    setTimeout(function () {
+      setError(null);
+    }, 2000);
   };
 
   const onJoin = (roomId) => {

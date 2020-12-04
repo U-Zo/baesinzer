@@ -293,6 +293,7 @@ const RoomList = ({
         {type === '닉네임' ? <ErrorBox id={type}>{error}</ErrorBox> : null}
         <NicknameBox>
           <InputNickname
+            maxLength="8"
             type="text"
             value={userInfo && userInfo.username}
             onChange={changeUsername}
