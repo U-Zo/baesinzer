@@ -32,7 +32,7 @@ const system = {
   username: 'System',
 };
 // map 정보
-const map = ['옥상', '화장실', '강의실1', '강의실2', '강의실3', '강의실4'];
+const map = ['로비', '강의실', '화장실', '보안실', '편의점'];
 const complexMissionIds = [10, 20];
 
 const RoomContainer = ({ match, history }) => {
@@ -143,7 +143,7 @@ const RoomContainer = ({ match, history }) => {
       if (mapInfo) {
         setMapInfo(false);
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
-        if (mapLocation > 0 && mapLocation <= 6) {
+        if (mapLocation > 0 && mapLocation <= 5) {
           dispatch(moveLocation(mapLocation));
           dispatch(
             logMessage(userInfo, `${map[mapLocation - 1]}로(으로) 이동했다.`)
@@ -200,7 +200,7 @@ const RoomContainer = ({ match, history }) => {
           dispatch(
             logMessage(
               userInfo,
-              `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]} 6.${map[5]}`
+              `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]}`
             )
           );
           setMapInfo(true);
