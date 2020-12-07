@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import Room from '../../components/chat/Room';
+import { simpleMissions } from '../../lib/missions';
 import {
   changeField,
   initialField,
@@ -14,6 +15,7 @@ import { exitRoom, loadRoomOnMessage } from '../../modules/room';
 import user, {
   initializeUser,
   kill,
+  loadMissions,
   moveLocation,
   tempUser,
   update,
@@ -31,7 +33,8 @@ const system = {
   username: 'System',
 };
 // map 정보
-const map = ['안방', '화장실', '강의실1', '강의실2', '강의실3', '강의실4'];
+const map = ['옥상', '화장실', '강의실1', '강의실2', '강의실3', '강의실4'];
+const complexMissionIds = [10, 20];
 
 const RoomContainer = ({ match, history }) => {
   const { roomId } = match.params;
@@ -49,6 +52,7 @@ const RoomContainer = ({ match, history }) => {
 
   // 시작 여부
   const [start, setStart] = useState(false);
+  const [missions, setMissions] = useState(false);
 
   // modal
   const [flag, setFlag] = useState(false);
@@ -376,8 +380,25 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start) {
       dispatch(initializeMessageLog());
+      const simpleMissionIds = [];
+      while (simpleMissionIds.length < 2) {
+        const index = Math.floor(Math.random() * 7) + 1;
+        if (!simpleMissionIds.find((num) => num === index)) {
+          simpleMissionIds.push(index);
+        }
+      }
+
+      const complexMissionId = complexMissionIds[Math.floor(Math.random() * 2)];
+      dispatch(loadMissions({ simpleMissionIds, complexMissionId }));
+      setMissions(true);
     }
   }, [room && room.start]);
+
+  useEffect(() => {
+    if (room && room.start) {
+      stompSend('PLAY');
+    }
+  }, [missions]);
 
   useEffect(() => {
     if (room && room.start) {
