@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import Room from '../../components/chat/Room';
-import { simpleMissions } from '../../lib/missions';
 import {
   changeField,
   initialField,
@@ -12,7 +11,7 @@ import {
   initializeMessageLog,
 } from '../../modules/messages';
 import { exitRoom, loadRoomOnMessage } from '../../modules/room';
-import user, {
+import {
   initializeUser,
   kill,
   loadMissions,
