@@ -4,6 +4,7 @@ import createRequestSaga, {
   createRequestActionTypes,
 } from '../lib/createRequestSaga';
 import * as authAPI from '../lib/api/auth';
+import { complexMissions, simpleMissions } from '../lib/missions';
 
 const TEMP_USER = 'auth/TEMP_SET_USER';
 const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
@@ -11,6 +12,7 @@ const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
 );
 const SET_USERNAME = 'user/SET_USERNAME';
 const LOGOUT = 'user/LOGOUT';
+const LOAD_MISSIONS = 'user/LOAD_MISSIONS';
 const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
 const VOTE = 'user/VOTE'; // 투표 액션 타입
 const KILL = 'uaer/KILL';
@@ -21,6 +23,19 @@ export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
 export const logout = createAction(LOGOUT);
 export const setUsername = createAction(SET_USERNAME, (username) => username);
+export const loadMissions = createAction(
+  LOAD_MISSIONS,
+  ({ simpleMissionIds, complexMissionId }) => {
+    console.log(simpleMissionIds, complexMissionId);
+    const simpleMissionList = simpleMissionIds.map((id) =>
+      simpleMissions.find((mission) => mission.missionId === id)
+    );
+    return [
+      ...simpleMissionList,
+      complexMissions.find((mission) => mission.missionId === complexMissionId),
+    ];
+  }
+);
 export const moveLocation = createAction(
   MOVE_LOCATION,
   (locationId) => locationId
@@ -75,6 +90,13 @@ const user = handleActions(
       ...state,
       userInfo: {
         username: state.userInfo.username,
+      },
+    }),
+    [LOAD_MISSIONS]: (state, { payload: missions }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        missionList: missions,
       },
     }),
     [MOVE_LOCATION]: (state, { payload: locationId }) => ({
