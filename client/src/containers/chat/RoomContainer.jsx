@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
+import MissionModal from '../../components/chat/MissionModal';
 import Room from '../../components/chat/Room';
 import {
   changeField,
@@ -56,6 +57,8 @@ const RoomContainer = ({ match, history }) => {
   // modal
   const [flag, setFlag] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [missionVisible, setMissionVisible] = useState(false);
+  const [missionId, setMissionId] = useState(0);
   const [killedby, setKilledby] = useState();
 
   // 긴급 회의
@@ -91,6 +94,10 @@ const RoomContainer = ({ match, history }) => {
 
   const closeModal = () => {
     setVisible(!visible);
+  };
+
+  const closeMissionModal = () => {
+    setMissionVisible(!missionVisible);
   };
 
   const stompSend = (type) => {
@@ -309,6 +316,7 @@ const RoomContainer = ({ match, history }) => {
         setStart(false);
         setKilledby(null);
         setFlag(false);
+        setMissions(false);
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -376,6 +384,7 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo]);
 
+  // 미션 랜덤 선택
   useEffect(() => {
     if (room && room.start) {
       dispatch(initializeMessageLog());
@@ -393,11 +402,12 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [room && room.start]);
 
+  // 미션 정보 동기화
   useEffect(() => {
-    if (room && room.start) {
+    if (room && room.start && !missionVisible) {
       stompSend('PLAY');
     }
-  }, [missions]);
+  }, [missions, missionVisible]);
 
   useEffect(() => {
     if (room && room.start) {
@@ -518,20 +528,27 @@ const RoomContainer = ({ match, history }) => {
   }, [meeting]);
 
   return (
-    <Room
-      onSubmit={sendMessage}
-      onChange={onChange}
-      startHandler={startHandler}
-      userInfo={userInfo}
-      message={message}
-      messageLog={messageLog}
-      usersArray={room && Object.values(room.users)}
-      exit={exit}
-      visible={visible}
-      closeModal={closeModal}
-      scrollRef={scrollRef}
-      killedby={killedby}
-    />
+    <>
+      <Room
+        onSubmit={sendMessage}
+        onChange={onChange}
+        startHandler={startHandler}
+        userInfo={userInfo}
+        message={message}
+        messageLog={messageLog}
+        usersArray={room && Object.values(room.users)}
+        exit={exit}
+        visible={visible}
+        closeModal={closeModal}
+        scrollRef={scrollRef}
+        killedby={killedby}
+      />
+      <MissionModal
+        missionVisible={missionVisible}
+        missionId={missionId}
+        closeMissionModal={closeMissionModal}
+      />
+    </>
   );
 };
 
