@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+
 const ModalBlock = styled.div`
   display: flex;
   justify-content: center;
@@ -33,8 +34,8 @@ const ModalFooter = styled.div`
  * visble은 useState를 사용해서 설정, onClick할때 true <-> false 교체되게 만든다
  * chileren은 Modal버튼을 눌렀을때 나타나는 component
  */
-const Modal = ({ visible, onClick, children }) => {
-  return visible && <ModalBlock>{children}</ModalBlock>;
+const Modal = ({ visible, onClick, children, ...rest }) => {
+  return visible && <ModalBlock {...rest}>{children}</ModalBlock>;
 };
 
 export default Modal;

@@ -11,6 +11,7 @@ const Block = styled.div`
   align-items: center;
   overflow: hidden;
 `;
+
 const RoomBlock = styled.div`
   position: relative;
   background-color: var(--color-background);
@@ -20,6 +21,7 @@ const RoomBlock = styled.div`
   width: 97rem;
   height: 72rem;
 `;
+
 const ChatBlock = styled.div`
   width: 58rem;
   height: 56rem;
@@ -75,6 +77,7 @@ const InputStyle = styled.input`
     outline: none;
   }
 `;
+
 const ButtonStyle = styled.button`
   bottom: 0;
   right: 0;
@@ -217,6 +220,7 @@ const AllUsers = styled.div`
     margin: 5rem;
   }
 `;
+
 const Start = styled.button`
   position: absolute;
   width: 18rem;
@@ -235,6 +239,7 @@ const Start = styled.button`
     font-weight: bold;
   }
 `;
+
 const Exit = styled.button`
   position: absolute;
   width: 18rem;
@@ -253,15 +258,19 @@ const Exit = styled.button`
     font-weight: bold;
   }
 `;
+
 const NewModal = styled(Modal)`
-  background-color: var(--color-red);
-  top: 10%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 const ModalText = styled.div`
   font-size: 2.3rem;
   color: var(--color-green);
 `;
+
 const ModalButton = styled.button`
   margin-top: 5rem;
   width: 18rem;
@@ -277,7 +286,7 @@ const ModalButton = styled.button`
     font-weight: bold;
   }
 `;
-// ================================================== //
+
 const Message = React.memo(({ userInfo, message }) => {
   return (
     <UserMessage userNo={userInfo.userNo}>
@@ -286,6 +295,7 @@ const Message = React.memo(({ userInfo, message }) => {
     </UserMessage>
   );
 });
+
 const Username = ({ username, userNo, dead }) => {
   return (
     <div>
@@ -297,6 +307,7 @@ const Username = ({ username, userNo, dead }) => {
     </div>
   );
 };
+
 const Room = ({
   onSubmit,
   onChange,

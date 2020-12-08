@@ -14,6 +14,7 @@ const SET_USERNAME = 'user/SET_USERNAME';
 const LOGOUT = 'user/LOGOUT';
 const LOAD_MISSIONS = 'user/LOAD_MISSIONS';
 const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
+const MISSION_DONE = 'user/MISSION_DONE'; // 미션 성공
 const VOTE = 'user/VOTE'; // 투표 액션 타입
 const KILL = 'uaer/KILL';
 const UPDATE = 'user/UPDATE';
@@ -40,6 +41,7 @@ export const moveLocation = createAction(
   MOVE_LOCATION,
   (locationId) => locationId
 );
+export const missionDone = createAction(MISSION_DONE, (missionId) => missionId);
 export const vote = createAction(VOTE, (userNo) => userNo);
 export const kill = createAction(KILL, (userNo) => userNo);
 export const update = createAction(UPDATE, (userInfo) => userInfo);
@@ -104,6 +106,15 @@ const user = handleActions(
       userInfo: {
         ...state.userInfo,
         locationId,
+      },
+    }),
+    [MISSION_DONE]: (state, { payload: missionId }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        missionList: state.userInfo.missionList.map((mission) =>
+          missionId === mission.missionId ? { ...mission, done: true } : mission
+        ),
       },
     }),
     [VOTE]: (state, { payload: userNo }) => ({
