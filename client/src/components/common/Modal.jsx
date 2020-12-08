@@ -12,7 +12,6 @@ const ModalBlock = styled.div`
   padding: 15px;
   //수정
   background-color: var(--color-background);
-  /* position: relative; */
   position: relative;
   left: 50%;
   top: -35%;
