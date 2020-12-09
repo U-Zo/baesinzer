@@ -81,8 +81,8 @@ const Mission2 = ({ onClose }) => {
     e.preventDefault();
     if (answer === 'Hello World') {
       setSuccess(true);
+      dispatch(missionDone(2));
       setTimeout(() => {
-        dispatch(missionDone(2));
         setSuccess(false);
         onClose();
       }, 1500);
