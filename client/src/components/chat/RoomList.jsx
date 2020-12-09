@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '../common/Modal';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { BiRefresh } from 'react-icons/bi';
 
 const Block = styled.div`
@@ -233,6 +233,14 @@ const ErrorBox = styled.div`
   }
 `;
 
+const rotateRefresh = keyframes`
+  from{
+    transform:rotate(0deg);
+    }
+  to{
+    transform:rotate(90deg);
+    }
+`;
 const Refresh = styled.div`
   position: relative;
   display: inline-block;
@@ -243,14 +251,11 @@ const Refresh = styled.div`
   left: 75%;
   cursor: pointer;
   #refresh {
-    transition: all ease 0.5s;
     font-size: 3rem;
     &:hover {
+      animation: ${rotateRefresh} 0.5s steps(3, start);
       transform: rotate(90deg);
     }
-    /* &:hover {
-      color: var(--color-dark-green);
-    } */
   }
 `;
 
