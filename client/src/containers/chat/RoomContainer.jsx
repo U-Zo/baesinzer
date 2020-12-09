@@ -103,7 +103,7 @@ const RoomContainer = ({ match, history }) => {
   };
 
   const closeMissionModal = () => {
-    setMissionVisible(!missionVisible);
+    setMissionVisible(false);
   };
 
   const stompSend = (type) => {
@@ -160,7 +160,7 @@ const RoomContainer = ({ match, history }) => {
         if (mapLocation > 0 && mapLocation <= 5) {
           dispatch(moveLocation(mapLocation));
           dispatch(
-            logMessage(userInfo, `${map[mapLocation - 1]}로(으로) 이동했다.`)
+            logMessage(userInfo, `${map[mapLocation - 1]}(으)로 이동했다.`)
           );
         } else if (
           (userInfo.baesinzer && message.includes('살해')) ||
@@ -198,6 +198,12 @@ const RoomContainer = ({ match, history }) => {
 
       // 미션 명령 토글 활성화 시
       if (missionInfo) {
+        setMissionInfo(false);
+        const mission = parseInt(message.replace(/[^0-9]/g, ''));
+        if (mission) {
+          setMissionId(mission);
+          setMissionVisible(true);
+        }
       }
 
       if (meeting) {
@@ -205,9 +211,11 @@ const RoomContainer = ({ match, history }) => {
         if (message.includes('투표')) {
           if (!voted) {
             const voteNo = parseInt(message.replace(/[^0-9]/g, ''));
-            dispatch(vote(voteNo));
-            setVoted(true);
-            dispatch(logMessage(userInfo, `${voteNo}이(가) 의심스럽다.`));
+            if (voteNo && voteNo > 0 && voteNo <= room.count) {
+              dispatch(vote(voteNo));
+              setVoted(true);
+              dispatch(logMessage(userInfo, `${voteNo}이(가) 의심스럽다.`));
+            }
           }
         } else {
           stompSend('ROOM');
@@ -260,13 +268,34 @@ const RoomContainer = ({ match, history }) => {
         } else {
           dispatch(logMessage(userInfo, message));
         }
+      } else if (message.includes('/일과')) {
+        // 해당 위치의 미션 목록 출력
+        if (!missionInfo && !userInfo.baesinzer && userInfo.missionList) {
+          const missionOnHere = userInfo.missionList
+            .filter(
+              (mission) =>
+                !mission.done && userInfo.locationId === mission.locationId
+            )
+            .map((mission) => `${mission.missionId}.${mission.missionName}`)
+            .join(' ');
+
+          if (!missionOnHere.length) {
+            dispatch(logMessage(userInfo, '여기서 할 일은 없는 것 같아'));
+          } else {
+            setMissionInfo(true); // 미션 명령 토글 활성화
+            dispatch(logMessage(userInfo, '여기서 할 일은'));
+            dispatch(logMessage(userInfo, missionOnHere));
+          }
+        } else {
+          dispatch(logMessage(userInfo, message));
+        }
       } else if (
         // 신고 명령
         (findDead && message.includes('/신고')) ||
         message.includes('/report')
       ) {
         stompSend('VOTE_START');
-      } else if (!mapInfo && !killInfo) {
+      } else if (!mapInfo && !killInfo && !missionInfo) {
         dispatch(logMessage(userInfo, message));
       }
       dispatch(initialField());
@@ -315,6 +344,9 @@ const RoomContainer = ({ match, history }) => {
       } else if (serverMesg.type === 'VOTE_START') {
         // 회의 시작
         setMeeting(true);
+        setKillInfo(false);
+        setMapInfo(false);
+        setMissionInfo(false);
         dispatch(logMessage(userInfoServer, serverMesg.message));
         dispatch(logMessage('System', '모든 인원과 통신이 연결되었습니다.'));
       } else if (serverMesg.type === 'VOTE_END') {
