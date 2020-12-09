@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Modal from '../common/Modal';
 import Mission1 from './missions/Mission1';
 import Mission2 from './missions/Mission2';
+import Mission3 from './missions/Mission3';
 
 const MissionModalBlock = styled(Modal)`
   position: absolute;
@@ -32,6 +33,7 @@ const MissionModal = ({ missionVisible, missionId, closeMissionModal }) => {
     <MissionModalBlock visible={missionVisible}>
       {missionId === 1 && <Mission1 onClose={closeMissionModal} />}
       {missionId === 2 && <Mission2 onClose={closeMissionModal} />}
+      {missionId === 3 && <Mission3 onClose={closeMissionModal} />}
       <MissionModalCloseButton onClick={closeMissionModal}>
         X
       </MissionModalCloseButton>
