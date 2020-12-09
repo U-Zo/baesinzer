@@ -59,7 +59,7 @@ const RoomContainer = ({ match, history }) => {
   const [visible, setVisible] = useState(false);
   const [missionVisible, setMissionVisible] = useState(false);
   const [missionId, setMissionId] = useState(0);
-  const [killedby, setKilledby] = useState();
+  const [killedby, setKilledby] = useState(null);
 
   // 긴급 회의
   const [meeting, setMeeting] = useState(false);
@@ -70,15 +70,21 @@ const RoomContainer = ({ match, history }) => {
   // 시체 발견
   const [findDead, setFindDead] = useState(false);
 
-  // 이동 키워드 작동
+  // 이동
+  const [movePossible, setMovePossible] = useState(true);
+  // 이동 명령 토글
   const [mapInfo, setMapInfo] = useState(false);
-  const [killPossible, setKillPossible] = useState(false);
+
+  // 살해
+  const [killPossible, setKillPossible] = useState(true);
+  // 살해 명령 토글
+  const [killInfo, setKillInfo] = useState(false);
+
+  // 미션 명령 토글
+  const [missionInfo, setMissionInfo] = useState(false);
 
   // 투표
   const [voted, setVoted] = useState(false);
-
-  // 이동
-  const [movePossible, setMovePossible] = useState(true);
 
   // ref
   const moveRef = useRef(null);
@@ -147,6 +153,7 @@ const RoomContainer = ({ match, history }) => {
     // dispatch로유저 정보를 저장한다.
     // dispatch(logMessage(username, message));
     if (room.start) {
+      // 이동 명령 토글 활성화 시
       if (mapInfo) {
         setMapInfo(false);
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
@@ -165,15 +172,14 @@ const RoomContainer = ({ match, history }) => {
           dispatch(logMessage(userInfo, `갈수없는 곳이군...`));
         }
       }
-      if (killPossible && userInfo.baesinzer) {
-        let userWord = parseInt(message.replace(/[^0-9]/g, ''));
-        let usersArray = Object.values(room.users);
-        setKillPossible(false);
-        console.log(userWord);
-        console.log(typeof userWord);
-        console.log(isNaN(userWord));
+
+      // 살해 명령 토글 활성화 시
+      if (killInfo && userInfo.baesinzer) {
+        const userWord = parseInt(message.replace(/[^0-9]/g, ''));
+        const usersArray = Object.values(room.users);
+        setKillInfo(false);
         if (
-          !isNaN(userWord) &&
+          userWord &&
           userWord <= usersArray.length &&
           userWord !== userInfo.userNo &&
           userInfo.locationId === usersArray[userWord - 1].locationId
@@ -189,6 +195,11 @@ const RoomContainer = ({ match, history }) => {
           dispatch(logMessage(userInfo, `일단 움직이자.`));
         }
       }
+
+      // 미션 명령 토글 활성화 시
+      if (missionInfo) {
+      }
+
       if (meeting) {
         // 회의 진행 중 투표 명령
         if (message.includes('투표')) {
@@ -222,44 +233,40 @@ const RoomContainer = ({ match, history }) => {
       ) {
         // 살해 명령
         if (userInfo && userInfo.baesinzer) {
-          let usersArray = Object.values(room.users);
-          // let userWord = message.split(' ');
-          let userList = '';
-          for (let i = 0; i < usersArray.length; i++) {
-            if (
-              userInfo.locationId === usersArray[i].locationId &&
-              userInfo.username !== usersArray[i].username &&
-              !usersArray[i].dead
-            ) {
-              userList += `${i + 1}.${usersArray[i].username} `;
+          if (killPossible) {
+            const usersArray = Object.values(room.users);
+            // let userWord = message.split(' ');
+            let userList = '';
+            for (let i = 0; i < usersArray.length; i++) {
+              if (
+                userInfo.locationId === usersArray[i].locationId &&
+                userInfo.username !== usersArray[i].username &&
+                !usersArray[i].dead
+              ) {
+                userList += `${i + 1}.${usersArray[i].username} `;
+              }
             }
-            // if (
-            //   userWord[1] === usersArray[i].username &&
-            //   userInfo.locationId === usersArray[i].locationId
-            // ) {
-            //   dispatch(kill(usersArray[i].userNo));
-            //   dispatch(
-            //     logMessage(
-            //       userInfo.username,
-            //       `${usersArray[i].username}을 처리했다.`
-            //     )
-            //   );
-            // }
-          }
-          if (userList === '') {
-            dispatch(logMessage(userInfo, '이곳은 죽일 수 있는 사람이 없군..'));
+            if (userList === '') {
+              dispatch(
+                logMessage(userInfo, '이곳은 죽일 수 있는 사람이 없군..')
+              );
+            } else {
+              dispatch(logMessage(userInfo, userList));
+              setKillInfo(true);
+            }
           } else {
-            dispatch(logMessage(userInfo, userList));
+            dispatch(logMessage(userInfo, '아직 처리할 힘이 없어'));
           }
-          setKillPossible(true);
+        } else {
+          dispatch(logMessage(userInfo, message));
         }
       } else if (
         // 신고 명령
-        (findDead && message.includes('신고')) ||
-        message.includes('report')
+        (findDead && message.includes('/신고')) ||
+        message.includes('/report')
       ) {
         stompSend('VOTE_START');
-      } else if (!mapInfo && !killPossible) {
+      } else if (!mapInfo && !killInfo) {
         dispatch(logMessage(userInfo, message));
       }
       dispatch(initialField());
@@ -297,6 +304,11 @@ const RoomContainer = ({ match, history }) => {
         serverMesg.type === 'EXIT'
       ) {
         dispatch(logMessage(userInfoServer, serverMesg.message)); // 서버로부터 받은 이름으로 messageLog에 추가
+      } else if (serverMesg.type === 'START') {
+        dispatch(logMessage(userInfoServer, serverMesg.message));
+        if (!start) {
+          setStart(true);
+        }
       } else if (serverMesg.type === 'KILL') {
         // 살해 발생된 지역 설정
         setKillLoc(userInfoServer.locationId);
@@ -371,7 +383,7 @@ const RoomContainer = ({ match, history }) => {
     // baesinzer로부터 죽음 모달 pop
     if (room) {
       for (let i = 0; i < Object.values(room.users).length; i++) {
-        if (Object.values(room.users)[i].kill > 0) {
+        if (Object.values(room.users)[i].kill > 0 && !killedby) {
           setKilledby(Object.values(room.users)[i].username);
         }
       }
@@ -388,6 +400,7 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start) {
       dispatch(initializeMessageLog());
+      dispatch(logMessage(system, '실험 시작, 모든 일과를 완수하십시오.'));
       const simpleMissionIds = [];
       while (simpleMissionIds.length < 2) {
         const index = Math.floor(Math.random() * 7) + 1;
@@ -404,7 +417,7 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 정보 동기화
   useEffect(() => {
-    if (room && room.start && !missionVisible) {
+    if (room && room.start && start && !missionVisible) {
       stompSend('PLAY');
     }
   }, [missions, missionVisible]);
@@ -412,17 +425,15 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start) {
       let t = 3;
-      if (t === 3) {
-        setMovePossible(false);
-        moveRef.current = window.setInterval(() => {
-          t = t - 1;
-          console.log(t);
-          if (t < 1) {
-            clear(moveRef);
-            setMovePossible(true);
-          }
-        }, 1000);
-      }
+      setMovePossible(false);
+      moveRef.current = window.setInterval(() => {
+        t--;
+        console.log(t);
+        if (t < 1) {
+          clear(moveRef);
+          setMovePossible(true);
+        }
+      }, 1000);
 
       stompSend('PLAY');
       if (findDead) {
@@ -440,7 +451,7 @@ const RoomContainer = ({ match, history }) => {
           dispatch(
             logMessage(
               userInfo,
-              `${userOnMap.username}이(가) 산송장이 되어있다. 신고할까?`
+              `${userOnMap.username}이(가) 산송장이 되어있다. 신고할까? (명령어: /신고)`
             )
           );
 
@@ -467,10 +478,18 @@ const RoomContainer = ({ match, history }) => {
     if (killLoc !== -1 && userInfo.locationId === killLoc) {
       if (!userInfo.baesinzer) {
         dispatch(
-          logMessage(userInfo, '지금 여기서 누군가가 살해당했다. 신고할까?')
+          logMessage(
+            userInfo,
+            '지금 여기서 누군가가 살해당했다. 신고할까? (명령어: /신고)'
+          )
         );
       } else {
-        dispatch(logMessage(userInfo, '누군가 발견하기 전에 먼저 신고할까?'));
+        dispatch(
+          logMessage(
+            userInfo,
+            '누군가 발견하기 전에 먼저 신고할까? (명령어: /신고)'
+          )
+        );
       }
       setFindDead(true);
       setKillLoc(-1);
@@ -487,7 +506,7 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (userInfo && userInfo.baesinzer) {
       dispatch(logMessage(system, '당신은 BaeSinZer입니다.'));
-      dispatch(logMessage(system, '목표: 무고한 시민을 살해하십시오.'));
+      dispatch(logMessage(system, '목표: 모든 시민을 처리하십시오.'));
     }
   }, [userInfo && userInfo.baesinzer]);
 
@@ -495,35 +514,31 @@ const RoomContainer = ({ match, history }) => {
   useEffect(() => {
     if (room && room.start && userInfo && userInfo.baesinzer) {
       let t = 6;
-      if (t === 6) {
-        setKillPossible(false);
-        killRef.current = window.setInterval(() => {
-          t = t - 1;
-          console.log(t);
-          if (t < 1) {
-            clear(killRef);
-            setKillPossible(true);
-          }
-        }, 1000);
-      }
+      setKillPossible(false);
+      killRef.current = window.setInterval(() => {
+        t--;
+        console.log(t);
+        if (t < 1) {
+          clear(killRef);
+          setKillPossible(true);
+        }
+      }, 1000);
     }
   }, [userInfo && userInfo.kill]);
 
   useEffect(() => {
     if (room && room.start && meeting) {
       let t = 5;
-      if (t === 5) {
-        voteRef.current = window.setInterval(() => {
-          t = t - 1;
-          if (t < 1 && !voted && !userInfo.dead) {
-            setTimeout(() => {
-              dispatch(vote(-1));
-              setVoted(true);
-            }, 500 * userInfo.userNo);
-            clear(voteRef);
-          }
-        }, 1000);
-      }
+      voteRef.current = window.setInterval(() => {
+        t--;
+        if (t < 1 && !voted && !userInfo.dead) {
+          setTimeout(() => {
+            dispatch(vote(-1));
+            setVoted(true);
+          }, 500 * userInfo.userNo);
+          clear(voteRef);
+        }
+      }, 1000);
     }
   }, [meeting]);
 
