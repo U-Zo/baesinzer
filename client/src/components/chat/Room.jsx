@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import map from '../../lib/map';
 import user from '../../modules/user';
 import Modal from '../common/Modal';
 
@@ -31,26 +32,41 @@ const ChatBlock = styled.div`
   /* border: 0.2rem solid var(--color-green); */
   border: 3px solid var(--color-green);
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
-  /* scroll-margin-top: 2rem; */
+  display: flex;
+  flex-direction: column;
+`;
 
-  ::-webkit-scrollbar {
-    width: 2rem;
-    height: 80%;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: var(--color-background);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-dark-green);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-green);
-  }
-  ::-webkit-scrollbar-button {
-    display: none;
-  }
+const ContentBlock = styled.div`
+  height: 11rem;
+  border-bottom: 0.2rem solid var(--color-green);
+`;
+
+const VoteTimeBlock = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+  font-size: 2rem;
+  color: var(--color-green);
+`;
+
+const WorkBoard = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+  color: var(--color-green);
+  flex-wrap: wrap;
+  align-items: baseline;
+  flex-direction: column;
+`;
+
+const WorkBoardLeft = styled.div``;
+
+const WorkBoardRight = styled.div`
+  border-left: 0.2rem solid var(--color-green);
+  height: 100%;
+  padding: 1rem;
 `;
 
 const InputStyle = styled.input`
@@ -99,6 +115,23 @@ const Chat = styled.ul`
   color: var(--color-green);
   list-style-type: none;
   padding: 1rem;
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 2rem;
+    height: 80%;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-dark-green);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-green);
+  }
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
 `;
 
 const UserMessage = styled.li`
@@ -302,9 +335,31 @@ const Username = ({ username, userNo, dead }) => {
       {dead ? (
         <AllUsers id={'dead' + userNo}>{username}</AllUsers>
       ) : (
-        <AllUsers id={'user' + userNo}>{username}</AllUsers>
+        <AllUsers id={'user' + userNo}>
+          {userNo}.{username}
+        </AllUsers>
       )}
     </div>
+  );
+};
+
+const MissionBlock = styled.div`
+  & + & {
+    margin-top: 0.5rem;
+  }
+
+  ${(props) =>
+    props.done &&
+    css`
+      text-decoration: line-through;
+    `}
+`;
+
+const Mission = ({ locationId, missionName, done }) => {
+  return (
+    <MissionBlock done={done}>
+      {map[locationId - 1]}: {missionName}
+    </MissionBlock>
   );
 };
 
@@ -321,12 +376,55 @@ const Room = ({
   closeModal,
   scrollRef,
   killedby,
+  start,
+  meeting,
+  voteTime,
+  missionList,
+  movePossible,
+  moveTime,
+  killPossible,
+  killTime,
 }) => {
   return (
     <Block>
       <RoomBlock>
         <ChatBlock>
-          <Chat ref={scrollRef}>
+          {start && (
+            <ContentBlock>
+              {meeting ? (
+                <VoteTimeBlock>투표 남은 시간: {voteTime}</VoteTimeBlock>
+              ) : (
+                missionList && (
+                  <WorkBoard>
+                    <WorkBoardLeft>
+                      <MissionBlock>
+                        {userInfo && userInfo.baesinzer
+                          ? '가짜 임무'
+                          : '오늘 할 일'}
+                      </MissionBlock>
+                      {missionList.map((mission) => (
+                        <Mission
+                          locationId={mission.locationId}
+                          missionName={mission.missionName}
+                          done={mission.done}
+                        />
+                      ))}
+                    </WorkBoardLeft>
+                    <WorkBoardRight>
+                      <div>쿨타임</div>
+                      <div>이동: {movePossible ? 'Ready' : `${moveTime}s`}</div>
+                      {userInfo && userInfo.baesinzer && (
+                        <div>
+                          살해: {killPossible ? 'Ready' : `${killTime}s`}
+                        </div>
+                      )}
+                    </WorkBoardRight>
+                  </WorkBoard>
+                )
+              )}
+            </ContentBlock>
+          )}
+          <Chat>
             {messageLog &&
               messageLog.map((message, index) => (
                 <Message
@@ -335,6 +433,7 @@ const Room = ({
                   message={message.message}
                 />
               ))}
+            <div ref={scrollRef}></div>
           </Chat>
         </ChatBlock>
 
@@ -346,6 +445,7 @@ const Room = ({
             value={message}
             autocomplete="off"
             maxLength="30"
+            autoFocus
           />
           <ButtonStyle>입력</ButtonStyle>
         </form>
