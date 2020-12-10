@@ -3,17 +3,6 @@ import { useDispatch } from 'react-redux';
 import { missionDone } from '../../../modules/user';
 import styled, { css, keyframes } from 'styled-components';
 import { ImFloppyDisk } from 'react-icons/im';
-// const SweepStyle = styled.input`
-//   padding: 0.75em;
-//   border: 1px var(--color-green) solid;
-//   background: linear-gradient(to right, var(--color-green), var(--color-green));
-//   background-repeat: no-repeat;
-//   background-size: 0 100%;
-//   transition: background-size 1s 0s;
-//   :hover {
-//     background-size: 100% 100%;
-//   }
-// `;
 
 const MissionBlock = styled.div`
   display: flex;
@@ -63,18 +52,10 @@ const MissionGauge = styled.div`
     text-align: center;
   }
 `;
-const Mission3 = ({ onClose }) => {
+const Mission4 = ({ onClose }) => {
   const dispatch = useDispatch();
   const [start, setStart] = useState('');
   const [complete, setComplete] = useState();
-
-  // const onClick = () => {
-  //   setStart('start');
-  //   setTimeout(() => {
-  //     setComplete('Mission Clear!');
-  //     dispatch(missionDone(3));
-  //   }, 6000);
-  // };
 
   const missionRef = useRef(null);
 
@@ -84,8 +65,8 @@ const Mission3 = ({ onClose }) => {
 
   const timer = () =>
     setTimeout(function () {
-      setComplete('파일 백업하기 완료');
-      dispatch(missionDone(3));
+      setComplete('파일 다운로드 완료');
+      dispatch(missionDone(4));
     }, 6000);
   useEffect(() => {
     missionRef.current = timer();
@@ -108,7 +89,7 @@ const Mission3 = ({ onClose }) => {
   return (
     <div>
       {/* <SweepStyle type="submit" value="Send Request" class="sweep"></SweepStyle> */}
-      <MissionInfo>Please backup your data.</MissionInfo>
+      <MissionInfo>Please download data.</MissionInfo>
       <MissionBlock>
         <MissionGauge id={start} />
         <ImFloppyDiskStyle id={start} />
@@ -118,4 +99,4 @@ const Mission3 = ({ onClose }) => {
   );
 };
 
-export default Mission3;
+export default Mission4;

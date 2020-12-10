@@ -457,6 +457,8 @@ const RoomContainer = ({ match, history }) => {
       const complexMissionId = complexMissionIds[Math.floor(Math.random() * 2)];
       dispatch(loadMissions({ simpleMissionIds, complexMissionId }));
       setMissions(true);
+      setMissionVisible(true);
+      setMissionId(5);
     }
   }, [room && room.start]);
 
