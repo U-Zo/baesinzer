@@ -9,10 +9,12 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import projectw.baesinzer.domain.Message;
+import projectw.baesinzer.domain.Mission;
 import projectw.baesinzer.domain.Room;
 import projectw.baesinzer.domain.UserInfo;
 import projectw.baesinzer.service.RoomService;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -90,6 +92,7 @@ public class MessageController {
             case PLAY:
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
+                    headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
                 break;
             case KILL:
@@ -98,6 +101,7 @@ public class MessageController {
                 deadUser.setDead(true);
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
+                    headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
                 break;
             case VOTE_START:
@@ -122,6 +126,7 @@ public class MessageController {
                 } else {
                     if (room.getUsers().get(userInfo.getUserNo()) != null) {
                         room.getUsers().put(userInfo.getUserNo(), userInfo);
+                        headerAccessor.getSessionAttributes().put("user", userInfo);
                     }
                 }
                 if (votedUserInfo != null) votedUserInfo.setVotedNum(votedUserInfo.getVotedNum() + 1);
@@ -138,22 +143,7 @@ public class MessageController {
                     break;
                 }
 
-                if (_userInfo.isHost()) {
-                    for (int i = 1; i <= 6; i++) {
-                        UserInfo nextHost = room.getUsers().get(i);
-                        System.out.println(nextHost);
-                        if (nextHost != null) {
-                            nextHost.setHost(true);
-                            Message nextHostMessage = new Message();
-                            nextHostMessage.setType(Message.MessageType.ROOM);
-                            nextHostMessage.setRoom(room);
-                            nextHostMessage.setUserInfo(system);
-                            nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
-                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
-                            break;
-                        }
-                    }
-                }
+                selectNewHost(_userInfo, system, room);
 
                 headerAccessor.getSessionAttributes().remove("user");
                 headerAccessor.getSessionAttributes().remove("room");
@@ -165,9 +155,32 @@ public class MessageController {
         operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
 
         System.out.println("메시지 보내고 나서");
+        message.setUserInfo(system);
 
         if (room.isStart()) {
+            int missions = (room.getCount() - 1) * 2; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
+
+            // 현재 수행된 미션 수 확인
+            for (int i = 1; i <= 6; i++) {
+                UserInfo user = room.getUsers().get(i);
+                if (user != null) {
+                    List<Mission> missionList = user.getMissionList();
+                    for (Mission mission : missionList) {
+                        if (mission.isDone()) {
+                            missions--;
+                        }
+                    }
+                }
+            }
+
+            // 미션이 남지 않았다면 게임 종료
+            if (missions < 1) {
+                gameEnd(message, room);
+                message.setMessage("실험 종료, 모든 일과를 수행하였습니다. (시민 승리)");
+                operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                return;
+            }
 
             // 생존자 수 확인
             for (int i = 1; i <= 6; i++) {
@@ -229,30 +242,25 @@ public class MessageController {
                         if (maxVoted.isBaesinzer()) {
                             message.setMessage(maxVoted.getUsername() + "은(는) BaesinZer입니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
-                            message.setType(Message.MessageType.END);
-                            room.setStart(false);
-
-                            // 게임 종료 시 게임 내 정보 초기화
-                            for (int i = 1; i <= 6; i++) {
-                                UserInfo user = room.getUsers().get(i);
-                                if (user != null) {
-                                    user.setBaesinzer(false);
-                                    user.setDead(false);
-                                    user.setLocationId(0);
-                                    user.setVotedNum(0);
-                                    user.setHasVoted(0);
-                                    user.setMissionList(null);
-                                    user.setKill(0);
-                                }
-                            }
+                            gameEnd(message, room);
                             message.setMessage("실험 종료, BaesinZer를 잡았습니다.");
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                            return;
                         } else {
                             message.setMessage(maxVoted.getUsername() + "은(는) 선량한 시민입니다.");
                             maxVoted.setDead(true);
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                         }
                     }
+                }
+            }
+
+            // 생존자 수 확인
+            alive = room.getCount() - 1;
+            for (int i = 1; i <= 6; i++) {
+                UserInfo user = room.getUsers().get(i);
+                if (user != null && user.isDead()) {
+                    alive--;
                 }
             }
 
@@ -286,12 +294,33 @@ public class MessageController {
         }
     }
 
+    private void gameEnd(Message message, Room room) {
+        message.setType(Message.MessageType.END);
+        room.setStart(false);
+
+        // 게임 종료 시 게임 내 정보 초기화
+        for (int i = 1; i <= 6; i++) {
+            UserInfo user = room.getUsers().get(i);
+            if (user != null) {
+                user.setBaesinzer(false);
+                user.setDead(false);
+                user.setLocationId(0);
+                user.setVotedNum(0);
+                user.setHasVoted(0);
+                user.setMissionList(null);
+                user.setKill(0);
+            }
+        }
+    }
+
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         UserInfo userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
         String roomCode = (String) headerAccessor.getSessionAttributes().get("roomCode");
+        UserInfo system = new UserInfo();
+        system.setUsername("System");
 
         if (roomCode == null || userInfo == null) return;
 
@@ -304,6 +333,8 @@ public class MessageController {
             roomService.removeRoom(room);
         }
 
+        selectNewHost(userInfo, system, room);
+
         Message message = new Message();
         message.setUserInfo(userInfo);
         message.setType(Message.MessageType.EXIT);
@@ -312,5 +343,24 @@ public class MessageController {
         headerAccessor.getSessionAttributes().remove("user");
         headerAccessor.getSessionAttributes().remove("room");
         operations.convertAndSend("/sub/socket/room/" + roomCode, message);
+    }
+
+    private void selectNewHost(UserInfo userInfo, UserInfo system, Room room) {
+        if (userInfo.isHost()) {
+            for (int i = 1; i <= 6; i++) {
+                UserInfo nextHost = room.getUsers().get(i);
+                System.out.println("방장 선정");
+                if (nextHost != null) {
+                    nextHost.setHost(true);
+                    Message nextHostMessage = new Message();
+                    nextHostMessage.setType(Message.MessageType.ROOM);
+                    nextHostMessage.setRoom(room);
+                    nextHostMessage.setUserInfo(system);
+                    nextHostMessage.setMessage(nextHost.getUsername() + " 님이 방장이 되셨습니다.");
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), nextHostMessage);
+                    break;
+                }
+            }
+        }
     }
 }
