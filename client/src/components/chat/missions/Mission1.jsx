@@ -3,8 +3,9 @@ import { missionDone } from '../../../modules/user';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoFastFoodOutline } from 'react-icons/io5';
-import { ImPacman } from 'react-icons/im';
-import { GiSmokeBomb } from 'react-icons/gi';
+import { BiGame } from 'react-icons/bi';
+import { RiGameLine } from 'react-icons/ri';
+
 const TextBox = styled.div`
   position: absolute;
   left: 50%;
@@ -41,7 +42,7 @@ const GageBar = styled.div`
   margin: 0.2rem;
   background-color: var(--color-green);
   height: 1.2rem;
-  animation: ${loading} 10s steps(70, end); //마지막부분 재생속도 점점 느리게
+  animation: ${loading} 10s steps(70, end); // 끊김
 `;
 
 const rotatePacman = keyframes`
@@ -54,19 +55,15 @@ const rotatePacman = keyframes`
 `;
 const Pacman = styled.div`
   display: inline-block;
-  animation: ${rotatePacman} 0.5s steps(10, end);
-  animation-iteration-count: 100;
-  font-size: 4rem;
+  font-size: 6rem;
 `;
 
 const smallerFood = keyframes`
   from{
     opacity:100%;
-    /* font-size:10rem; */
   }
   to{
     opacity:0%;
-    /* font-size:8rem; */
   } 
   
 `;
@@ -88,12 +85,9 @@ const End = styled.div`
 const Mission1 = ({ onClose }) => {
   const dispatch = useDispatch();
 
+  const [change, setChange] = useState(false);
   const [text, setText] = useState(null);
   const missionRef = useRef(null);
-
-  const onClick = () => {
-    dispatch(missionDone(1));
-  };
 
   const timer = () =>
     setTimeout(function () {
@@ -119,6 +113,19 @@ const Mission1 = ({ onClose }) => {
     };
   }, []);
 
+  //0.5초당 팩맨 이모지 교체
+  useEffect(() => {
+    let t = 10;
+    const changePacman = setInterval(() => {
+      t--;
+      if (t % 2 === 0) {
+        setChange(false);
+      } else {
+        setChange(true);
+      }
+    }, 500);
+  }, []);
+
   return (
     <div>
       <TextBox>
@@ -127,9 +134,7 @@ const Mission1 = ({ onClose }) => {
 
       <div>
         <Icongraphic>
-          <Pacman>
-            <ImPacman />
-          </Pacman>
+          <Pacman>{change ? <BiGame /> : <RiGameLine />}</Pacman>
           {text ? null : (
             <Food>
               <IoFastFoodOutline />
