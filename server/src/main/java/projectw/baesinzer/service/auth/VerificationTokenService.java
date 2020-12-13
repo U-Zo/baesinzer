@@ -48,7 +48,7 @@ public class VerificationTokenService {
                 .findByToken(token).orElseGet(VerificationToken::new);
 
         if (verificationToken.getUser() == null) {
-            return "잘못된 접근입니다.";
+            return "만료된 인증 이메일입니다.";
         }
 
         if (isTokenExpired(verificationToken)

@@ -33,7 +33,7 @@ export const loadMissions = createAction(
     );
     return [
       ...simpleMissionList,
-      complexMissions.find((mission) => mission.missionId === complexMissionId),
+      //complexMissions.find((mission) => mission.missionId === complexMissionId),
     ];
   }
 );

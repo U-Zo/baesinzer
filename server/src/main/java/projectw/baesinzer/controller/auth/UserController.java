@@ -49,7 +49,7 @@ public class UserController {
         if (user.getRole().equals(UserRole.ROLE_NOT_PERMITTED)) {
             response.setStatus(403);
             verificationTokenService.createVerification(user.getEmail());
-            auth.put("authError", "이메일 인증이 필요합니다.");
+            auth.put("message", "이메일 인증이 필요합니다.");
             return auth;
         }
 
