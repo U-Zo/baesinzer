@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '../common/Modal';
 import Mission1 from './missions/Mission1';
+import Mission10 from './missions/Mission10';
 import Mission2 from './missions/Mission2';
 import Mission3 from './missions/Mission3';
 import Mission4 from './missions/Mission4';
@@ -49,6 +50,7 @@ const MissionModal = ({
       {missionId === 8 && (
         <Mission8 onClose={closeMissionModal} username={username} />
       )}
+      {missionId === 10 && <Mission10 onClose={closeMissionModal} />}
       <MissionModalCloseButton onClick={closeMissionModal}>
         X
       </MissionModalCloseButton>

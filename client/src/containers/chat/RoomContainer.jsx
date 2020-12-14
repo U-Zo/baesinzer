@@ -448,7 +448,7 @@ const RoomContainer = ({ match, history }) => {
       dispatch(logMessage(system, '실험 시작, 모든 일과를 완수하십시오.'));
       const simpleMissionIds = [];
       while (simpleMissionIds.length < 2) {
-        const index = Math.floor(Math.random() * 3) + 1;
+        const index = Math.floor(Math.random() * 5) + 1;
         if (!simpleMissionIds.find((num) => num === index)) {
           simpleMissionIds.push(index);
         }
@@ -457,8 +457,6 @@ const RoomContainer = ({ match, history }) => {
       const complexMissionId = complexMissionIds[Math.floor(Math.random() * 2)];
       dispatch(loadMissions({ simpleMissionIds, complexMissionId }));
       setMissions(true);
-      setMissionVisible(true);
-      setMissionId(5);
     }
   }, [room && room.start]);
 
