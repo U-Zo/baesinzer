@@ -447,7 +447,7 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeMessageLog());
       dispatch(logMessage(system, '실험 시작, 모든 일과를 완수하십시오.'));
       const simpleMissionIds = [];
-      while (simpleMissionIds.length < 3) {
+      while (simpleMissionIds.length < 2) {
         const index = Math.floor(Math.random() * 5) + 1;
         if (!simpleMissionIds.find((num) => num === index)) {
           simpleMissionIds.push(index);
