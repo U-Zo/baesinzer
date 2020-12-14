@@ -52,37 +52,37 @@ export const simpleMissions = [
 export const complexMissions = [
   {
     missionId: 10,
-    missionName: '터미널에서 사물함 열쇠 탐색하기',
+    missionName: '터미널에서 사물함 열쇠 검색하기 [0/3]',
     isDone: false,
     locationId: 4,
   },
   {
     missionId: 11,
-    missionName: '사물함 열쇠 찾기',
+    missionName: '사물함 열쇠 찾기 [1/3]',
     isDone: false,
     locationId: 3,
   },
   {
     missionId: 12,
-    missionName: '사물함 열기',
+    missionName: '사물함 열기 [2/3]',
     isDone: false,
     locationId: 2,
   },
   {
     missionId: 20,
-    missionName: '터미널에서 온도계 탐색하기',
+    missionName: '터미널에서 온도계 탐색하기 [0/3]',
     isDone: false,
     locationId: 4,
   },
   {
     missionId: 21,
-    missionName: '온도계 찾기',
+    missionName: '온도계 찾기 [1/3]',
     isDone: false,
     locationId: 5,
   },
   {
     missionId: 22,
-    missionName: '온도 체크하기',
+    missionName: '온도 체크하기 [2/3]',
     isDone: false,
     locationId: 1,
   },
