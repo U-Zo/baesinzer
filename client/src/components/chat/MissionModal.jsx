@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '../common/Modal';
 import Mission1 from './missions/Mission1';
+import Mission10 from './missions/Mission10';
 import Mission2 from './missions/Mission2';
 import Mission3 from './missions/Mission3';
 import Mission4 from './missions/Mission4';
@@ -38,6 +39,7 @@ const MissionModal = ({ missionVisible, missionId, closeMissionModal }) => {
       {missionId === 3 && <Mission3 onClose={closeMissionModal} />}
       {missionId === 4 && <Mission4 onClose={closeMissionModal} />}
       {missionId === 5 && <Mission5 onClose={closeMissionModal} />}
+      {missionId === 10 && <Mission10 onClose={closeMissionModal} />}
       <MissionModalCloseButton onClick={closeMissionModal}>
         X
       </MissionModalCloseButton>
