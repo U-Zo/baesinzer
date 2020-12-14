@@ -9,6 +9,7 @@ const Block = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
 const AuthBlock = styled.div`
   position: relative;
   margin: 0 auto;
@@ -21,6 +22,7 @@ const AuthBlock = styled.div`
   flex-direction: column;
   background-color: var(--color-background);
 `;
+
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
@@ -30,6 +32,7 @@ const StyledForm = styled.form`
   margin-bottom: 3rem;
   margin-top: 20rem;
 `;
+
 const InputStyled = styled.input`
   margin-bottom: 1.5rem;
   width: 30rem;
@@ -60,6 +63,7 @@ const InputStyled = styled.input`
     }
   }
 `;
+
 const ButtonStyled = styled.button`
   width: 10rem;
   height: 2rem;
@@ -81,6 +85,7 @@ const ButtonBlock = styled.div`
   align-items: baseline;
   margin-top: 3rem;
 `;
+
 const BaesinZerMain = styled.div`
   width: 100%;
   height: 10rem;
@@ -107,6 +112,7 @@ const Footer = styled.div`
     }
   }
 `;
+
 const ErrorBlock = styled.div`
   color: var(--color-red);
   position: absolute;
@@ -118,26 +124,18 @@ const ErrorBlock = styled.div`
     padding-bottom: 15rem;
   }
 `;
+
 const LoadingBlock = styled.div`
   color: var(--color-red);
   font-size: 2.5rem;
 `;
 
-const AuthForm = ({
-  success,
-  form,
-  type,
-  onSubmit,
-  onChange,
-  error,
-  loading,
-}) => {
+const AuthForm = ({ form, type, onSubmit, onChange, error, loading }) => {
   return (
     <Block>
       <AuthBlock>
         <BaesinZerMain>BaesinZer</BaesinZerMain>
         {error && <ErrorBlock id={type}>{error}</ErrorBlock>}
-        {success && <ErrorBlock id={type}>{success}</ErrorBlock>}
         <StyledForm onSubmit={onSubmit}>
           <InputStyled
             type="text"
@@ -171,7 +169,7 @@ const AuthForm = ({
               </Footer>
             ) : (
               <Footer>
-                <Link to="/">로그인</Link>
+                <Link to="/">돌아가기</Link>
               </Footer>
             )}
           </ButtonBlock>

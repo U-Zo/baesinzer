@@ -19,7 +19,7 @@ const LoginContainer = ({ history }) => {
     })
   );
 
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const dispatch = useDispatch();
 
   const onChange = (e) => {
@@ -28,11 +28,13 @@ const LoginContainer = ({ history }) => {
   };
 
   const onSubmit = (e) => {
+    e.preventDefault();
     const { email, password } = form;
+
     if (!chkEmail(email)) {
       setError('올바른 이메일 형식이 아닙니다');
+      return;
     }
-    e.preventDefault();
     dispatch(login({ email, password }));
   };
 
@@ -42,10 +44,13 @@ const LoginContainer = ({ history }) => {
 
   useEffect(() => {
     if (authError) {
-      if (error === '올바른 이메일 형식이 아닙니다') {
-      } else setError('이메일 인증이 필요합니다');
+      if (authError.response.status === 504) {
+        setError('서버와 연결할 수 없습니다.');
+      } else {
+        setError(authError.response.data.message);
+      }
     }
-  }, [authError, error]);
+  }, [authError]);
 
   useEffect(() => {
     if (auth) {
