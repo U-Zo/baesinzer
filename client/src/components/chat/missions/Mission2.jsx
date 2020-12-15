@@ -82,10 +82,10 @@ const Mission2 = ({ onClose }) => {
     if (answer === 'Hello World') {
       setSuccess(true);
       dispatch(missionDone(2));
+      setSuccess(false);
       setTimeout(() => {
-        setSuccess(false);
         onClose();
-      }, 1500);
+      }, 2000);
     } else {
       setError('정답이 아닙니다.');
     }
