@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
-import { BiCake, BiTennisBall, BiJoystickAlt } from 'react-icons/bi';
+import {
+  RiSurgicalMaskLine,
+  RiSurgicalMaskFill,
+  RiKnifeLine,
+  RiScissorsLine,
+} from 'react-icons/ri';
 import {
   AiFillWallet,
   AiFillShop,
@@ -115,7 +120,7 @@ const AreltBlock = styled.div`
   bottom: 6rem;
 `;
 
-const Mission5 = ({ onClose }) => {
+const Mission6 = ({ onClose }) => {
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [itemNo, setItemNo] = useState(null);
@@ -130,7 +135,7 @@ const Mission5 = ({ onClose }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log(productNum);
+
     if (productNum[itemNo] === 1) {
       setItem('item');
       setError();
@@ -141,7 +146,7 @@ const Mission5 = ({ onClose }) => {
 
   const timer = () =>
     setTimeout(function () {
-      setComplete('간식사기 완료');
+      setComplete('마스크 사기 완료');
       dispatch(missionDone(5));
     }, 6000);
 
@@ -178,7 +183,7 @@ const Mission5 = ({ onClose }) => {
 
   return (
     <Block>
-      <MissionInfo>간식사기</MissionInfo>
+      <MissionInfo>마스크사기</MissionInfo>
       {item ? (
         <PayBlock>
           <AiFillWallet />
@@ -190,13 +195,13 @@ const Mission5 = ({ onClose }) => {
           <ItemBlock>
             {productNum.map((num) => {
               if (num === 1) {
-                return <BiCake id="item" />;
+                return <RiSurgicalMaskLine id="item" />;
               }
               if (num === 2) {
-                return <BiTennisBall id="item" />;
+                return <RiKnifeLine id="item" />;
               }
               if (num === 3) {
-                return <BiJoystickAlt id="item" />;
+                return <RiScissorsLine id="item" />;
               }
             })}
           </ItemBlock>
@@ -212,4 +217,4 @@ const Mission5 = ({ onClose }) => {
   );
 };
 
-export default Mission5;
+export default Mission6;

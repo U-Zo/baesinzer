@@ -7,6 +7,7 @@ import Mission2 from './missions/Mission2';
 import Mission3 from './missions/Mission3';
 import Mission4 from './missions/Mission4';
 import Mission5 from './missions/Mission5';
+import Mission6 from './missions/Mission6';
 import Mission7 from './missions/Mission7';
 import Mission8 from './missions/Mission8';
 
@@ -46,6 +47,7 @@ const MissionModal = ({
       {missionId === 3 && <Mission3 onClose={closeMissionModal} />}
       {missionId === 4 && <Mission4 onClose={closeMissionModal} />}
       {missionId === 5 && <Mission5 onClose={closeMissionModal} />}
+      {missionId === 6 && <Mission6 onClose={closeMissionModal} />}
       {missionId === 7 && <Mission7 onClose={closeMissionModal} />}
       {missionId === 8 && (
         <Mission8 onClose={closeMissionModal} username={username} />
