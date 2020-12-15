@@ -12,12 +12,15 @@ const TextBox = styled.div`
   top: 30%;
   transform: translate(-50%, -50%);
 `;
+
 const EatingSuccess = styled.div`
   font-size: 3rem;
   color: var(--color-red);
 `;
+
 const Icongraphic = styled.div`
   color: var(--color-green);
+  margin-top: 3rem;
 `;
 
 const loading = keyframes`
@@ -45,14 +48,6 @@ const GageBar = styled.div`
   animation: ${loading} 10s steps(70, end); // 끊김
 `;
 
-const rotatePacman = keyframes`
-  from{
-    transform:rotate(0deg);
-    }
-  to{
-    transform:rotate(25deg);
-    }
-`;
 const Pacman = styled.div`
   display: inline-block;
   font-size: 6rem;
@@ -67,12 +62,14 @@ const smallerFood = keyframes`
   } 
   
 `;
+
 const Food = styled.div`
   display: inline-block;
   animation: ${smallerFood} 10s ease-in-out;
   opacity: 0%;
   font-size: 8rem;
 `;
+
 const End = styled.div`
   display: inline-block;
   position: absolute;
@@ -82,6 +79,7 @@ const End = styled.div`
   font-size: 5rem;
   color: var(--color-green);
 `;
+
 const Mission1 = ({ onClose }) => {
   const dispatch = useDispatch();
 
@@ -143,7 +141,6 @@ const Mission1 = ({ onClose }) => {
           {text ? <End>♥</End> : null}
         </Icongraphic>
       </div>
-
       <div>
         <GageBox>
           <GageBar />
