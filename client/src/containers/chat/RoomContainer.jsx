@@ -327,7 +327,7 @@ const RoomContainer = ({ match, history }) => {
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       const userInfoServer = serverMesg.userInfo;
 
-      // 수정 userInfo update
+      // userInfo update
       if (!isConnect && serverMesg.type === 'JOIN') {
         dispatch(tempUser(userInfoServer));
         isConnect = true;
@@ -395,7 +395,6 @@ const RoomContainer = ({ match, history }) => {
       //컴포넌트 끝
       stompClient.connected && subId.unsubscribe();
       stompSend('EXIT');
-      //수정
       dispatch(exitRoom());
       dispatch(initializeMessageLog());
       dispatch(initializeUser());
@@ -448,7 +447,7 @@ const RoomContainer = ({ match, history }) => {
       dispatch(logMessage(system, '실험 시작, 모든 일과를 완수하십시오.'));
       const simpleMissionIds = [];
       while (simpleMissionIds.length < 2) {
-        const index = Math.floor(Math.random() * 5) + 1;
+        const index = Math.floor(Math.random() * 8) + 1;
         if (!simpleMissionIds.find((num) => num === index)) {
           simpleMissionIds.push(index);
         }
@@ -627,6 +626,7 @@ const RoomContainer = ({ match, history }) => {
         missionVisible={missionVisible}
         missionId={missionId}
         closeMissionModal={closeMissionModal}
+        username={userInfo.username}
       />
     </>
   );

@@ -3,11 +3,11 @@ import { ImQrcode } from 'react-icons/im';
 import { useDispatch } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 import { missionDone } from '../../../modules/user';
-import Modal from '../../common/Modal';
 
 const MissionBlock = styled.div`
   opacity: ${(props) => (props.change ? `20%` : `100%`)};
 `;
+
 const TitleBox = styled.div`
   display: flex;
   flex-direction: row;
@@ -19,6 +19,7 @@ const TitleBox = styled.div`
 `;
 
 const Title = styled.div``;
+
 const QrCodeBox = styled.div`
   display: inline;
   float: left;
@@ -88,17 +89,6 @@ const Square = styled.div`
   }
 `;
 
-const SuccessModal = styled(Modal)`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  width: auto;
-  height: auto;
-  padding: 2rem;
-`;
-
 const Mission8 = ({ onClose, username }) => {
   const dispatch = useDispatch();
 
@@ -141,14 +131,14 @@ const Mission8 = ({ onClose, username }) => {
     if (locationX < -8 || locationX > 39) {
       setLocationX(28);
     }
-    if (locationY < -35 || locationY > -12) {
+    if (locationY <= -40 || locationY >= -7) {
       setLocationY(-21);
     }
     // qr 인증 박스를 감싸면 success
     if (
-      -3 <= locationX &&
+      -1 <= locationX &&
       locationX <= 1 &&
-      -23 <= locationY &&
+      -21 <= locationY &&
       locationY <= -19
     ) {
       setSuccess(true);
@@ -172,9 +162,9 @@ const Mission8 = ({ onClose, username }) => {
     divFocus();
   }, []);
 
+  // 인증 완료 후 2초 뒤에 모달창 down
   useEffect(() => {
     if (success) {
-      // 인증 완료 후 2초 뒤에 모달창 down
       setTimeout(() => {
         onClose();
       }, 5000);
