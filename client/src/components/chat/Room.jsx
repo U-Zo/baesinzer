@@ -392,7 +392,7 @@ const Room = ({
           {start && (
             <ContentBlock>
               {meeting ? (
-                <VoteTimeBlock>투표 남은 시간: {voteTime}</VoteTimeBlock>
+                <VoteTimeBlock>투표 남은 시간: {voteTime}s</VoteTimeBlock>
               ) : (
                 missionList && (
                   <WorkBoard>

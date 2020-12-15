@@ -13,6 +13,7 @@ const [CHECK, CHECK_SUCCESS, CHECK_FAILURE] = createRequestActionTypes(
 const SET_USERNAME = 'user/SET_USERNAME';
 const LOGOUT = 'user/LOGOUT';
 const LOAD_MISSIONS = 'user/LOAD_MISSIONS';
+const SWITCH_MISSION = 'user/SWITCH_MISSION';
 const MOVE_LOCATION = 'user/MOVE_LOCATION'; // 맵 이동 액션 타입
 const MISSION_DONE = 'user/MISSION_DONE'; // 미션 성공
 const VOTE = 'user/VOTE'; // 투표 액션 타입
@@ -36,6 +37,13 @@ export const loadMissions = createAction(
       complexMissions.find((mission) => mission.missionId === complexMissionId),
     ];
   }
+);
+export const swtichMission = createAction(
+  SWITCH_MISSION,
+  ({ prevMissionId, nextMissionId }) => ({
+    prevMissionId,
+    nextMissionId,
+  })
 );
 export const moveLocation = createAction(
   MOVE_LOCATION,
@@ -99,6 +107,22 @@ const user = handleActions(
       userInfo: {
         ...state.userInfo,
         missionList: missions,
+      },
+    }),
+    [SWITCH_MISSION]: (
+      state,
+      { payload: { prevMissionId, nextMissionId } }
+    ) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        missionList: state.userInfo.missionList.map((mission) =>
+          mission.missionId === prevMissionId
+            ? complexMissions.find(
+                (cMission) => cMission.missionId === nextMissionId
+              )
+            : mission
+        ),
       },
     }),
     [MOVE_LOCATION]: (state, { payload: locationId }) => ({

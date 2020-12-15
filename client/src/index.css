@@ -16,13 +16,13 @@ html {
   font-family: 'D Fixedsys';
   src: url('./lib/fonts/DungGeunMo.eot?#iefix') format('embedded-opentype'),
     url('./lib/fonts/DungGeunMo.woff') format('woff'),
-    url('./lib//fonts//DungGeunMo.woff2') format('woff2');
+    url('./lib/fonts/DungGeunMo.woff2') format('woff2');
 }
 
 body {
-  font-family: 'D Fixedsys', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'D Fixedsys', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 1.6rem;
@@ -30,7 +30,8 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
 input,

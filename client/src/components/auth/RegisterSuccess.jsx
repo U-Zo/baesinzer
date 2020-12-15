@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Block = styled.div`
@@ -9,6 +8,7 @@ const Block = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
 const AuthBlock = styled.div`
   position: relative;
   margin: 0 auto;
@@ -33,6 +33,7 @@ const BaesinZerMain = styled.div`
   font-weight: bolder;
   color: var(--color-green);
 `;
+
 const MessageBlock = styled.div`
   width: 100%;
   height: 12rem;
@@ -46,6 +47,7 @@ const MessageBlock = styled.div`
   margin-top: 12rem;
   margin-bottom: 6rem;
 `;
+
 const MessageStyle = styled.div`
   text-align: center;
   width: 800%;
@@ -57,6 +59,7 @@ const MessageStyle = styled.div`
     padding-top: 4rem;
   }
 `;
+
 const ButtonStyled = styled.button`
   width: 10rem;
   height: 2rem;
@@ -69,6 +72,7 @@ const ButtonStyled = styled.button`
     font-weight: bold;
   }
 `;
+
 const RegisterSuccess = ({ email, onClick }) => {
   return (
     <Block>
