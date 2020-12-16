@@ -46,7 +46,7 @@ const SuccessModal = styled(Modal)`
 
 const loadingArr = ['|', '/', '-', '\\'];
 
-const Mission10 = ({ onClose }) => {
+const Mission10 = ({ onClose, setMissionDone }) => {
   const [command, setCommand] = useState('');
   const [success, setSuccess] = useState(false);
   const [consoleLog, setConsoleLog] = useState([
@@ -85,6 +85,7 @@ const Mission10 = ({ onClose }) => {
           clearInterval(interval);
           setSuccess(true);
           dispatch(swtichMission({ prevMissionId: 10, nextMissionId: 11 }));
+          setMissionDone(true);
           setTimeout(() => {
             onClose();
           }, 2000);
