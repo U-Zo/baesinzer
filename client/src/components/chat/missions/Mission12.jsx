@@ -85,7 +85,7 @@ const SuccessModal = styled(Modal)`
   padding: 2rem;
 `;
 
-const Mission12 = ({ onClose }) => {
+const Mission12 = ({ onClose, setMissionDone }) => {
   const [locationX, setLocationX] = useState(3);
   const [locationY, setLocationY] = useState(1);
   const [locationDoor, setLocationDoor] = useState(1);
@@ -126,6 +126,7 @@ const Mission12 = ({ onClose }) => {
     if (e.keyCode === 39) {
       if (locationDoor + 1 > 28) {
         dispatch(missionDone(12));
+        setMissionDone(true);
         setSuccess(true);
         setTimeout(() => {
           onClose();

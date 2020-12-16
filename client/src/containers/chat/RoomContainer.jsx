@@ -82,6 +82,7 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 명령 토글
   const [missionInfo, setMissionInfo] = useState(false);
+  const [missionDone, setMissionDone] = useState(false);
 
   // 투표
   const [votePossible, setVotePossible] = useState(true);
@@ -210,6 +211,7 @@ const RoomContainer = ({ match, history }) => {
           if (m && !m.done) {
             setMissionId(mission);
             setMissionVisible(true);
+            setMissionDone(false);
           }
         }
       }
@@ -461,10 +463,10 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 정보 동기화
   useEffect(() => {
-    if (room && room.start && start && !missionVisible) {
+    if (room && room.start && start) {
       stompSend('PLAY');
     }
-  }, [missions, missionVisible]);
+  }, [missions, missionDone]);
 
   useEffect(() => {
     if (room && room.start) {
@@ -625,6 +627,7 @@ const RoomContainer = ({ match, history }) => {
       <MissionModal
         missionVisible={missionVisible}
         missionId={missionId}
+        setMissionDone={setMissionDone}
         closeMissionModal={closeMissionModal}
         username={userInfo.username}
       />

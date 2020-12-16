@@ -80,7 +80,7 @@ const End = styled.div`
   color: var(--color-green);
 `;
 
-const Mission1 = ({ onClose }) => {
+const Mission1 = ({ onClose, setMissionDone }) => {
   const dispatch = useDispatch();
 
   const [change, setChange] = useState(false);
@@ -91,6 +91,7 @@ const Mission1 = ({ onClose }) => {
     setTimeout(function () {
       setText('밥먹기 완료');
       dispatch(missionDone(1));
+      setMissionDone(true);
     }, 10000);
 
   useEffect(() => {

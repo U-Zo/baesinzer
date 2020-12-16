@@ -40,21 +40,50 @@ const MissionModal = ({
   missionId,
   closeMissionModal,
   username,
+  setMissionDone,
 }) => {
   return (
     <MissionModalBlock visible={missionVisible}>
-      {missionId === 1 && <Mission1 onClose={closeMissionModal} />}
-      {missionId === 2 && <Mission2 onClose={closeMissionModal} />}
-      {missionId === 3 && <Mission3 onClose={closeMissionModal} />}
-      {missionId === 4 && <Mission4 onClose={closeMissionModal} />}
-      {missionId === 5 && <Mission5 onClose={closeMissionModal} />}
-      {missionId === 6 && <Mission6 onClose={closeMissionModal} />}
-      {missionId === 7 && <Mission7 onClose={closeMissionModal} />}
-      {missionId === 8 && (
-        <Mission8 onClose={closeMissionModal} username={username} />
+      {missionId === 1 && (
+        <Mission1 onClose={closeMissionModal} setMissionDone={setMissionDone} />
       )}
-      {missionId === 10 && <Mission10 onClose={closeMissionModal} />}
-      {missionId === 12 && <Mission12 onClose={closeMissionModal} />}
+      {missionId === 2 && (
+        <Mission2 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 3 && (
+        <Mission3 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 4 && (
+        <Mission4 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 5 && (
+        <Mission5 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 6 && (
+        <Mission6 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 7 && (
+        <Mission7 onClose={closeMissionModal} setMissionDone={setMissionDone} />
+      )}
+      {missionId === 8 && (
+        <Mission8
+          onClose={closeMissionModal}
+          username={username}
+          setMissionDone={setMissionDone}
+        />
+      )}
+      {missionId === 10 && (
+        <Mission10
+          onClose={closeMissionModal}
+          setMissionDone={setMissionDone}
+        />
+      )}
+      {missionId === 12 && (
+        <Mission12
+          onClose={closeMissionModal}
+          setMissionDone={setMissionDone}
+        />
+      )}
       <MissionModalCloseButton onClick={closeMissionModal}>
         X
       </MissionModalCloseButton>

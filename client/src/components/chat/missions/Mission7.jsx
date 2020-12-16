@@ -90,7 +90,7 @@ const GageBar = styled.div`
   width: ${(props) => `${props.count * 5.2 - 10}%`};
 `;
 
-const Mission7 = ({ onClose }) => {
+const Mission7 = ({ onClose, setMissionDone }) => {
   // div focus
   const missionRef = useRef();
 
@@ -115,6 +115,7 @@ const Mission7 = ({ onClose }) => {
     if (count >= 20) {
       setSuccess(true);
       dispatch(missionDone(7));
+      setMissionDone(true);
       setTimeout(() => {
         setSuccess(false);
         onClose();
