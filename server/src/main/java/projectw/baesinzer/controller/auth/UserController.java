@@ -68,23 +68,17 @@ public class UserController {
     @GetMapping("/check")
     public UserInfo check(HttpServletRequest request) {
         Cookie jwtToken = cookieUtil.getCookie(request, JwtTokenUtil.ACCESS_TOKEN_NAME);
-        if (jwtToken.getValue().equals("")) {
+        if (jwtToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-
-        if (jwtTokenUtil.getEmail(jwtToken.getValue()) != null) {
-            return new UserInfo();
         } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            return new UserInfo();
         }
     }
 
     @GetMapping("/logout")
     public void logout(HttpServletResponse response) {
-        Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, null);
-        Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, null);
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
+        cookieUtil.deleteCookie(response, JwtTokenUtil.ACCESS_TOKEN_NAME);
+        cookieUtil.deleteCookie(response, JwtTokenUtil.REFRESH_TOKEN_NAME);
     }
 
     @GetMapping("/verify")

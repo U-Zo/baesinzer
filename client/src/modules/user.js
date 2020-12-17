@@ -84,6 +84,7 @@ const user = handleActions(
     }),
     [CHECK_FAILURE]: (state, { payload: error }) => {
       localStorage.removeItem('userInfo');
+      window.location.replace('/');
       return { ...state, userInfo: null, error };
     },
     [LOGOUT]: () => ({

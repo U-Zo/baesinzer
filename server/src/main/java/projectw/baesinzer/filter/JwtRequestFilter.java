@@ -45,7 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (jwtToken != null) {
                 accessToken = jwtToken.getValue();
 
-                if (!accessToken.equals("")) {
+                if (accessToken != null) {
                     email = jwtTokenUtil.getEmail(accessToken);
                 }
             }
@@ -55,14 +55,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 try {
                     userDetails = userDetailsService.loadUserByUsername(email);
                 } catch (UsernameNotFoundException e) {
-                    Cookie accessTokenCookie = cookieUtil.createCookie(JwtTokenUtil.ACCESS_TOKEN_NAME, "");
-                    Cookie refreshTokenCookie = cookieUtil.createCookie(JwtTokenUtil.REFRESH_TOKEN_NAME, "");
-                    response.addCookie(accessTokenCookie);
-                    response.addCookie(refreshTokenCookie);
-                    e.printStackTrace();
+                    cookieUtil.deleteCookie(response, JwtTokenUtil.ACCESS_TOKEN_NAME);
+                    cookieUtil.deleteCookie(response, JwtTokenUtil.REFRESH_TOKEN_NAME);
+                    throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
                 }
 
-                if (jwtTokenUtil.validateToken(accessToken, userDetails)) {
+                if (userDetails != null && jwtTokenUtil.validateToken(accessToken, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                             = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -79,9 +77,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         try {
             if (refreshToken != null) {
-                UserDetails userDetails = userDetailsService.loadUserByRefreshToken(refreshToken);
+                UserDetails userDetails = null;
+                try {
+                    userDetails = userDetailsService.loadUserByRefreshToken(refreshToken);
+                } catch (UsernameNotFoundException e) {
+                    cookieUtil.deleteCookie(response, JwtTokenUtil.ACCESS_TOKEN_NAME);
+                    cookieUtil.deleteCookie(response, JwtTokenUtil.REFRESH_TOKEN_NAME);
+                    throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+                }
 
-                if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
+                if (userDetails != null && jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                             = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
