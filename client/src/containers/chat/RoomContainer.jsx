@@ -95,6 +95,9 @@ const RoomContainer = ({ match, history }) => {
   const voteRef = useRef(null);
   const [voteTime, setVoteTime] = useState(100);
 
+  // input ref
+  const inputRef = useRef(null);
+
   let isConnect = false;
 
   const onChange = (e) => {
@@ -108,6 +111,7 @@ const RoomContainer = ({ match, history }) => {
 
   const closeMissionModal = () => {
     setMissionVisible(false);
+    inputRef.current.focus();
   };
 
   const stompSend = (type) => {
@@ -133,7 +137,7 @@ const RoomContainer = ({ match, history }) => {
   };
 
   // scroll관련
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const scrollToBottom = () => {
     scrollRef.current.scrollIntoView(-10); // scroll을 항상 아래로 내리기
   };
@@ -623,6 +627,7 @@ const RoomContainer = ({ match, history }) => {
         killPossible={killPossible}
         killTime={killTime}
         missionList={userInfo && userInfo.missionList}
+        inputRef={inputRef}
       />
       <MissionModal
         missionVisible={missionVisible}
