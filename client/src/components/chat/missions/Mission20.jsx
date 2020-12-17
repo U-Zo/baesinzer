@@ -121,7 +121,11 @@ const Mission20 = ({ onClose, setMissionDone }) => {
         }
       }, 125);
     } else {
-      setConsoleLog(consoleLog.concat(`> ${command}: Unknown item`));
+      setConsoleLog(
+        consoleLog.concat(
+          `> ${command}: Unknown item, item list: key, therometer`
+        )
+      );
     }
     setCommand('');
   };
