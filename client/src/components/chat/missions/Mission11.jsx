@@ -69,7 +69,7 @@ const SuccessModal = styled(Modal)`
   padding: 2rem;
 `;
 
-const Mission11 = ({ onClose }) => {
+const Mission11 = ({ onClose, setMissionDone }) => {
   const mapRef = useRef(null);
 
   const [success, setSuccess] = useState(false);
@@ -157,6 +157,7 @@ const Mission11 = ({ onClose }) => {
 
   useEffect(() => {
     if (success) {
+      setMissionDone();
       setTexts(['< 열쇠를 찾았습니다.　', ' 다음 미션으로 이동하세요. >']); // 배열로 바꾸기
       setTimeout(() => {
         dispatch(swtichMission({ prevMissionId: 11, nextMissionId: 12 }));
