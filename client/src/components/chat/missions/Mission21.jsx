@@ -2,6 +2,15 @@ import React, { useRef, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaUserAlt } from 'react-icons/fa';
 import { FaKey } from 'react-icons/fa';
+import {
+  FaThermometerEmpty,
+  FaThermometerQuarter,
+  FaThermometerHalf,
+  FaThermometerThreeQuarters,
+  FaThermometerFull,
+} from 'react-icons/fa';
+import { FiThermometer } from 'react-icons/fi';
+
 import { useDispatch } from 'react-redux';
 import { swtichMission } from '../../../modules/user';
 import miros from '../../../lib/miros';
@@ -51,11 +60,12 @@ const MiroRoad = styled.div`
     props.block ? `var(--color-dark-green)` : `var(--color-background)`};
 `;
 
-const Key = styled(FaKey)`
+const Thermometer = styled(FaThermometerEmpty)`
   margin: 0.8rem;
   font-size: 3rem;
+  transform: rotate(30deg);
   color: ${(props) =>
-    props.success ? `var(--color-background)` : `var(--color-user2)`};
+    props.success ? `var(--color-background)` : `var(--color-user1)`};
 `;
 
 const SuccessModal = styled(Modal)`
@@ -69,11 +79,11 @@ const SuccessModal = styled(Modal)`
   padding: 2rem;
 `;
 
-const Mission11 = ({ onClose }) => {
+const Mission21 = ({ onClose }) => {
   const mapRef = useRef(null);
 
   const [success, setSuccess] = useState(false);
-  const [texts, setTexts] = useState(['< 길을 따라 열쇠를 찾으세요. >']);
+  const [texts, setTexts] = useState(['< 길을 따라 온도계를 찾으세요. >']);
 
   const dispatch = useDispatch();
 
@@ -159,7 +169,7 @@ const Mission11 = ({ onClose }) => {
     if (success) {
       setTexts(['< 열쇠를 찾았습니다.　', ' 다음 미션으로 이동하세요. >']); // 배열로 바꾸기
       setTimeout(() => {
-        dispatch(swtichMission({ prevMissionId: 11, nextMissionId: 12 }));
+        dispatch(swtichMission({ prevMissionId: 21, nextMissionId: 22 }));
         onClose();
       }, 2000);
     }
@@ -208,7 +218,7 @@ const Mission11 = ({ onClose }) => {
                           if (rowIndex === 9 && colIndex === 5) {
                             return (
                               <MiroRoad>
-                                <Key success={success} />
+                                <Thermometer success={success} />
                               </MiroRoad>
                             );
                           }
@@ -216,7 +226,7 @@ const Mission11 = ({ onClose }) => {
                           if (rowIndex === 11 && colIndex === 0) {
                             return (
                               <MiroRoad>
-                                <Key success={success} />
+                                <Thermometer success={success} />
                               </MiroRoad>
                             );
                           }
@@ -224,7 +234,7 @@ const Mission11 = ({ onClose }) => {
                           if (rowIndex === 12 && colIndex === 6) {
                             return (
                               <MiroRoad>
-                                <Key success={success} />
+                                <Thermometer success={success} />
                               </MiroRoad>
                             );
                           }
@@ -238,9 +248,11 @@ const Mission11 = ({ onClose }) => {
             );
           })}
       </MiroBlock>
-      {success && <SuccessModal visible={success}>열쇠 찾기 완료</SuccessModal>}
+      {success && (
+        <SuccessModal visible={success}>온도계 찾기 완료</SuccessModal>
+      )}
     </div>
   );
 };
 
-export default Mission11;
+export default Mission21;
