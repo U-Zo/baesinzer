@@ -69,6 +69,11 @@ const Mission10 = ({ onClose, setMissionDone }) => {
     e.preventDefault();
     setConsoleLog(consoleLog.concat(`> ${command}`));
     const operationArr = command.split(' ');
+    if (querying) {
+      setCommand('');
+      return;
+    }
+
     if (operationArr[0] !== 'query') {
       setConsoleLog(consoleLog.concat(`> ${command}: Unknown command`));
     } else if (operationArr[1] === 'key') {
