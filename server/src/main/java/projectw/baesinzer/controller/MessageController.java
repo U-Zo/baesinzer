@@ -8,10 +8,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import projectw.baesinzer.domain.Message;
-import projectw.baesinzer.domain.Mission;
-import projectw.baesinzer.domain.Room;
-import projectw.baesinzer.domain.UserInfo;
+import projectw.baesinzer.domain.*;
 import projectw.baesinzer.service.RoomService;
 
 import java.util.List;
@@ -99,12 +96,16 @@ public class MessageController {
                 int killNo = userInfo.getKill();
                 UserInfo deadUser = room.getUsers().get(killNo);
                 deadUser.setDead(true);
+
+                // 살해된 유저 추가
+                room.getDeadList().add(new DeadUser(deadUser.getUsername(), deadUser.getLocationId()));
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
                     headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
                 break;
             case VOTE_START:
+                room.getDeadList().clear(); // dead 상태 유저 목록 초기화
                 message.setUserInfo(system);
                 message.setMessage("긴급 회의가 시작되었습니다.");
                 for (int i = 1; i <= 6; i++) {
