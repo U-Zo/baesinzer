@@ -82,6 +82,7 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 명령 토글
   const [missionInfo, setMissionInfo] = useState(false);
+  const [missionDone, setMissionDone] = useState(false);
 
   // 투표
   const [votePossible, setVotePossible] = useState(true);
@@ -93,6 +94,9 @@ const RoomContainer = ({ match, history }) => {
   const [killTime, setKillTime] = useState(15);
   const voteRef = useRef(null);
   const [voteTime, setVoteTime] = useState(100);
+
+  // input ref
+  const inputRef = useRef(null);
 
   let isConnect = false;
 
@@ -107,6 +111,7 @@ const RoomContainer = ({ match, history }) => {
 
   const closeMissionModal = () => {
     setMissionVisible(false);
+    inputRef.current.focus();
   };
 
   const stompSend = (type) => {
@@ -132,7 +137,7 @@ const RoomContainer = ({ match, history }) => {
   };
 
   // scroll관련
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const scrollToBottom = () => {
     scrollRef.current.scrollIntoView(-10); // scroll을 항상 아래로 내리기
   };
@@ -210,6 +215,7 @@ const RoomContainer = ({ match, history }) => {
           if (m && !m.done) {
             setMissionId(mission);
             setMissionVisible(true);
+            setMissionDone(false);
           }
         }
       }
@@ -461,10 +467,10 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 정보 동기화
   useEffect(() => {
-    if (room && room.start && start && !missionVisible) {
+    if (room && room.start && start) {
       stompSend('PLAY');
     }
-  }, [missions, missionVisible]);
+  }, [missions, missionDone]);
 
   useEffect(() => {
     if (room && room.start) {
@@ -621,10 +627,12 @@ const RoomContainer = ({ match, history }) => {
         killPossible={killPossible}
         killTime={killTime}
         missionList={userInfo && userInfo.missionList}
+        inputRef={inputRef}
       />
       <MissionModal
         missionVisible={missionVisible}
         missionId={missionId}
+        setMissionDone={setMissionDone}
         closeMissionModal={closeMissionModal}
         username={userInfo.username}
       />

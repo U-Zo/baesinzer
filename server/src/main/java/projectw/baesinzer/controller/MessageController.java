@@ -158,7 +158,7 @@ public class MessageController {
         message.setUserInfo(system);
 
         if (room.isStart()) {
-            int missions = (room.getCount() - 1) * 2; // 시민의 총 미션 수
+            int missions = (room.getCount() - 1) * 4; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
 
             // 현재 수행된 미션 수 확인
@@ -284,7 +284,6 @@ public class MessageController {
                         user.setLocationId(0);
                         user.setVotedNum(0);
                         user.setHasVoted(0);
-                        user.setMissionList(null);
                         user.setKill(0);
                     }
                 }
@@ -307,7 +306,6 @@ public class MessageController {
                 user.setLocationId(0);
                 user.setVotedNum(0);
                 user.setHasVoted(0);
-                user.setMissionList(null);
                 user.setKill(0);
             }
         }

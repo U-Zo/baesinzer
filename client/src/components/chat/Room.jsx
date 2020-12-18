@@ -384,6 +384,7 @@ const Room = ({
   moveTime,
   killPossible,
   killTime,
+  inputRef,
 }) => {
   return (
     <Block>
@@ -446,6 +447,7 @@ const Room = ({
             autocomplete="off"
             maxLength="30"
             autoFocus
+            ref={inputRef}
           />
           <ButtonStyle>입력</ButtonStyle>
         </form>

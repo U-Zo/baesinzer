@@ -66,7 +66,7 @@ const SuccessModal = styled(Modal)`
   padding: 2rem;
 `;
 
-const Mission2 = ({ onClose }) => {
+const Mission2 = ({ onClose, setMissionDone }) => {
   const [answer, setAnswer] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -82,6 +82,7 @@ const Mission2 = ({ onClose }) => {
     if (answer === 'Hello World') {
       setSuccess(true);
       dispatch(missionDone(2));
+      setMissionDone(true);
       setTimeout(() => {
         setSuccess(false);
         onClose();

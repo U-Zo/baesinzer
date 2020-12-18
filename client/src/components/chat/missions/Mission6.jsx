@@ -120,7 +120,7 @@ const AreltBlock = styled.div`
   bottom: 6rem;
 `;
 
-const Mission6 = ({ onClose }) => {
+const Mission6 = ({ onClose, setMissionDone }) => {
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [itemNo, setItemNo] = useState(null);
@@ -148,6 +148,7 @@ const Mission6 = ({ onClose }) => {
     setTimeout(function () {
       setComplete('마스크 사기 완료');
       dispatch(missionDone(6));
+      setMissionDone(true);
     }, 6000);
 
   useEffect(() => {

@@ -115,7 +115,7 @@ const AreltBlock = styled.div`
   bottom: 6rem;
 `;
 
-const Mission5 = ({ onClose }) => {
+const Mission5 = ({ onClose, setMissionDone }) => {
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [itemNo, setItemNo] = useState(null);
@@ -143,6 +143,7 @@ const Mission5 = ({ onClose }) => {
     setTimeout(function () {
       setComplete('간식사기 완료');
       dispatch(missionDone(5));
+      setMissionDone(true);
     }, 6000);
 
   useEffect(() => {
