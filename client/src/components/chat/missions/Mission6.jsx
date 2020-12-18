@@ -147,7 +147,7 @@ const Mission6 = ({ onClose }) => {
   const timer = () =>
     setTimeout(function () {
       setComplete('마스크 사기 완료');
-      dispatch(missionDone(5));
+      dispatch(missionDone(6));
     }, 6000);
 
   useEffect(() => {
@@ -193,7 +193,7 @@ const Mission6 = ({ onClose }) => {
       ) : (
         <div>
           <ItemBlock>
-            {productNum.map((num) => {
+            {productNum.map((num, i) => {
               if (num === 1) {
                 return <RiSurgicalMaskLine id="item" />;
               }
