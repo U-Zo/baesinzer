@@ -194,7 +194,7 @@ const Mission6 = ({ onClose, setMissionDone }) => {
       ) : (
         <div>
           <ItemBlock>
-            {productNum.map((num) => {
+            {productNum.map((num, i) => {
               if (num === 1) {
                 return <RiSurgicalMaskLine id="item" />;
               }
