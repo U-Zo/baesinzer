@@ -82,6 +82,7 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 명령 토글
   const [missionInfo, setMissionInfo] = useState(false);
+  const [missionDone, setMissionDone] = useState(false);
 
   // 투표
   const [votePossible, setVotePossible] = useState(true);
@@ -93,6 +94,9 @@ const RoomContainer = ({ match, history }) => {
   const [killTime, setKillTime] = useState(15);
   const voteRef = useRef(null);
   const [voteTime, setVoteTime] = useState(100);
+
+  // input ref
+  const inputRef = useRef(null);
 
   let isConnect = false;
 
@@ -107,6 +111,7 @@ const RoomContainer = ({ match, history }) => {
 
   const closeMissionModal = () => {
     setMissionVisible(false);
+    inputRef.current.focus();
   };
 
   const stompSend = (type) => {
@@ -132,7 +137,7 @@ const RoomContainer = ({ match, history }) => {
   };
 
   // scroll관련
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const scrollToBottom = () => {
     scrollRef.current.scrollIntoView(-10); // scroll을 항상 아래로 내리기
   };
@@ -210,25 +215,29 @@ const RoomContainer = ({ match, history }) => {
           if (m && !m.done) {
             setMissionId(mission);
             setMissionVisible(true);
+            setMissionDone(false);
           }
         }
       }
 
       if (meeting) {
         // 회의 진행 중 투표 명령
-        if (message.includes('투표')) {
-          if (votePossible) {
-            const voteNo = parseInt(message.replace(/[^0-9]/g, ''));
-            if (voteNo && voteNo > 0 && voteNo <= room.count) {
-              dispatch(vote(voteNo));
-              dispatch(logMessage(userInfo, `${voteNo}이(가) 의심스럽다.`));
-              setVotePossible(false);
+        // 죽은 상태면 투표 및 채팅 불가
+        if (!userInfo.dead) {
+          if (message.includes('/투표')) {
+            if (votePossible) {
+              const voteNo = parseInt(message.replace(/[^0-9]/g, ''));
+              if (voteNo && voteNo > 0 && voteNo <= room.count) {
+                dispatch(vote(voteNo));
+                dispatch(logMessage(userInfo, `${voteNo}이(가) 의심스럽다.`));
+                setVotePossible(false);
+              }
             }
+          } else {
+            stompSend('ROOM');
           }
-        } else {
-          stompSend('ROOM');
         }
-      } else if (message === '이동' || message === 'move') {
+      } else if (message === '/이동' || message === '/move') {
         // 맵 이동 명령
         if (movePossible) {
           dispatch(
@@ -243,9 +252,9 @@ const RoomContainer = ({ match, history }) => {
           dispatch(logMessage(userInfo, '아직 움직일 수 없어..'));
         }
       } else if (
-        message.includes('살해') ||
-        message.includes('kill') ||
-        message.includes('죽')
+        message.includes('/살해') ||
+        message.includes('/kill') ||
+        message.includes('/죽')
       ) {
         // 살해 명령
         if (userInfo && userInfo.baesinzer) {
@@ -302,6 +311,10 @@ const RoomContainer = ({ match, history }) => {
         (findDead && message.includes('/신고')) ||
         message.includes('/report')
       ) {
+        // 죽은 상태는 신고 불가
+        if (!userInfo.dead) {
+          stompSend('VOTE_START');
+        }
         stompSend('VOTE_START');
       } else if (!mapInfo && !killInfo && !missionInfo) {
         dispatch(logMessage(userInfo, message));
@@ -461,10 +474,10 @@ const RoomContainer = ({ match, history }) => {
 
   // 미션 정보 동기화
   useEffect(() => {
-    if (room && room.start && start && !missionVisible) {
+    if (room && room.start && start) {
       stompSend('PLAY');
     }
-  }, [missions, missionVisible]);
+  }, [missions, missionDone]);
 
   useEffect(() => {
     if (room && room.start) {
@@ -477,9 +490,8 @@ const RoomContainer = ({ match, history }) => {
         return;
       }
 
-      const userList = Object.values(room.users);
-      for (const userOnMap of userList) {
-        if (userInfo.locationId === userOnMap.locationId && userOnMap.dead) {
+      for (const userOnMap of room.deadList) {
+        if (!userInfo.dead && userInfo.locationId === userOnMap.locationId) {
           setFindDead(true);
           dispatch(
             logMessage(
@@ -608,6 +620,7 @@ const RoomContainer = ({ match, history }) => {
         message={message}
         messageLog={messageLog}
         usersArray={room && Object.values(room.users)}
+        deadList={room && room.deadList}
         exit={exit}
         visible={visible}
         closeModal={closeModal}
@@ -621,10 +634,12 @@ const RoomContainer = ({ match, history }) => {
         killPossible={killPossible}
         killTime={killTime}
         missionList={userInfo && userInfo.missionList}
+        inputRef={inputRef}
       />
       <MissionModal
         missionVisible={missionVisible}
         missionId={missionId}
+        setMissionDone={setMissionDone}
         closeMissionModal={closeMissionModal}
         username={userInfo.username}
       />

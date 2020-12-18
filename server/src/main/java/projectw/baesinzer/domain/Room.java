@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -19,4 +20,5 @@ public class Room {
     private int count;
     private Map<Integer, UserInfo> users;
     private boolean start;
+    private List<DeadUser> deadList;
 }

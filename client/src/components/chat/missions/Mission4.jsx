@@ -52,7 +52,7 @@ const MissionGauge = styled.div`
     text-align: center;
   }
 `;
-const Mission4 = ({ onClose }) => {
+const Mission4 = ({ onClose, setMissionDone }) => {
   const dispatch = useDispatch();
   const [start, setStart] = useState('');
   const [complete, setComplete] = useState();
@@ -67,6 +67,7 @@ const Mission4 = ({ onClose }) => {
     setTimeout(function () {
       setComplete('파일 다운로드 완료');
       dispatch(missionDone(4));
+      setMissionDone(true);
     }, 6000);
   useEffect(() => {
     missionRef.current = timer();

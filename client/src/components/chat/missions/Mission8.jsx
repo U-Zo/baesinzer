@@ -89,7 +89,7 @@ const Square = styled.div`
   }
 `;
 
-const Mission8 = ({ onClose, username }) => {
+const Mission8 = ({ onClose, username, setMissionDone }) => {
   const dispatch = useDispatch();
 
   // Mission
@@ -143,6 +143,7 @@ const Mission8 = ({ onClose, username }) => {
     ) {
       setSuccess(true);
       dispatch(missionDone(8));
+      setMissionDone(true);
       // qr 인증 후 로딩 애니메이션 띄우기
       setChange(true);
       setTimeout(() => {

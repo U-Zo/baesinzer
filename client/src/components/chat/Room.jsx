@@ -207,6 +207,21 @@ const AllUsers = styled.div`
   text-align: center;
   font-size: 2.5rem;
   letter-spacing: 0.3rem;
+
+  ${(props) =>
+    props.red &&
+    css`
+      color: var(--color-red);
+      text-decoration: line-through;
+    `}
+
+  ${(props) =>
+    props.me &&
+    css`
+      color: var(--color-dark-green);
+      text-decoration: line-through;
+    `}
+
   &#dead1 {
     color: var(--color-user1);
     text-decoration: line-through;
@@ -329,16 +344,22 @@ const Message = React.memo(({ userInfo, message }) => {
   );
 });
 
-const Username = ({ username, userNo, dead }) => {
+const Username = ({ username, userNo, dead, me }) => {
   return (
     <div>
-      {dead ? (
-        <AllUsers id={'dead' + userNo}>{username}</AllUsers>
-      ) : (
+      {!dead && (
         <AllUsers id={'user' + userNo}>
           {userNo}.{username}
         </AllUsers>
       )}
+    </div>
+  );
+};
+
+const DeadUser = ({ username }) => {
+  return (
+    <div>
+      <AllUsers red>{username}</AllUsers>
     </div>
   );
 };
@@ -371,6 +392,7 @@ const Room = ({
   message,
   messageLog,
   usersArray,
+  deadList,
   exit,
   visible,
   closeModal,
@@ -384,6 +406,7 @@ const Room = ({
   moveTime,
   killPossible,
   killTime,
+  inputRef,
 }) => {
   return (
     <Block>
@@ -446,6 +469,7 @@ const Room = ({
             autocomplete="off"
             maxLength="30"
             autoFocus
+            ref={inputRef}
           />
           <ButtonStyle>입력</ButtonStyle>
         </form>
@@ -466,6 +490,13 @@ const Room = ({
                     userNo={user.userNo}
                     dead={user.dead}
                   />
+                )
+            )}
+          {deadList &&
+            deadList.map(
+              (deadUser, index) =>
+                deadUser.locationId === userInfo.locationId && (
+                  <DeadUser key={index} username={deadUser.username} />
                 )
             )}
           {userInfo && userInfo.host && (

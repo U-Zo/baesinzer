@@ -33,6 +33,7 @@ public class RoomService {
         Room room = new Room(roomName);
         room.setRoomCode(UUID.randomUUID().toString());
         room.setUsers(new HashMap<>());
+        room.setDeadList(new ArrayList<>());
         roomRepository.sava(room);
         return room;
     }

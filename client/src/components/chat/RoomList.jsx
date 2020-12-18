@@ -117,6 +117,7 @@ const ButtonStyle = styled.button`
     font-weight: bold;
   }
 `;
+
 const CodeInputStyle = styled.input`
   position: relative;
   text-align: center;
@@ -171,11 +172,13 @@ const ModalInput = styled.input`
     outline: none;
   }
 `;
+
 const Buttons = styled.div`
   /* position: absolute; */
   /* left: 20%; */
   margin-top: 4rem;
 `;
+
 const MakeRoomButton = styled.button`
   background-color: var(--color-background);
   display: inline-block;
@@ -210,6 +213,7 @@ const CancelButton = styled.button`
     font-weight: bold;
   }
 `;
+
 const ErrorBox = styled.div`
   position: absolute;
   display: flex;
@@ -241,6 +245,7 @@ const rotateRefresh = keyframes`
     transform:rotate(90deg);
     }
 `;
+
 const Refresh = styled.div`
   position: relative;
   display: inline-block;

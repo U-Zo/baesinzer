@@ -63,7 +63,7 @@ const MissionGauge = styled.div`
     text-align: center;
   }
 `;
-const Mission3 = ({ onClose }) => {
+const Mission3 = ({ onClose, setMissionDone }) => {
   const dispatch = useDispatch();
   const [start, setStart] = useState('');
   const [complete, setComplete] = useState();
@@ -86,6 +86,7 @@ const Mission3 = ({ onClose }) => {
     setTimeout(function () {
       setComplete('파일 백업하기 완료');
       dispatch(missionDone(3));
+      setMissionDone(true);
     }, 6000);
   useEffect(() => {
     missionRef.current = timer();

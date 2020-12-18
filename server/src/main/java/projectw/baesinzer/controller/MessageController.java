@@ -8,10 +8,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import projectw.baesinzer.domain.Message;
-import projectw.baesinzer.domain.Mission;
-import projectw.baesinzer.domain.Room;
-import projectw.baesinzer.domain.UserInfo;
+import projectw.baesinzer.domain.*;
 import projectw.baesinzer.service.RoomService;
 
 import java.util.List;
@@ -99,12 +96,16 @@ public class MessageController {
                 int killNo = userInfo.getKill();
                 UserInfo deadUser = room.getUsers().get(killNo);
                 deadUser.setDead(true);
+
+                // 살해된 유저 추가
+                room.getDeadList().add(new DeadUser(deadUser.getUsername(), deadUser.getLocationId()));
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
                     headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
                 break;
             case VOTE_START:
+                room.getDeadList().clear(); // dead 상태 유저 목록 초기화
                 message.setUserInfo(system);
                 message.setMessage("긴급 회의가 시작되었습니다.");
                 for (int i = 1; i <= 6; i++) {
@@ -158,7 +159,7 @@ public class MessageController {
         message.setUserInfo(system);
 
         if (room.isStart()) {
-            int missions = (room.getCount() - 1) * 2; // 시민의 총 미션 수
+            int missions = (room.getCount() - 1) * 4; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
 
             // 현재 수행된 미션 수 확인
@@ -284,7 +285,6 @@ public class MessageController {
                         user.setLocationId(0);
                         user.setVotedNum(0);
                         user.setHasVoted(0);
-                        user.setMissionList(null);
                         user.setKill(0);
                     }
                 }
@@ -307,7 +307,6 @@ public class MessageController {
                 user.setLocationId(0);
                 user.setVotedNum(0);
                 user.setHasVoted(0);
-                user.setMissionList(null);
                 user.setKill(0);
             }
         }

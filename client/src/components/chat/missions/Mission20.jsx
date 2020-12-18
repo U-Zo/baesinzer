@@ -46,7 +46,7 @@ const SuccessModal = styled(Modal)`
 
 const loadingArr = ['|', '/', '-', '\\'];
 
-const Mission10 = ({ onClose, setMissionDone }) => {
+const Mission20 = ({ onClose, setMissionDone }) => {
   const [command, setCommand] = useState('');
   const [success, setSuccess] = useState(false);
   const [consoleLog, setConsoleLog] = useState([
@@ -54,7 +54,7 @@ const Mission10 = ({ onClose, setMissionDone }) => {
     '(c) 2020 BaesinZer. All rights reserved.',
     '----------- command',
     'query [item]: 해당 물건이 어디있는지 검색합니다.',
-    'hint) The item is key',
+    'hint) The item is therometer',
   ]);
   const [querying, setQuerying] = useState(false);
 
@@ -90,14 +90,8 @@ const Mission10 = ({ onClose, setMissionDone }) => {
           setConsoleLog(
             consoleLog.concat('item: key, location: bathroom, locationId: 3')
           );
-          clearInterval(interval);
-          setSuccess(true);
-          dispatch(swtichMission({ prevMissionId: 10, nextMissionId: 11 }));
-          setMissionDone(true);
           setQuerying(false);
-          setTimeout(() => {
-            onClose();
-          }, 2000);
+          clearInterval(interval);
         }
       }, 125);
     } else if (operationArr[1] === 'therometer') {
@@ -117,7 +111,13 @@ const Mission10 = ({ onClose, setMissionDone }) => {
             )
           );
           clearInterval(interval);
+          setSuccess(true);
+          dispatch(swtichMission({ prevMissionId: 20, nextMissionId: 21 }));
+          setMissionDone(true);
           setQuerying(false);
+          setTimeout(() => {
+            onClose();
+          }, 2000);
         }
       }, 125);
     } else {
@@ -156,9 +156,11 @@ const Mission10 = ({ onClose, setMissionDone }) => {
           </form>
         </CodeBlock>
       </MissionBlock>
-      {success && <SuccessModal visible={success}>열쇠 검색 완료</SuccessModal>}
+      {success && (
+        <SuccessModal visible={success}>온도계 검색 완료</SuccessModal>
+      )}
     </>
   );
 };
 
-export default Mission10;
+export default Mission20;
