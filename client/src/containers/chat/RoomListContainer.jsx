@@ -25,12 +25,6 @@ const RoomListContainer = ({ history }) => {
 
   const changeUsername = (e) => {
     const inputUsername = e.target.value;
-    // if (inputUsername.length > 8) {
-    //   setType('닉네임');
-    //   setError('닉네임이 너무 깁니다.');
-    // } else if (inputUsername <= 8) {
-    //   setError('');
-    // }
     dispatch(setUsername(inputUsername));
   };
 
