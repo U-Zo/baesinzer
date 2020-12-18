@@ -3,9 +3,11 @@ import styled from 'styled-components';
 import Modal from '../common/Modal';
 import Mission1 from './missions/Mission1';
 import Mission10 from './missions/Mission10';
+import Mission11 from './missions/Mission11';
 import Mission12 from './missions/Mission12';
 import Mission2 from './missions/Mission2';
 import Mission20 from './missions/Mission20';
+import Mission21 from './missions/Mission21';
 import Mission22 from './missions/Mission22';
 import Mission3 from './missions/Mission3';
 import Mission4 from './missions/Mission4';
@@ -80,6 +82,12 @@ const MissionModal = ({
           setMissionDone={setMissionDone}
         />
       )}
+      {missionId === 11 && (
+        <Mission11
+          onClose={closeMissionModal}
+          setMissionDone={setMissionDone}
+        />
+      )}
       {missionId === 12 && (
         <Mission12
           onClose={closeMissionModal}
@@ -88,6 +96,12 @@ const MissionModal = ({
       )}
       {missionId === 20 && (
         <Mission20
+          onClose={closeMissionModal}
+          setMissionDone={setMissionDone}
+        />
+      )}
+      {missionId === 21 && (
+        <Mission21
           onClose={closeMissionModal}
           setMissionDone={setMissionDone}
         />
