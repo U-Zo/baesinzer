@@ -315,7 +315,6 @@ const RoomContainer = ({ match, history }) => {
         if (!userInfo.dead) {
           stompSend('VOTE_START');
         }
-        stompSend('VOTE_START');
       } else if (!mapInfo && !killInfo && !missionInfo) {
         dispatch(logMessage(userInfo, message));
       }
@@ -607,6 +606,8 @@ const RoomContainer = ({ match, history }) => {
           clear(voteRef);
         }
       }, 1000);
+    } else {
+      clear(voteRef);
     }
   }, [meeting]);
 

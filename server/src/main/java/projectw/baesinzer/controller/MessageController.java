@@ -159,7 +159,7 @@ public class MessageController {
         message.setUserInfo(system);
 
         if (room.isStart()) {
-            int missions = (room.getCount() - 1) * 4; // 시민의 총 미션 수
+            int missions = (room.getCount() - 1) * 3; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
 
             // 현재 수행된 미션 수 확인
@@ -270,6 +270,7 @@ public class MessageController {
                 message.setType(Message.MessageType.END);
                 message.setUserInfo(system);
                 room.setStart(false);
+                room.getDeadList().clear();
 
                 // 게임 종료 시 게임 내 정보 초기화
                 for (int i = 1; i <= 6; i++) {
@@ -297,6 +298,7 @@ public class MessageController {
     private void gameEnd(Message message, Room room) {
         message.setType(Message.MessageType.END);
         room.setStart(false);
+        room.getDeadList().clear();
 
         // 게임 종료 시 게임 내 정보 초기화
         for (int i = 1; i <= 6; i++) {
