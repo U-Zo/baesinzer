@@ -102,7 +102,7 @@ const InputStyled = styled.input`
     }
   }
 `;
-const Mission22 = ({ onClose, username }) => {
+const Mission22 = ({ onClose, username, setMissionDone }) => {
   const [error, setError] = useState(false);
   const [agree, setAgree] = useState(null);
   const [measure, setMeasure] = useState(false);
@@ -167,8 +167,9 @@ const Mission22 = ({ onClose, username }) => {
   //키보드 눌러 온도가 36.5가 되면 2초후에 미션완료& 닫기
   useEffect(() => {
     if (temperature === 36.5) {
+      dispatch(missionDone(22));
+      setMissionDone(true);
       setTimeout(() => {
-        dispatch(missionDone(22));
         onClose();
       }, 2000);
     }
