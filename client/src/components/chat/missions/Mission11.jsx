@@ -157,10 +157,10 @@ const Mission11 = ({ onClose, setMissionDone }) => {
 
   useEffect(() => {
     if (success) {
-      setMissionDone();
+      setMissionDone(true);
+      dispatch(swtichMission({ prevMissionId: 11, nextMissionId: 12 }));
       setTexts(['< 열쇠를 찾았습니다.　', ' 다음 미션으로 이동하세요. >']); // 배열로 바꾸기
       setTimeout(() => {
-        dispatch(swtichMission({ prevMissionId: 11, nextMissionId: 12 }));
         onClose();
       }, 2000);
     }
