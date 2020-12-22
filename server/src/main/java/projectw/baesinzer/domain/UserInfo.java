@@ -19,4 +19,5 @@ public class UserInfo {
     private List<Mission> missionList;
     private boolean host;
     private int kill;
+    private int closeLocationId;
 }

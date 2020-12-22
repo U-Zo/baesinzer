@@ -55,7 +55,6 @@ public class UserService {
         user.setRefreshToken(token);
     }
 
-
     public Optional<User> findOne(Long userId) {
         return userRepository.findById(userId);
     }

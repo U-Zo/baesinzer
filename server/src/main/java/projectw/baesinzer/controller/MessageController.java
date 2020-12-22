@@ -43,6 +43,7 @@ public class MessageController {
 
                     if (room.getUsers().get(i) == null) {
                         room.getUsers().put(i, userInfo);
+                        room.getLocationList().get(0).getUserList().add(userInfo);
                         userInfo.setUserNo(i);
                         room.setCount(room.getUsers().size());
 
@@ -55,41 +56,49 @@ public class MessageController {
             case START:
                 message.setUserInfo(system);
                 message.setMessage("5초 뒤 게임이 시작됩니다.");
-                Timer timer = new Timer();
-                TimerTask timerTask = new TimerTask() {
-                    int count = 4;
-
-                    @Override
-                    public void run() {
-                        if (count > 0) {
-                            message.setMessage(count + "초 뒤 게임이 시작됩니다.");
-                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
-                            count--;
-                        } else {
-                            // 랜덤으로 baesinzer 선정
-                            Random random = new Random();
-                            while (true) {
-                                int ranNum = random.nextInt(6) + 1; // 1 ~ 6까지 난수
-                                UserInfo nextBaesinzer = room.getUsers().get(ranNum); // 난수에 해당하는 사용자
-                                if (nextBaesinzer != null) { // 사용자가 존재하면
-                                    nextBaesinzer.setBaesinzer(true); // baesinzer로 선정
-                                    break;
-                                }
-                            }
-                            room.setStart(true);
-                            message.setMessage("게임이 시작되었습니다.");
-                            operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
-                            timer.cancel();
-                        }
-                    }
-                };
-
-                timer.schedule(timerTask, 1000, 1000);
+                startTimer(message, room);
                 break;
             case PLAY:
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
                     headerAccessor.getSessionAttributes().put("user", userInfo);
+                }
+                break;
+            case MOVE:
+                int prevLocationId = 0; // 이동 전 위치 번호
+                Location toLocation = null; // 이동 후 위치
+                for (Location _location : room.getLocationList()) {
+
+                    // 이동 전 위치 정보 저장
+                    if (prevLocationId == 0) {
+                        for (UserInfo user : _location.getUserList()) {
+                            if (userInfo.getUserNo() == user.getUserNo()) {
+                                prevLocationId = user.getLocationId();
+                                _location.getUserList().remove(user);
+                                system.setLocationId(prevLocationId);
+                                break;
+                            }
+                        }
+                    }
+
+                    // 이동 후 위치 저장
+                    if (_location.getLocationId() == userInfo.getLocationId()) {
+                        toLocation = _location;
+                        _location.getUserList().add(userInfo);
+                    }
+                }
+
+                if (room.getUsers().get(userInfo.getUserNo()) != null) {
+                    room.getUsers().put(userInfo.getUserNo(), userInfo);
+                    headerAccessor.getSessionAttributes().put("user", userInfo);
+                }
+
+                if (toLocation != null) {
+                    message.setMessage(
+                            userInfo.getUsername() + "이(가) " + toLocation.getLocationName() + "(으)로 이동했습니다."
+                    );
+                } else {
+                    return;
                 }
                 break;
             case KILL:
@@ -98,14 +107,33 @@ public class MessageController {
                 deadUser.setDead(true);
 
                 // 살해된 유저 추가
-                room.getDeadList().add(new DeadUser(deadUser.getUsername(), deadUser.getLocationId()));
+                room.getLocationList()
+                        .get(userInfo.getLocationId())
+                        .getDeadList()
+                        .add(new DeadUser(deadUser.getUsername(), deadUser.getLocationId()));
+
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
                     headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
                 break;
+            case TURN_OFF:
+                message.setMessage("전등 시스템에 오류가 발생했습니다. 20초 후에 고쳐집니다.");
+                break;
+            case CLOSE_LOCATION:
+                int closeLocationId = userInfo.getCloseLocationId();
+                List<Location> locationList = room.getLocationList();
+                for (Location location : locationList) {
+                    if (location.getLocationId() == closeLocationId) {
+                        location.setClose(true);
+                        closeTimer(location, 10);
+                        break;
+                    }
+                }
+                break;
             case VOTE_START:
-                room.getDeadList().clear(); // dead 상태 유저 목록 초기화
+                clearDeadList(room);
+
                 message.setUserInfo(system);
                 message.setMessage("긴급 회의가 시작되었습니다.");
                 for (int i = 1; i <= 6; i++) {
@@ -123,7 +151,9 @@ public class MessageController {
                 }
                 UserInfo votedUserInfo = room.getUsers().get(userNo);
                 if (userNo == userInfo.getUserNo()) {
-                    if (votedUserInfo != null) votedUserInfo.setHasVoted(userNo);
+                    if (votedUserInfo != null) {
+                        votedUserInfo.setHasVoted(userNo);
+                    }
                 } else {
                     if (room.getUsers().get(userInfo.getUserNo()) != null) {
                         room.getUsers().put(userInfo.getUserNo(), userInfo);
@@ -270,7 +300,7 @@ public class MessageController {
                 message.setType(Message.MessageType.END);
                 message.setUserInfo(system);
                 room.setStart(false);
-                room.getDeadList().clear();
+                clearDeadList(room);
 
                 // 게임 종료 시 게임 내 정보 초기화
                 for (int i = 1; i <= 6; i++) {
@@ -295,10 +325,85 @@ public class MessageController {
         }
     }
 
+    /**
+     * 게임 시작 카운트 다운
+     *
+     * @param message 클라이언트에게 전송할 메시지
+     * @param room    전송할 게임 방 정보
+     */
+    private void startTimer(Message message, Room room) {
+        Timer startTimer = new Timer();
+        TimerTask startTimerTask = new TimerTask() {
+            int count = 4;
+
+            @Override
+            public void run() {
+                if (count > 0) {
+                    message.setMessage(count + "초 뒤 게임이 시작됩니다.");
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                    count--;
+                } else {
+                    // 랜덤으로 baesinzer 선정
+                    Random random = new Random();
+                    while (true) {
+                        int ranNum = random.nextInt(6) + 1; // 1 ~ 6까지 난수
+                        UserInfo nextBaesinzer = room.getUsers().get(ranNum); // 난수에 해당하는 사용자
+                        if (nextBaesinzer != null) { // 사용자가 존재하면
+                            nextBaesinzer.setBaesinzer(true); // baesinzer로 선정
+                            break;
+                        }
+                    }
+                    room.setStart(true);
+                    message.setMessage("게임이 시작되었습니다.");
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                    startTimer.cancel();
+                }
+            }
+        };
+
+        startTimer.schedule(startTimerTask, 1000, 1000);
+    }
+
+    /**
+     * 방 문 close 타이머
+     *
+     * @param location 닫을 장소
+     * @param time     접근할 수 없는 시간
+     */
+    private void closeTimer(Location location, int time) {
+        Timer closeTimer = new Timer();
+        TimerTask closeTimerTask = new TimerTask() {
+            int count = time;
+
+            @Override
+            public void run() {
+                if (count > 0) {
+                    count--;
+                } else {
+                    location.setClose(false);
+                    closeTimer.cancel();
+                }
+            }
+        };
+
+        closeTimer.schedule(closeTimerTask, 1000, 1000);
+    }
+
+    /**
+     * 방 객체의 모든 deadList 초기화
+     *
+     * @param room 변경할 게임 방 객체
+     */
+    private void clearDeadList(Room room) {
+        for (Location location : room.getLocationList()) {
+            location.getDeadList().clear();
+        }
+    }
+
     private void gameEnd(Message message, Room room) {
         message.setType(Message.MessageType.END);
         room.setStart(false);
-        room.getDeadList().clear();
+        clearDeadList(room);
 
         // 게임 종료 시 게임 내 정보 초기화
         for (int i = 1; i <= 6; i++) {

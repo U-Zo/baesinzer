@@ -25,9 +25,6 @@ public class RoomController {
     @GetMapping("/room/{roomCode}")
     public Room joinRoom(@PathVariable String roomCode) {
         Room room = roomService.findOne(roomCode);
-//        if (room.getUsers().size() == 6) {
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가득 찬 방입니다.");
-//        }
 
         return room;
     }
