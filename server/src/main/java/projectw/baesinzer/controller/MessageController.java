@@ -93,9 +93,10 @@ public class MessageController {
                     headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
 
-                if (toLocation != null) {
+                if (toLocation != null && !userInfo.isDead()) {
+                    message.setUserInfo(system);
                     message.setMessage(
-                            userInfo.getUsername() + "이(가) " + toLocation.getLocationName() + "(으)로 이동했습니다."
+                            userInfo.getUsername() + "이(가) " + toLocation.getLocationName() + "(으)로 이동했다."
                     );
                 } else {
                     return;
