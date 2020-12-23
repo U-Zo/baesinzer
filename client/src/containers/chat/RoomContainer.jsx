@@ -92,6 +92,11 @@ const RoomContainer = ({ match, history }) => {
   // 투표
   const [votePossible, setVotePossible] = useState(true);
 
+  // 방해
+  const [disturbancePossible, setDisturbancePossible] = useState(true);
+  const [disturbanceInfo, setDisturbanceInfo] = useState(false);
+  const [turnOff, setTurnOff] = useState(false);
+
   // 각종 시간
   const moveRef = useRef(null);
   const [moveTime, setMoveTime] = useState(5);
@@ -99,6 +104,9 @@ const RoomContainer = ({ match, history }) => {
   const [killTime, setKillTime] = useState(15);
   const voteRef = useRef(null);
   const [voteTime, setVoteTime] = useState(100);
+  const disturbanceRef = useRef(null);
+  const [disturbanceTime, setDisturbanceTime] = useState(60);
+  const [turnOffTime, setTurnOffTime] = useState(20);
 
   // input ref
   const inputRef = useRef(null);
@@ -225,6 +233,16 @@ const RoomContainer = ({ match, history }) => {
         }
       }
 
+      // 방해 명령 토글 활성화 시
+      if (disturbanceInfo && userInfo.baesinzer) {
+        setDisturbanceInfo(false);
+        const disturbance = parseInt(message.replace(/[^0-9]/g, ''));
+        // 전력 공급 중단
+        if (disturbance === 1) {
+          stompSend('TURN_OFF');
+        }
+      }
+
       if (meeting) {
         // 회의 진행 중 투표 명령
         // 죽은 상태면 투표 및 채팅 불가
@@ -290,7 +308,24 @@ const RoomContainer = ({ match, history }) => {
         } else {
           dispatch(logMessage(userInfo, message));
         }
-      } else if (message.includes('/일과')) {
+      }
+      // 방해 공작
+      else if (message.includes('/방해') || message.includes('/disturbance')) {
+        if (userInfo && userInfo.baesinzer) {
+          if (disturbancePossible) {
+            dispatch(logMessage(userInfo, `1.전력 공급 중단 2.방 문 닫기`));
+            setDisturbanceInfo(true);
+          } else {
+            dispatch(
+              logMessage(userInfo, `지금은 방해할 수 없어. 조금만 기다리자..`)
+            );
+          }
+        } else {
+          dispatch(logMessage(userInfo, message));
+        }
+      }
+      /////////////////
+      else if (message.includes('/일과')) {
         // 해당 위치의 미션 목록 출력
         if (!missionInfo && !userInfo.baesinzer && userInfo.missionList) {
           const missionOnHere = userInfo.missionList
@@ -396,6 +431,11 @@ const RoomContainer = ({ match, history }) => {
         setFlag(false);
         setMissions(false);
         setVotePossible(true);
+      }
+      // 방해
+      else if (serverMesg.type === 'TURN_OFF') {
+        setTurnOff(true);
+        setDisturbancePossible(false);
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -517,15 +557,17 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [userInfo && userInfo.locationId]);
 
+  // 이동 정보 출력
   useEffect(() => {
     if ((room && !room.start) || meeting) {
       return;
     }
 
-    if (userInfo.locationId === moveLocationInfo.locationId) {
+    // 암전 시 이동 정보 출력 x
+    if (userInfo.locationId === moveLocationInfo.locationId && !turnOff) {
       dispatch(logMessage(userInfo, moveLocationInfo.message));
     }
-  }, [moveLocationInfo, room && room.start]);
+  }, [moveLocationInfo, room && room.start, turnOff]);
 
   // scroll
   useEffect(() => {
@@ -633,6 +675,58 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [meeting]);
 
+  // 방해 공작 쿨 타이머
+  useEffect(() => {
+    if (!disturbancePossible && disturbanceTime > 59 && turnOffTime > 19) {
+      let t = 60; // 방해 쿨 타임 60초
+      let _t_off = 20; // 암전 시간 20초
+
+      disturbanceRef.current = setInterval(() => {
+        if (t > 1) {
+          t--;
+          setDisturbanceTime(t);
+          console.log('방해 쿨 타임', t);
+        } else {
+          clear(disturbanceRef);
+          setDisturbancePossible(true);
+          setDisturbanceTime(60);
+        }
+        if (_t_off > 1) {
+          _t_off--;
+          setTurnOffTime(_t_off);
+          console.log('userlist암전 ', _t_off, '초 후 암전 끝');
+        } else {
+          setTurnOff(false);
+          setTurnOffTime(20);
+          // dispatch(logMessage(system, '전력 수리가 완료되었습니다. '));
+        }
+      }, 1000);
+    }
+  }, [disturbancePossible, turnOff]);
+
+  // 방해 - 암전관련 메세지
+  useEffect(() => {
+    if (room && room.start && turnOff) {
+      if (!userInfo.baesinzer) {
+        dispatch(
+          logMessage(
+            system,
+            '전등 시스템에 오류가 발생했습니다. 20초 후에 고쳐집니다.'
+          )
+        );
+      } else {
+        dispatch(
+          logMessage(
+            userInfo,
+            '시민들의 전력 시스템을 다운시켰어. 복구되기 전에 조용히 시민을 처리하자.'
+          )
+        );
+      }
+    } else if (room && room.start && !turnOff) {
+      dispatch(logMessage(system, '전력 시스템이 복구되었습니다.'));
+    }
+  }, [turnOff]);
+
   return (
     <>
       <Room
@@ -668,6 +762,9 @@ const RoomContainer = ({ match, history }) => {
         killTime={killTime}
         missionList={userInfo && userInfo.missionList}
         inputRef={inputRef}
+        turnOff={turnOff}
+        disturbancePossible={disturbancePossible}
+        disturbanceTime={disturbanceTime}
       />
       <MissionModal
         missionVisible={missionVisible}
