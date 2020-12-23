@@ -30,14 +30,13 @@ const RoomListContainer = ({ history }) => {
 
   // start modal option
   const onClick = () => {
-    //수정-----
-    if (userInfo.username === null || userInfo.username === '') {
+    if (userInfo.username === null || userInfo.username === ' ') {
       setVisible(false);
       setType('닉네임');
       setError('닉네임을 입력하세요.');
-    } else if (userInfo.username.length > 8) {
+    } else if (userInfo.username.length > 5) {
       setType('닉네임');
-      setError('닉네임이 너무 깁니다.');
+      setError('5글자 이내로 작성하세요');
     } else setVisible(!visible);
     setTimeout(function () {
       setError(null);
