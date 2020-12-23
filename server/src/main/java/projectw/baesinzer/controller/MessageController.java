@@ -166,6 +166,9 @@ public class MessageController {
                 break;
             case EXIT:
                 UserInfo _userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
+                for (Location location : room.getLocationList()) {
+                    location.getUserList().removeIf(exitUser -> _userInfo.getUserNo() == exitUser.getUserNo());
+                }
                 room.getUsers().remove(_userInfo.getUserNo());
                 room.setCount(room.getUsers().size());
 
@@ -186,9 +189,8 @@ public class MessageController {
 
         operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
 
-        System.out.println("메시지 보내고 나서");
+        // 메시지 보내고 난 후 처리
         message.setUserInfo(system);
-
         if (room.isStart()) {
             int missions = (room.getCount() - 1) * 3; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
@@ -447,6 +449,11 @@ public class MessageController {
         message.setType(Message.MessageType.EXIT);
         message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
         message.setRoom(room);
+
+        for (Location location : room.getLocationList()) {
+            location.getUserList().removeIf(exitUser -> userInfo.getUserNo() == exitUser.getUserNo());
+        }
+
         headerAccessor.getSessionAttributes().remove("user");
         headerAccessor.getSessionAttributes().remove("room");
         operations.convertAndSend("/sub/socket/room/" + roomCode, message);
