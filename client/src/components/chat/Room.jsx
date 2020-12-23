@@ -481,17 +481,14 @@ const Room = ({
         )}
         <AllUsersBox>
           {usersArray &&
-            usersArray.map(
-              (user, index) =>
-                user.locationId === userInfo.locationId && (
-                  <Username
-                    key={index}
-                    username={user.username}
-                    userNo={user.userNo}
-                    dead={user.dead}
-                  />
-                )
-            )}
+            usersArray.map((user, index) => (
+              <Username
+                key={index}
+                username={user.username}
+                userNo={user.userNo}
+                dead={user.dead}
+              />
+            ))}
           {deadList &&
             deadList.map(
               (deadUser, index) =>

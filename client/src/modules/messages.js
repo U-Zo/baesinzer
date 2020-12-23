@@ -42,6 +42,12 @@ const messages = (state = initialState, action) => {
         message: action.payload.message,
       };
     case LOG_MESSAGE:
+      if (!action.payload.message) {
+        return {
+          ...state,
+        };
+      }
+
       return {
         ...state,
         messageLog: state.messageLog.concat({

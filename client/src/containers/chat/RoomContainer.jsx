@@ -74,6 +74,11 @@ const RoomContainer = ({ match, history }) => {
   const [movePossible, setMovePossible] = useState(true);
   // 이동 명령 토글
   const [mapInfo, setMapInfo] = useState(false);
+  // 상대방 이동 정보
+  const [moveLocationInfo, setMoveLocationInfo] = useState({
+    locationId: 0,
+    message: '',
+  });
 
   // 살해
   const [killPossible, setKillPossible] = useState(true);
@@ -358,6 +363,11 @@ const RoomContainer = ({ match, history }) => {
         if (!start) {
           setStart(true);
         }
+      } else if (serverMesg.type === 'MOVE') {
+        setMoveLocationInfo({
+          locationId: userInfoServer.locationId,
+          message: serverMesg.message,
+        });
       } else if (serverMesg.type === 'KILL') {
         // 살해 발생된 지역 설정
         setKillLoc(userInfoServer.locationId);
@@ -480,7 +490,7 @@ const RoomContainer = ({ match, history }) => {
 
   useEffect(() => {
     if (room && room.start) {
-      stompSend('PLAY');
+      stompSend('MOVE');
       if (findDead) {
         setFindDead(false);
       }
@@ -489,8 +499,12 @@ const RoomContainer = ({ match, history }) => {
         return;
       }
 
-      for (const userOnMap of room.deadList) {
-        if (!userInfo.dead && userInfo.locationId === userOnMap.locationId) {
+      const deadList = room.locationList.find(
+        (location) => userInfo.locationId === location.locationId
+      ).deadList;
+
+      if (deadList.length) {
+        for (const userOnMap of deadList) {
           setFindDead(true);
           dispatch(
             logMessage(
@@ -498,12 +512,20 @@ const RoomContainer = ({ match, history }) => {
               `${userOnMap.username}이(가) 산송장이 되어있다. 신고할까? (명령어: /신고)`
             )
           );
-
-          break;
         }
       }
     }
   }, [userInfo && userInfo.locationId]);
+
+  useEffect(() => {
+    if ((room && !room.start) || meeting) {
+      return;
+    }
+
+    if (userInfo.locationId === moveLocationInfo.locationId) {
+      dispatch(logMessage(userInfo, moveLocationInfo.message));
+    }
+  }, [moveLocationInfo, room && room.start]);
 
   // scroll
   useEffect(() => {
@@ -620,8 +642,18 @@ const RoomContainer = ({ match, history }) => {
         userInfo={userInfo}
         message={message}
         messageLog={messageLog}
-        usersArray={room && Object.values(room.users)}
-        deadList={room && room.deadList}
+        usersArray={
+          room &&
+          room.locationList.find(
+            (location) => userInfo.locationId === location.locationId
+          ).userList
+        }
+        deadList={
+          room &&
+          room.locationList.find(
+            (location) => userInfo.locationId === location.locationId
+          ).deadList
+        }
         exit={exit}
         visible={visible}
         closeModal={closeModal}
