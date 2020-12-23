@@ -37,7 +37,7 @@ const system = {
 const complexMissionIds = [10, 20];
 
 const RoomContainer = ({ match, history }) => {
-  const { roomId } = match.params;
+  const { roomCode } = match.params;
 
   const dispatch = useDispatch();
 
@@ -339,7 +339,7 @@ const RoomContainer = ({ match, history }) => {
   // 접속했을 때 구독
   const stompSubscribe = () =>
     stompClient.connected &&
-    stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
+    stompClient.subscribe(`/sub/socket/room/${roomCode}`, (data) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       const userInfoServer = serverMesg.userInfo;
@@ -421,7 +421,7 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeMessageLog());
       dispatch(initializeUser());
     };
-  }, [roomId]); // roomId가 바뀌면 새로운 접속
+  }, [roomCode]); // roomCode가 바뀌면 새로운 접속
 
   // ref 타이머 초기화
   const clear = (id) => {
@@ -489,6 +489,10 @@ const RoomContainer = ({ match, history }) => {
   }, [missions, missionDone]);
 
   useEffect(() => {
+    if (userInfo.locationId === undefined) {
+      return;
+    }
+
     if (room && room.start) {
       stompSend('MOVE');
       if (findDead) {
@@ -501,9 +505,9 @@ const RoomContainer = ({ match, history }) => {
 
       const deadList = room.locationList.find(
         (location) => userInfo.locationId === location.locationId
-      ).deadList;
+      )?.deadList;
 
-      if (deadList.length) {
+      if (deadList && deadList.length) {
         for (const userOnMap of deadList) {
           setFindDead(true);
           dispatch(
@@ -646,13 +650,13 @@ const RoomContainer = ({ match, history }) => {
           room &&
           room.locationList.find(
             (location) => userInfo.locationId === location.locationId
-          ).userList
+          )?.userList
         }
         deadList={
           room &&
           room.locationList.find(
             (location) => userInfo.locationId === location.locationId
-          ).deadList
+          )?.deadList
         }
         exit={exit}
         visible={visible}

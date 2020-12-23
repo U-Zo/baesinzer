@@ -25,13 +25,9 @@ const [
 
 const LOAD_ROOM_ON_MESSAGE = 'room/LOAD_ROOM_ON_MESSAGE';
 
-export const createRoom = createAction(CREATE_ROOM, (roomName) => ({
-  roomName,
-}));
+export const createRoom = createAction(CREATE_ROOM, (roomName) => roomName);
 
-export const loadRoom = createAction(LOAD_ROOM, ({ roomId }) => ({
-  roomId,
-}));
+export const loadRoom = createAction(LOAD_ROOM, (roomCode) => roomCode);
 
 export const loadRoomOnMessage = createAction(
   LOAD_ROOM_ON_MESSAGE,
@@ -72,7 +68,7 @@ const room = handleActions(
       room,
       error: null,
     }),
-    [LOAD_ROOM_FAILURE]: (state, { payload: { error } }) => ({
+    [LOAD_ROOM_FAILURE]: (state, { payload: error }) => ({
       ...state,
       room: null,
       error,
@@ -85,7 +81,7 @@ const room = handleActions(
       ...state,
       room: null,
     }),
-    [EXIT_ROOM_FAILURE]: (state, { payload: { error } }) => ({
+    [EXIT_ROOM_FAILURE]: (state, { payload: error }) => ({
       ...state,
       error,
     }),
