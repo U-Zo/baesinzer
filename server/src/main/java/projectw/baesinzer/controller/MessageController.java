@@ -127,7 +127,7 @@ public class MessageController {
                 for (Location location : locationList) {
                     if (location.getLocationId() == closeLocationId) {
                         location.setClose(true);
-                        closeTimer(location, 10);
+                        closeTimer(message, room, location, 10);
                         break;
                     }
                 }
@@ -368,12 +368,14 @@ public class MessageController {
     }
 
     /**
-     * 방 문 close 타이머
+     * 방 폐쇠 타이머
      *
+     * @param message  클라이언트로 보낼 메시지
+     * @param room     해당 게임 방
      * @param location 닫을 장소
      * @param time     접근할 수 없는 시간
      */
-    private void closeTimer(Location location, int time) {
+    private void closeTimer(Message message, Room room, Location location, int time) {
         Timer closeTimer = new Timer();
         TimerTask closeTimerTask = new TimerTask() {
             int count = time;
@@ -384,6 +386,7 @@ public class MessageController {
                     count--;
                 } else {
                     location.setClose(false);
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                     closeTimer.cancel();
                 }
             }
