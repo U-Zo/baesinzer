@@ -97,6 +97,7 @@ const RoomContainer = ({ match, history }) => {
   const [disturbancePossible, setDisturbancePossible] = useState(true);
   const [disturbanceInfo, setDisturbanceInfo] = useState(false);
   const [turnOff, setTurnOff] = useState(false);
+  const [closePossible, setClosePossible] = useState(false);
 
   // 각종 시간
   const moveRef = useRef(null);
@@ -238,6 +239,17 @@ const RoomContainer = ({ match, history }) => {
         }
       }
 
+      if (closePossible && userInfo.baesinzer) {
+        const closeRoom = parseInt(message.replace(/[^0-9]/g, ''));
+        if (closeRoom > 0 && closeRoom <= 5) {
+          dispatch(closeLocation(closeRoom));
+          setClosePossible(false);
+          dispatch(logMessage(userInfo, `${map[closeRoom - 1]}을(를) 잠갔다.`));
+        } else {
+          dispatch(logMessage(userInfo, `잠글수 없는 곳이다.`));
+        }
+      }
+
       // 방해 명령 토글 활성화 시
       if (disturbanceInfo && userInfo.baesinzer) {
         setDisturbanceInfo(false);
@@ -247,10 +259,16 @@ const RoomContainer = ({ match, history }) => {
           stompSend('TURN_OFF');
         }
         if (disturbance === 2) {
-          dispatch(closeLocation(userInfo.locationId));
+          dispatch(logMessage(userInfo, `어디를 잠글까?`));
+          dispatch(
+            logMessage(
+              userInfo,
+              `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]}`
+            )
+          );
+          setClosePossible(true);
         }
       }
-
       if (meeting) {
         // 회의 진행 중 투표 명령
         // 죽은 상태면 투표 및 채팅 불가
@@ -367,7 +385,13 @@ const RoomContainer = ({ match, history }) => {
         if (!userInfo.dead) {
           stompSend('VOTE_START');
         }
-      } else if (!mapInfo && !killInfo && !missionInfo) {
+      } else if (
+        !mapInfo &&
+        !killInfo &&
+        !missionInfo &&
+        !disturbanceInfo &&
+        !closePossible
+      ) {
         dispatch(logMessage(userInfo, message));
       }
       dispatch(initialField());
