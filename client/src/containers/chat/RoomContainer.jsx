@@ -13,6 +13,7 @@ import {
 } from '../../modules/messages';
 import { exitRoom, loadRoomOnMessage } from '../../modules/room';
 import {
+  closeLocation,
   initializeUser,
   kill,
   loadMissions,
@@ -74,6 +75,11 @@ const RoomContainer = ({ match, history }) => {
   const [movePossible, setMovePossible] = useState(true);
   // 이동 명령 토글
   const [mapInfo, setMapInfo] = useState(false);
+  // 상대방 이동 정보
+  const [moveLocationInfo, setMoveLocationInfo] = useState({
+    locationId: 0,
+    message: '',
+  });
 
   // 살해
   const [killPossible, setKillPossible] = useState(true);
@@ -87,6 +93,11 @@ const RoomContainer = ({ match, history }) => {
   // 투표
   const [votePossible, setVotePossible] = useState(true);
 
+  // 방해
+  const [disturbancePossible, setDisturbancePossible] = useState(true);
+  const [disturbanceInfo, setDisturbanceInfo] = useState(false);
+  const [turnOff, setTurnOff] = useState(false);
+
   // 각종 시간
   const moveRef = useRef(null);
   const [moveTime, setMoveTime] = useState(5);
@@ -94,6 +105,9 @@ const RoomContainer = ({ match, history }) => {
   const [killTime, setKillTime] = useState(15);
   const voteRef = useRef(null);
   const [voteTime, setVoteTime] = useState(100);
+  const disturbanceRef = useRef(null);
+  const [disturbanceTime, setDisturbanceTime] = useState(60);
+  const [turnOffTime, setTurnOffTime] = useState(20);
 
   // input ref
   const inputRef = useRef(null);
@@ -166,11 +180,15 @@ const RoomContainer = ({ match, history }) => {
         setMapInfo(false);
         const mapLocation = parseInt(message.replace(/[^0-9]/g, ''));
         if (mapLocation > 0 && mapLocation <= 5) {
-          dispatch(moveLocation(mapLocation));
-          dispatch(
-            logMessage(userInfo, `${map[mapLocation - 1]}(으)로 이동했다.`)
-          );
-          setMovePossible(false);
+          if (!room.locationList[mapLocation].close) {
+            dispatch(moveLocation(mapLocation));
+            dispatch(
+              logMessage(userInfo, `${map[mapLocation - 1]}(으)로 이동했다.`)
+            );
+            setMovePossible(false);
+          } else {
+            dispatch(logMessage(userInfo, '방이 잠겼다..'));
+          }
         } else if (
           (userInfo.baesinzer && message.includes('살해')) ||
           (userInfo.baesinzer && message.includes('kill')) ||
@@ -220,6 +238,19 @@ const RoomContainer = ({ match, history }) => {
         }
       }
 
+      // 방해 명령 토글 활성화 시
+      if (disturbanceInfo && userInfo.baesinzer) {
+        setDisturbanceInfo(false);
+        const disturbance = parseInt(message.replace(/[^0-9]/g, ''));
+        // 전력 공급 중단
+        if (disturbance === 1) {
+          stompSend('TURN_OFF');
+        }
+        if (disturbance === 2) {
+          dispatch(closeLocation(userInfo.locationId));
+        }
+      }
+
       if (meeting) {
         // 회의 진행 중 투표 명령
         // 죽은 상태면 투표 및 채팅 불가
@@ -239,17 +270,21 @@ const RoomContainer = ({ match, history }) => {
         }
       } else if (message === '/이동' || message === '/move') {
         // 맵 이동 명령
-        if (movePossible) {
-          dispatch(
-            logMessage(
-              userInfo,
-              `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]}`
-            )
-          );
-          setMapInfo(true);
-          console.log(mapInfo);
+        if (!room.locationList[userInfo.locationId].close) {
+          if (movePossible) {
+            dispatch(
+              logMessage(
+                userInfo,
+                `1.${map[0]} 2.${map[1]} 3.${map[2]} 4.${map[3]} 5.${map[4]}`
+              )
+            );
+            setMapInfo(true);
+            console.log(mapInfo);
+          } else {
+            dispatch(logMessage(userInfo, '아직 움직일 수 없어..'));
+          }
         } else {
-          dispatch(logMessage(userInfo, '아직 움직일 수 없어..'));
+          dispatch(logMessage(userInfo, '방이 잠겼다..!'));
         }
       } else if (
         message.includes('/살해') ||
@@ -285,7 +320,24 @@ const RoomContainer = ({ match, history }) => {
         } else {
           dispatch(logMessage(userInfo, message));
         }
-      } else if (message.includes('/일과')) {
+      }
+      // 방해 공작
+      else if (message.includes('/방해') || message.includes('/disturbance')) {
+        if (userInfo && userInfo.baesinzer) {
+          if (disturbancePossible) {
+            dispatch(logMessage(userInfo, `1.전력 공급 중단 2.방 문 닫기`));
+            setDisturbanceInfo(true);
+          } else {
+            dispatch(
+              logMessage(userInfo, `지금은 방해할 수 없어. 조금만 기다리자..`)
+            );
+          }
+        } else {
+          dispatch(logMessage(userInfo, message));
+        }
+      }
+      /////////////////
+      else if (message.includes('/일과')) {
         // 해당 위치의 미션 목록 출력
         if (!missionInfo && !userInfo.baesinzer && userInfo.missionList) {
           const missionOnHere = userInfo.missionList
@@ -358,6 +410,11 @@ const RoomContainer = ({ match, history }) => {
         if (!start) {
           setStart(true);
         }
+      } else if (serverMesg.type === 'MOVE') {
+        setMoveLocationInfo({
+          locationId: userInfoServer.locationId,
+          message: serverMesg.message,
+        });
       } else if (serverMesg.type === 'KILL') {
         // 살해 발생된 지역 설정
         setKillLoc(userInfoServer.locationId);
@@ -386,6 +443,13 @@ const RoomContainer = ({ match, history }) => {
         setFlag(false);
         setMissions(false);
         setVotePossible(true);
+        setTurnOff(false);
+      }
+      // 방해
+      else if (serverMesg.type === 'TURN_OFF') {
+        setTurnOff(true);
+        setDisturbancePossible(false);
+      } else if (serverMesg.type === 'CLOSE_LOCTION') {
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -480,7 +544,7 @@ const RoomContainer = ({ match, history }) => {
 
   useEffect(() => {
     if (room && room.start) {
-      stompSend('PLAY');
+      stompSend('MOVE');
       if (findDead) {
         setFindDead(false);
       }
@@ -489,8 +553,12 @@ const RoomContainer = ({ match, history }) => {
         return;
       }
 
-      for (const userOnMap of room.deadList) {
-        if (!userInfo.dead && userInfo.locationId === userOnMap.locationId) {
+      const deadList = room.locationList.find(
+        (location) => userInfo.locationId === location.locationId
+      ).deadList;
+
+      if (deadList.length) {
+        for (const userOnMap of deadList) {
           setFindDead(true);
           dispatch(
             logMessage(
@@ -498,12 +566,22 @@ const RoomContainer = ({ match, history }) => {
               `${userOnMap.username}이(가) 산송장이 되어있다. 신고할까? (명령어: /신고)`
             )
           );
-
-          break;
         }
       }
     }
   }, [userInfo && userInfo.locationId]);
+
+  // 이동 정보 출력
+  useEffect(() => {
+    if ((room && !room.start) || meeting) {
+      return;
+    }
+
+    // 암전 시 이동 정보 출력 x
+    if (userInfo.locationId === moveLocationInfo.locationId && !turnOff) {
+      dispatch(logMessage(userInfo, moveLocationInfo.message));
+    }
+  }, [moveLocationInfo, room && room.start, turnOff]);
 
   // scroll
   useEffect(() => {
@@ -611,6 +689,68 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [meeting]);
 
+  // 방해 공작 및 암전 쿨 타이머
+  useEffect(() => {
+    if (room && room.start) {
+      if (!disturbancePossible && disturbanceTime > 59 && turnOffTime > 19) {
+        let t = 60; // 방해 쿨 타임 60초
+        let _t_off = 20; // 암전 시간 20초
+
+        disturbanceRef.current = setInterval(() => {
+          if (t > 1 && room && room.start) {
+            t--;
+            setDisturbanceTime(t);
+            console.log('방해 쿨 타임', t);
+          } else {
+            clear(disturbanceRef);
+            setDisturbancePossible(true);
+            setDisturbanceTime(60);
+          }
+          if (_t_off > 1 && room && room.start) {
+            _t_off--;
+            setTurnOffTime(_t_off);
+            console.log('userlist암전 ', _t_off, '초 후 암전 끝');
+          } else {
+            setTurnOff(false);
+            setTurnOffTime(20);
+          }
+        }, 1000);
+      }
+    } else {
+      clear(disturbanceRef);
+    }
+  }, [disturbancePossible, turnOff]);
+
+  // 방해 - 암전관련 메세지
+  useEffect(() => {
+    if (room && room.start && turnOff) {
+      if (!userInfo.baesinzer) {
+        dispatch(
+          logMessage(
+            system,
+            '전등 시스템에 오류가 발생했습니다. 20초 후에 고쳐집니다.'
+          )
+        );
+      } else {
+        dispatch(
+          logMessage(
+            userInfo,
+            '시민들의 전력 시스템을 다운시켰어. 복구되기 전에 조용히 시민을 처리하자.'
+          )
+        );
+      }
+    } else if (room && room.start && !turnOff) {
+      dispatch(logMessage(system, '전력 시스템이 복구되었습니다.'));
+    }
+  }, [turnOff]);
+
+  useEffect(() => {
+    if (room && room.start) {
+      if (userInfo.closeLocationId !== 0) {
+        stompSend('CLOSE_LOCATION');
+      }
+    }
+  }, [userInfo.closeLocationId]);
   return (
     <>
       <Room
@@ -620,8 +760,18 @@ const RoomContainer = ({ match, history }) => {
         userInfo={userInfo}
         message={message}
         messageLog={messageLog}
-        usersArray={room && Object.values(room.users)}
-        deadList={room && room.deadList}
+        usersArray={
+          room &&
+          room.locationList.find(
+            (location) => userInfo.locationId === location.locationId
+          ).userList
+        }
+        deadList={
+          room &&
+          room.locationList.find(
+            (location) => userInfo.locationId === location.locationId
+          ).deadList
+        }
         exit={exit}
         visible={visible}
         closeModal={closeModal}
@@ -636,6 +786,9 @@ const RoomContainer = ({ match, history }) => {
         killTime={killTime}
         missionList={userInfo && userInfo.missionList}
         inputRef={inputRef}
+        turnOff={turnOff}
+        disturbancePossible={disturbancePossible}
+        disturbanceTime={disturbanceTime}
       />
       <MissionModal
         missionVisible={missionVisible}
