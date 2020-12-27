@@ -422,6 +422,10 @@ const RoomContainer = ({ match, history }) => {
         // 회의 종료
         setMeeting(false);
         setVotePossible(true);
+      } else if (serverMesg.type === 'TURN_OFF') {
+        // 방해
+        setTurnOff(true);
+        setDisturbancePossible(false);
       } else if (serverMesg.type === 'END') {
         // 게임 종료
         dispatch(initializeMessageLog());
@@ -431,11 +435,7 @@ const RoomContainer = ({ match, history }) => {
         setFlag(false);
         setMissions(false);
         setVotePossible(true);
-      }
-      // 방해
-      else if (serverMesg.type === 'TURN_OFF') {
-        setTurnOff(true);
-        setDisturbancePossible(false);
+        setTurnOff(false);
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -518,6 +518,8 @@ const RoomContainer = ({ match, history }) => {
       const complexMissionId = complexMissionIds[Math.floor(Math.random() * 2)];
       dispatch(loadMissions({ simpleMissionIds, complexMissionId }));
       setMissions(true);
+    } else {
+      clear(disturbanceRef);
     }
   }, [room && room.start]);
 
@@ -675,13 +677,14 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [meeting]);
 
-  // 방해 공작 쿨 타이머
+  // 방해 공작 및 암전 쿨 타이머
   useEffect(() => {
     if (!disturbancePossible && disturbanceTime > 59 && turnOffTime > 19) {
       let t = 60; // 방해 쿨 타임 60초
       let _t_off = 20; // 암전 시간 20초
 
       disturbanceRef.current = setInterval(() => {
+        // 방해 쿨타임
         if (t > 1) {
           t--;
           setDisturbanceTime(t);
@@ -691,6 +694,8 @@ const RoomContainer = ({ match, history }) => {
           setDisturbancePossible(true);
           setDisturbanceTime(60);
         }
+
+        // 암전 시간
         if (_t_off > 1) {
           _t_off--;
           setTurnOffTime(_t_off);
@@ -698,7 +703,6 @@ const RoomContainer = ({ match, history }) => {
         } else {
           setTurnOff(false);
           setTurnOffTime(20);
-          // dispatch(logMessage(system, '전력 수리가 완료되었습니다. '));
         }
       }, 1000);
     }

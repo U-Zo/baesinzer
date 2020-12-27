@@ -335,6 +335,12 @@ const ModalButton = styled.button`
   }
 `;
 
+const TurnOffMessage = styled.div`
+  color: var(--color-red);
+  margin: 1.5rem;
+  text-align: center;
+`;
+
 const Message = React.memo(({ userInfo, message }) => {
   return (
     <UserMessage userNo={userInfo.userNo}>
@@ -492,6 +498,12 @@ const Room = ({
           <BaesinzerText>Baesinzer</BaesinzerText>
         )}
         <AllUsersBox>
+          {turnOff && !userInfo.baesinzer && (
+            <div>
+              <TurnOffMessage> 암전 발생 !</TurnOffMessage>
+              <TurnOffMessage> 시스템 수리중...</TurnOffMessage>
+            </div>
+          )}
           {userInfo && userInfo.baesinzer ? (
             <div>
               {usersArray &&
