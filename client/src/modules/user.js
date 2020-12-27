@@ -20,6 +20,7 @@ const VOTE = 'user/VOTE'; // 투표 액션 타입
 const KILL = 'uaer/KILL';
 const UPDATE = 'user/UPDATE';
 const INITIALIZE_USER = 'user/INITIALIZE_USER';
+const CLOSE_LOCATION = 'user/CLOSE_LOCATION';
 
 export const tempUser = createAction(TEMP_USER, (userInfo) => userInfo);
 export const check = createAction(CHECK);
@@ -54,6 +55,10 @@ export const vote = createAction(VOTE, (userNo) => userNo);
 export const kill = createAction(KILL, (userNo) => userNo);
 export const update = createAction(UPDATE, (userInfo) => userInfo);
 export const initializeUser = createAction(INITIALIZE_USER);
+export const closeLocation = createAction(
+  CLOSE_LOCATION,
+  (locationId) => locationId
+);
 
 const checkSaga = createRequestSaga(CHECK, authAPI.check);
 export function* userSaga() {
@@ -154,6 +159,13 @@ const user = handleActions(
       userInfo: {
         ...state.userInfo,
         kill: userNo,
+      },
+    }),
+    [CLOSE_LOCATION]: (state, { payload: closeLocationId }) => ({
+      ...state,
+      userInfo: {
+        ...state.userInfo,
+        closeLocationId: closeLocationId,
       },
     }),
   },
