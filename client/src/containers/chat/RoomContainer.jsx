@@ -38,7 +38,7 @@ const system = {
 const complexMissionIds = [10, 20];
 
 const RoomContainer = ({ match, history }) => {
-  const { roomId } = match.params;
+  const { roomCode } = match.params;
 
   const dispatch = useDispatch();
 
@@ -221,7 +221,7 @@ const RoomContainer = ({ match, history }) => {
           );
           setKillPossible(false);
         } else if (message.includes('이동') || message.includes('move')) {
-          dispatch(logMessage(userInfo, `일단 움직이자.`));
+          dispatch(logMessage(userInfo, '일단 움직이자.'));
         }
       }
 
@@ -239,17 +239,6 @@ const RoomContainer = ({ match, history }) => {
         }
       }
 
-      if (closePossible && userInfo.baesinzer) {
-        const closeRoom = parseInt(message.replace(/[^0-9]/g, ''));
-        if (closeRoom > 0 && closeRoom <= 5) {
-          dispatch(closeLocation(closeRoom));
-          setClosePossible(false);
-          dispatch(logMessage(userInfo, `${map[closeRoom - 1]}을(를) 잠갔다.`));
-        } else {
-          dispatch(logMessage(userInfo, `잠글수 없는 곳이다.`));
-        }
-      }
-
       // 방해 명령 토글 활성화 시
       if (disturbanceInfo && userInfo.baesinzer) {
         setDisturbanceInfo(false);
@@ -258,8 +247,9 @@ const RoomContainer = ({ match, history }) => {
         if (disturbance === 1) {
           stompSend('TURN_OFF');
         }
+
         if (disturbance === 2) {
-          dispatch(logMessage(userInfo, `어디를 잠글까?`));
+          dispatch(logMessage(userInfo, '어디를 잠글까?'));
           dispatch(
             logMessage(
               userInfo,
@@ -269,6 +259,19 @@ const RoomContainer = ({ match, history }) => {
           setClosePossible(true);
         }
       }
+      
+      // 잠금 명령 토글 활성화 시
+      if (closePossible && userInfo.baesinzer) {
+        setClosePossible(false);
+        const closeRoom = parseInt(message.replace(/[^0-9]/g, ''));
+        if (closeRoom > 0 && closeRoom <= 5) {
+          dispatch(closeLocation(closeRoom));
+          dispatch(logMessage(userInfo, `${map[closeRoom - 1]}을(를) 잠갔다.`));
+        } else {
+          dispatch(logMessage(userInfo, '잠글수 없는 곳이다.'));
+        }
+      }
+
       if (meeting) {
         // 회의 진행 중 투표 명령
         // 죽은 상태면 투표 및 채팅 불가
@@ -410,7 +413,7 @@ const RoomContainer = ({ match, history }) => {
   // 접속했을 때 구독
   const stompSubscribe = () =>
     stompClient.connected &&
-    stompClient.subscribe(`/sub/socket/room/${roomId}`, (data) => {
+    stompClient.subscribe(`/sub/socket/room/${roomCode}`, (data) => {
       // 서버로부터 데이터를 받음
       const serverMesg = JSON.parse(data.body); // 받아온 메세지를 json형태로 parsing
       const userInfoServer = serverMesg.userInfo;
@@ -458,6 +461,10 @@ const RoomContainer = ({ match, history }) => {
         // 회의 종료
         setMeeting(false);
         setVotePossible(true);
+      } else if (serverMesg.type === 'TURN_OFF') {
+        // 암전 방해
+        setTurnOff(true);
+        setDisturbancePossible(false);
       } else if (serverMesg.type === 'END') {
         // 게임 종료
         dispatch(initializeMessageLog());
@@ -468,12 +475,6 @@ const RoomContainer = ({ match, history }) => {
         setMissions(false);
         setVotePossible(true);
         setTurnOff(false);
-      }
-      // 방해
-      else if (serverMesg.type === 'TURN_OFF') {
-        setTurnOff(true);
-        setDisturbancePossible(false);
-      } else if (serverMesg.type === 'CLOSE_LOCTION') {
       }
       dispatch(loadRoomOnMessage(serverMesg.room));
     });
@@ -499,7 +500,7 @@ const RoomContainer = ({ match, history }) => {
       dispatch(initializeMessageLog());
       dispatch(initializeUser());
     };
-  }, [roomId]); // roomId가 바뀌면 새로운 접속
+  }, [roomCode]); // roomCode가 바뀌면 새로운 접속
 
   // ref 타이머 초기화
   const clear = (id) => {
@@ -556,6 +557,8 @@ const RoomContainer = ({ match, history }) => {
       const complexMissionId = complexMissionIds[Math.floor(Math.random() * 2)];
       dispatch(loadMissions({ simpleMissionIds, complexMissionId }));
       setMissions(true);
+    } else {
+      clear(disturbanceRef);
     }
   }, [room && room.start]);
 
@@ -567,6 +570,10 @@ const RoomContainer = ({ match, history }) => {
   }, [missions, missionDone]);
 
   useEffect(() => {
+    if (userInfo.locationId === undefined) {
+      return;
+    }
+
     if (room && room.start) {
       stompSend('MOVE');
       if (findDead) {
@@ -579,9 +586,9 @@ const RoomContainer = ({ match, history }) => {
 
       const deadList = room.locationList.find(
         (location) => userInfo.locationId === location.locationId
-      ).deadList;
+      )?.deadList;
 
-      if (deadList.length) {
+      if (deadList && deadList.length) {
         for (const userOnMap of deadList) {
           setFindDead(true);
           dispatch(
@@ -715,33 +722,32 @@ const RoomContainer = ({ match, history }) => {
 
   // 방해 공작 및 암전 쿨 타이머
   useEffect(() => {
-    if (room && room.start) {
-      if (!disturbancePossible && disturbanceTime > 59 && turnOffTime > 19) {
-        let t = 60; // 방해 쿨 타임 60초
-        let _t_off = 20; // 암전 시간 20초
+    if (!disturbancePossible && disturbanceTime > 59 && turnOffTime > 19) {
+      let t = 60; // 방해 쿨 타임 60초
+      let _t_off = 20; // 암전 시간 20초
 
-        disturbanceRef.current = setInterval(() => {
-          if (t > 1 && room && room.start) {
-            t--;
-            setDisturbanceTime(t);
-            console.log('방해 쿨 타임', t);
-          } else {
-            clear(disturbanceRef);
-            setDisturbancePossible(true);
-            setDisturbanceTime(60);
-          }
-          if (_t_off > 1 && room && room.start) {
-            _t_off--;
-            setTurnOffTime(_t_off);
-            console.log('userlist암전 ', _t_off, '초 후 암전 끝');
-          } else {
-            setTurnOff(false);
-            setTurnOffTime(20);
-          }
-        }, 1000);
-      }
-    } else {
-      clear(disturbanceRef);
+      disturbanceRef.current = setInterval(() => {
+        // 방해 쿨타임
+        if (t > 1) {
+          t--;
+          setDisturbanceTime(t);
+          console.log('방해 쿨 타임', t);
+        } else {
+          clear(disturbanceRef);
+          setDisturbancePossible(true);
+          setDisturbanceTime(60);
+        }
+
+        // 암전 시간
+        if (_t_off > 1) {
+          _t_off--;
+          setTurnOffTime(_t_off);
+          console.log('userlist암전 ', _t_off, '초 후 암전 끝');
+        } else {
+          setTurnOff(false);
+          setTurnOffTime(20);
+        }
+      }, 1000);
     }
   }, [disturbancePossible, turnOff]);
 
@@ -768,6 +774,7 @@ const RoomContainer = ({ match, history }) => {
     }
   }, [turnOff]);
 
+  // 방 문 닫기
   useEffect(() => {
     if (room && room.start) {
       if (userInfo.closeLocationId !== 0) {
@@ -775,6 +782,7 @@ const RoomContainer = ({ match, history }) => {
       }
     }
   }, [userInfo.closeLocationId]);
+
   return (
     <>
       <Room
@@ -788,13 +796,13 @@ const RoomContainer = ({ match, history }) => {
           room &&
           room.locationList.find(
             (location) => userInfo.locationId === location.locationId
-          ).userList
+          )?.userList
         }
         deadList={
           room &&
           room.locationList.find(
             (location) => userInfo.locationId === location.locationId
-          ).deadList
+          )?.deadList
         }
         exit={exit}
         visible={visible}

@@ -30,21 +30,20 @@ const RoomListContainer = ({ history }) => {
 
   // start modal option
   const onClick = () => {
-    //수정-----
-    if (userInfo.username === null || userInfo.username === '') {
+    if (userInfo.username === null || userInfo.username === ' ') {
       setVisible(false);
       setType('닉네임');
       setError('닉네임을 입력하세요.');
-    } else if (userInfo.username.length > 8) {
+    } else if (userInfo.username.length > 5) {
       setType('닉네임');
-      setError('닉네임이 너무 깁니다.');
+      setError('5글자 이내로 작성하세요');
     } else setVisible(!visible);
     setTimeout(function () {
       setError(null);
     }, 2000);
   };
 
-  const onJoin = (roomId) => {
+  const onJoin = (roomCode) => {
     if (!userInfo.username) {
       setType('닉네임');
       setError('닉네임을 입력하세요.');
@@ -52,7 +51,7 @@ const RoomListContainer = ({ history }) => {
         setError(null);
       }, 2000);
     } else {
-      dispatch(loadRoom({ roomId }));
+      dispatch(loadRoom(roomCode));
     }
   };
 
@@ -63,7 +62,7 @@ const RoomListContainer = ({ history }) => {
 
   const makeRoom = (e) => {
     e.preventDefault();
-    if (roomName == null) {
+    if (roomName === null) {
       setError('방 제목을 입력하세요.');
       setType('방제목');
       setTimeout(function () {
@@ -95,6 +94,9 @@ const RoomListContainer = ({ history }) => {
         setType('인원');
         setError('방이 가득 찼습니다.');
         setVisible(true);
+      } else if (room.start) {
+        setType('시작');
+        setError('이미 시작된 방입니다.');
       } else {
         history.push(`/room/${room.roomCode}`);
       }

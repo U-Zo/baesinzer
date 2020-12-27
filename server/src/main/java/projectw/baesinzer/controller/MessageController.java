@@ -93,9 +93,10 @@ public class MessageController {
                     headerAccessor.getSessionAttributes().put("user", userInfo);
                 }
 
-                if (toLocation != null) {
+                if (toLocation != null && !userInfo.isDead()) {
+                    message.setUserInfo(system);
                     message.setMessage(
-                            userInfo.getUsername() + "이(가) " + toLocation.getLocationName() + "(으)로 이동했습니다."
+                            userInfo.getUsername() + "이(가) " + toLocation.getLocationName() + "(으)로 이동했다."
                     );
                 } else {
                     return;
@@ -126,7 +127,7 @@ public class MessageController {
                 for (Location location : locationList) {
                     if (location.getLocationId() == closeLocationId) {
                         location.setClose(true);
-                        closeTimer(location, 10);
+                        closeTimer(message, room, location, 10);
                         break;
                     }
                 }
@@ -165,6 +166,9 @@ public class MessageController {
                 break;
             case EXIT:
                 UserInfo _userInfo = (UserInfo) headerAccessor.getSessionAttributes().get("user");
+                for (Location location : room.getLocationList()) {
+                    location.getUserList().removeIf(exitUser -> _userInfo.getUserNo() == exitUser.getUserNo());
+                }
                 room.getUsers().remove(_userInfo.getUserNo());
                 room.setCount(room.getUsers().size());
 
@@ -185,9 +189,8 @@ public class MessageController {
 
         operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
 
-        System.out.println("메시지 보내고 나서");
+        // 메시지 보내고 난 후 처리
         message.setUserInfo(system);
-
         if (room.isStart()) {
             int missions = (room.getCount() - 1) * 3; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
@@ -365,12 +368,14 @@ public class MessageController {
     }
 
     /**
-     * 방 문 close 타이머
+     * 방 폐쇠 타이머
      *
+     * @param message  클라이언트로 보낼 메시지
+     * @param room     해당 게임 방
      * @param location 닫을 장소
      * @param time     접근할 수 없는 시간
      */
-    private void closeTimer(Location location, int time) {
+    private void closeTimer(Message message, Room room, Location location, int time) {
         Timer closeTimer = new Timer();
         TimerTask closeTimerTask = new TimerTask() {
             int count = time;
@@ -381,6 +386,7 @@ public class MessageController {
                     count--;
                 } else {
                     location.setClose(false);
+                    operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                     closeTimer.cancel();
                 }
             }
@@ -446,6 +452,11 @@ public class MessageController {
         message.setType(Message.MessageType.EXIT);
         message.setMessage(userInfo.getUsername() + "님이 퇴장하셨습니다.");
         message.setRoom(room);
+
+        for (Location location : room.getLocationList()) {
+            location.getUserList().removeIf(exitUser -> userInfo.getUserNo() == exitUser.getUserNo());
+        }
+
         headerAccessor.getSessionAttributes().remove("user");
         headerAccessor.getSessionAttributes().remove("room");
         operations.convertAndSend("/sub/socket/room/" + roomCode, message);

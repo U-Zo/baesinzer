@@ -318,15 +318,18 @@ const RoomList = ({
           <RoomBox>
             {!loading &&
               roomList &&
-              roomList.map((room) => (
-                <RoomLink>
-                  <Room
-                    onClick={() => onJoin(room.roomCode)}
-                    name={room.roomName}
-                    count={room.count}
-                  />
-                </RoomLink>
-              ))}
+              roomList.map(
+                (room) =>
+                  !room.start && (
+                    <RoomLink>
+                      <Room
+                        onClick={() => onJoin(room.roomCode)}
+                        name={room.roomName}
+                        count={room.count}
+                      />
+                    </RoomLink>
+                  )
+              )}
           </RoomBox>
         </RoomListBox>
         {/* modal */}

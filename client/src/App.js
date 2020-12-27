@@ -11,7 +11,7 @@ const App = () => {
       <Route path="/" component={LoginPage} exact />
       <Route path="/register" component={RegisterPage} />
       <Route path="/lobby" component={RoomListPage} />
-      <Route path="/room/:roomId" component={RoomPage} />
+      <Route path="/room/:roomCode" component={RoomPage} />
     </>
   );
 };

@@ -335,6 +335,12 @@ const ModalButton = styled.button`
   }
 `;
 
+const TurnOffMessage = styled.div`
+  color: var(--color-red);
+  margin: 1.5rem;
+  text-align: center;
+`;
+
 const Message = React.memo(({ userInfo, message }) => {
   return (
     <UserMessage userNo={userInfo.userNo}>
@@ -407,6 +413,9 @@ const Room = ({
   killPossible,
   killTime,
   inputRef,
+  turnOff,
+  disturbancePossible,
+  disturbanceTime,
 }) => {
   return (
     <Block>
@@ -435,10 +444,19 @@ const Room = ({
                     </WorkBoardLeft>
                     <WorkBoardRight>
                       <div>쿨타임</div>
+                      <div></div>
                       <div>이동: {movePossible ? 'Ready' : `${moveTime}s`}</div>
                       {userInfo && userInfo.baesinzer && (
                         <div>
-                          살해: {killPossible ? 'Ready' : `${killTime}s`}
+                          <div>
+                            살해: {killPossible ? 'Ready' : `${killTime}s`}
+                          </div>
+                          <div>
+                            방해:{' '}
+                            {disturbancePossible
+                              ? 'Ready'
+                              : `${disturbanceTime}s`}
+                          </div>
                         </div>
                       )}
                     </WorkBoardRight>
@@ -480,25 +498,53 @@ const Room = ({
           <BaesinzerText>Baesinzer</BaesinzerText>
         )}
         <AllUsersBox>
-          {usersArray &&
-            usersArray.map(
-              (user, index) =>
-                user.locationId === userInfo.locationId && (
+          {turnOff && !userInfo.baesinzer && (
+            <div>
+              <TurnOffMessage> 암전 발생 !</TurnOffMessage>
+              <TurnOffMessage> 시스템 수리중...</TurnOffMessage>
+            </div>
+          )}
+          {userInfo && userInfo.baesinzer ? (
+            <div>
+              {usersArray &&
+                usersArray.map((user, index) => (
                   <Username
                     key={index}
                     username={user.username}
                     userNo={user.userNo}
                     dead={user.dead}
                   />
-                )
-            )}
-          {deadList &&
-            deadList.map(
-              (deadUser, index) =>
-                deadUser.locationId === userInfo.locationId && (
-                  <DeadUser key={index} username={deadUser.username} />
-                )
-            )}
+                ))}
+              {deadList &&
+                deadList.map(
+                  (deadUser, index) =>
+                    deadUser.locationId === userInfo.locationId && (
+                      <DeadUser key={index} username={deadUser.username} />
+                    )
+                )}
+            </div>
+          ) : (
+            <div>
+              {!turnOff &&
+                usersArray &&
+                usersArray.map((user, index) => (
+                  <Username
+                    key={index}
+                    username={user.username}
+                    userNo={user.userNo}
+                    dead={user.dead}
+                  />
+                ))}
+              {!turnOff &&
+                deadList &&
+                deadList.map(
+                  (deadUser, index) =>
+                    deadUser.locationId === userInfo.locationId && (
+                      <DeadUser key={index} username={deadUser.username} />
+                    )
+                )}
+            </div>
+          )}
           {userInfo && userInfo.host && (
             <Start onClick={startHandler}>START</Start>
           )}
