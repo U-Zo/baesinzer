@@ -259,7 +259,7 @@ const RoomContainer = ({ match, history }) => {
           setClosePossible(true);
         }
       }
-      
+
       // 잠금 명령 토글 활성화 시
       if (closePossible && userInfo.baesinzer) {
         setClosePossible(false);
@@ -700,6 +700,8 @@ const RoomContainer = ({ match, history }) => {
   // 투표 타임
   useEffect(() => {
     if (meeting) {
+      // 암전 해제
+      setTurnOff(false);
       let t = 100;
       voteRef.current = setInterval(() => {
         if (t > 0) {
