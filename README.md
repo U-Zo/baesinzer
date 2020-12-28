@@ -2,7 +2,7 @@
 
 React + Spring Boot 텍스트 기반 웹 게임
 
-![](https://github.com/U-Zo/project-w/blob/develop/_github_img/main.png)
+![](https://github.com/U-Zo/project-w/blob/master/_github_img/main.png)
 
 ## Skills
 
