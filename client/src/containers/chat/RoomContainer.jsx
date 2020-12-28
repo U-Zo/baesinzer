@@ -259,7 +259,7 @@ const RoomContainer = ({ match, history }) => {
           setClosePossible(true);
         }
       }
-      
+
       // 잠금 명령 토글 활성화 시
       if (closePossible && userInfo.baesinzer) {
         setClosePossible(false);
@@ -793,14 +793,12 @@ const RoomContainer = ({ match, history }) => {
         message={message}
         messageLog={messageLog}
         usersArray={
-          room &&
-          room.locationList.find(
+          room?.locationList.find(
             (location) => userInfo.locationId === location.locationId
           )?.userList
         }
         deadList={
-          room &&
-          room.locationList.find(
+          room?.locationList.find(
             (location) => userInfo.locationId === location.locationId
           )?.deadList
         }
