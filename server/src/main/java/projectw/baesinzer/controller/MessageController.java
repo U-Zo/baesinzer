@@ -113,6 +113,17 @@ public class MessageController {
                         .getDeadList()
                         .add(new DeadUser(deadUser.getUsername(), deadUser.getLocationId()));
 
+                // 살해된 유저 dead 상태 업데이트
+                List<UserInfo> killedUserList = room.getLocationList()
+                        .get(userInfo.getLocationId())
+                        .getUserList();
+                for (UserInfo killedUser : killedUserList) {
+                    if (killedUser.getUserNo() == killNo) {
+                        killedUser.setDead(true);
+                        break;
+                    }
+                }
+
                 if (room.getUsers().get(userInfo.getUserNo()) != null) {
                     room.getUsers().put(userInfo.getUserNo(), userInfo);
                     headerAccessor.getSessionAttributes().put("user", userInfo);
@@ -195,10 +206,16 @@ public class MessageController {
             int missions = (room.getCount() - 1) * 3; // 시민의 총 미션 수
             int alive = room.getCount() - 1;
 
+            boolean baesinzer = false;
+
             // 현재 수행된 미션 수 확인
             for (int i = 1; i <= 6; i++) {
                 UserInfo user = room.getUsers().get(i);
                 if (user != null) {
+                    if (user.isBaesinzer()) {
+                        baesinzer = true;
+                    }
+
                     List<Mission> missionList = user.getMissionList();
                     for (Mission mission : missionList) {
                         if (mission.isDone()) {
@@ -206,6 +223,13 @@ public class MessageController {
                         }
                     }
                 }
+            }
+
+            if (!baesinzer) {
+                gameEnd(message, room);
+                message.setMessage("실험 종료, BaesinZer가 탈출하였습니다.");
+                operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
+                return;
             }
 
             // 미션이 남지 않았다면 게임 종료
@@ -283,6 +307,14 @@ public class MessageController {
                         } else {
                             message.setMessage(maxVoted.getUsername() + "은(는) 선량한 시민입니다.");
                             maxVoted.setDead(true);
+
+                            // 처리된 유저 리스트 죽음 처리
+                            for (UserInfo findUser : room.getLocationList().get(0).getUserList()) {
+                                if (findUser.getUserNo() == maxVoted.getUserNo()) {
+                                    findUser.setDead(true);
+                                    break;
+                                }
+                            }
                             operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
                         }
                     }
@@ -303,7 +335,10 @@ public class MessageController {
                 message.setType(Message.MessageType.END);
                 message.setUserInfo(system);
                 room.setStart(false);
-                clearDeadList(room);
+
+                Location lobby = room.getLocationList().get(0);
+                List<UserInfo> lobbyUserList = lobby.getUserList();
+                clearUserList(room);
 
                 // 게임 종료 시 게임 내 정보 초기화
                 for (int i = 1; i <= 6; i++) {
@@ -320,9 +355,11 @@ public class MessageController {
                         user.setVotedNum(0);
                         user.setHasVoted(0);
                         user.setKill(0);
+                        lobbyUserList.add(user);
                     }
                 }
 
+                clearDeadList(room);
                 operations.convertAndSend("/sub/socket/room/" + room.getRoomCode(), message);
             }
         }
@@ -396,6 +433,17 @@ public class MessageController {
     }
 
     /**
+     * 방 객체의 모든 userList 초기화
+     *
+     * @param room 변경할 게임 방 객체
+     */
+    private void clearUserList(Room room) {
+        for (Location location : room.getLocationList()) {
+            location.getUserList().clear();
+        }
+    }
+
+    /**
      * 방 객체의 모든 deadList 초기화
      *
      * @param room 변경할 게임 방 객체
@@ -411,6 +459,10 @@ public class MessageController {
         room.setStart(false);
         clearDeadList(room);
 
+        Location lobby = room.getLocationList().get(0);
+        List<UserInfo> lobbyUserList = lobby.getUserList();
+        clearUserList(room);
+
         // 게임 종료 시 게임 내 정보 초기화
         for (int i = 1; i <= 6; i++) {
             UserInfo user = room.getUsers().get(i);
@@ -421,6 +473,7 @@ public class MessageController {
                 user.setVotedNum(0);
                 user.setHasVoted(0);
                 user.setKill(0);
+                lobbyUserList.add(user);
             }
         }
     }

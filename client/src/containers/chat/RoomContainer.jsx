@@ -795,14 +795,12 @@ const RoomContainer = ({ match, history }) => {
         message={message}
         messageLog={messageLog}
         usersArray={
-          room &&
-          room.locationList.find(
+          room?.locationList.find(
             (location) => userInfo.locationId === location.locationId
           )?.userList
         }
         deadList={
-          room &&
-          room.locationList.find(
+          room?.locationList.find(
             (location) => userInfo.locationId === location.locationId
           )?.deadList
         }
